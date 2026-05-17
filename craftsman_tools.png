@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - CommonCents</title>
+    <meta name="description" content="Get in touch with CommonCents for inquiries, feedback, or business partnerships.">
+    <meta property="og:title" content="Contact Us - CommonCents">
+    <meta property="og:description" content="Get in touch with CommonCents for inquiries, feedback, or business partnerships.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://commoncentsdeals.netlify.app/contact">
+    <meta property="og:site_name" content="CommonCents">
+    <link rel="canonical" href="https://commoncentsdeals.netlify.app/contact">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "CommonCents",
+        "alternateName": ["Common Cents", "CommonCents Deals"],
+        "url": "https://commoncentsdeals.netlify.app/"
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .page-content { max-width: 800px; margin: 3rem auto; padding: 0 20px; }
+        .page-content h1 { font-size: 2.5rem; margin-bottom: 2rem; color: var(--highlight); }
+        .page-content h2 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem; color: var(--text-primary); }
+        .page-content p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 1rem; }
+        .page-content a { color: var(--highlight); }
+        .page-content a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-content">
+            <a href="/" class="logo">Common<span class="highlight"><span class="cent-sign">C</span>ents</span></a>
+        </div>
+    </header>
+    <div class="page-content">
+        <h1>Contact Us</h1>
+        <p>We'd love to hear from you! Whether you have a question, feedback, or want to report an issue, feel free to reach out.</p>
+        
+        <h2>Get in Touch</h2>
+        <p>General Inquiries: <a href="mailto:hellocommoncents.com@gmail.com">hellocommoncents.com@gmail.com</a></p>
+        <p>Business & Partnerships: <a href="mailto:hellocommoncents.com@gmail.com">hellocommoncents.com@gmail.com</a></p>
+        
+        <h2>Frequently Asked Questions</h2>
+        <h3>How do I submit a deal?</h3>
+        <p>Click the "Submit a Deal" button on our homepage. We review all submissions and will feature the best deals on our site.</p>
+        
+        <h3>Why are some deals no longer available?</h3>
+        <p>Deals can expire quickly or sell out. We update our site regularly, but we recommend verifying availability directly with the retailer before making a purchase.</p>
+        
+        <h3>Do you price match?</h3>
+        <p>We're not a retailer – we simply share deals from other merchants. Please contact the merchant directly for price matching inquiries.</p>
+        
+        <h2>Response Time</h2>
+        <p>We typically respond to emails within 24-48 hours during business days. Thank you for your patience!</p>
+    </div>
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div class="footer-disclosure">Affiliate Disclosure: CommonCents is a participant in the Amazon Services LLC Associates Program and other affiliate programs. As an Amazon Associate, we earn from qualifying purchases. We may receive a commission when you click our links and make purchases at no additional cost to you.</div>
+            <div class="footer-brand">Common<span class="highlight"><span class="cent-sign">C</span>ents</span></div>
+            <p class="footer-tagline">Making every cent count with the best deals online.</p>
+            <nav class="footer-nav">
+                <a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/cookies">Cookies</a>
+            </nav>
+            <p class="footer-copyright">&copy; 2025 CommonCents. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

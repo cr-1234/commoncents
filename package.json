@@ -1,0 +1,12 @@
+{
+  "name": "commoncents-auto",
+  "version": "1.0.0",
+  "description": "Automated deal fetcher for CommonCents",
+  "main": "fetch-deals.js",
+  "scripts": {
+    "update-deals": "node fetch-deals.js"
+  },
+  "dependencies": {
+    "amazon-paapi": "^1.0.6"
+  }
+}

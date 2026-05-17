@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CommonCents | Best Deals on Tech, Tools, Household & More</title>
+    <meta name="description" content="Save money with daily curated deals on tech, tools, household, and more. CommonCents curates the best online deals so every cent counts.">
+    <meta name="keywords" content="deals, coupons, discounts, tech deals, tool deals, household deals, credit card deals, savings">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="CommonCents | Best Deals on Tech, Tools, Household & More">
+    <meta property="og:description" content="Save money with daily curated deals on tech, tools, household, and more.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://commoncentsdeals.netlify.app/">
+    <meta property="og:site_name" content="CommonCents">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CommonCents | Best Deals on Tech, Tools, Household & More">
+    <meta name="twitter:description" content="Save money with daily curated deals on tech, tools, household, and more.">
+
+    <!-- JSON-LD Structured Data for Google Site Name -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "CommonCents",
+        "alternateName": ["Common Cents", "CommonCents Deals"],
+        "url": "https://commoncentsdeals.netlify.app/"
+    }
+    </script>
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://commoncentsdeals.netlify.app/">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container header-content">
+            <a href="/" class="logo">Common<span class="highlight"><span class="cent-sign">C</span>ents</span></a>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search deals...">
+                <button id="searchBtn"><i data-lucide="search"></i></button>
+            </div>
+            <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">
+                <i data-lucide="sun" class="sun-icon"></i>
+                <i data-lucide="moon" class="moon-icon" style="display:none;"></i>
+            </button>
+            <nav class="main-nav">
+                <a href="#" class="nav-link active" data-category="all">All Deals</a>
+                <a href="#" class="nav-link" data-category="tech">Tech</a>
+                <a href="#" class="nav-link" data-category="tools">Tools</a>
+                <a href="#" class="nav-link" data-category="household">Household</a>
+                <a href="#" class="nav-link" data-category="credit-cards">Credit Cards</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-widget">
+                <h3>Categories</h3>
+                <ul class="category-list">
+                    <li><a href="#" data-category="all" class="active">All Deals</a></li>
+                    <li><a href="#" data-category="tech">Tech</a></li>
+                    <li><a href="#" data-category="tools">Tools</a></li>
+                    <li><a href="#" data-category="household">Household</a></li>
+                    <li><a href="#" data-category="credit-cards">Credit Cards</a></li>
+                </ul>
+            </div>
+
+        </aside>
+
+        <!-- Feed -->
+        <main class="feed-section">
+            <div class="feed-header">
+                <h1 style="font-size:1.5rem;">Today's Best Deals</h1>
+                <div class="sort-options">
+                    <select id="sortSelect">
+                        <option value="newest">Newest</option>
+                        <option value="popular">Most Popular</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="discount">Biggest Discount</option>
+                    </select>
+                </div>
+            </div>
+            <div class="deal-grid" id="dealGrid">
+                <!-- Deals rendered by JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Deal Modal -->
+    <div class="modal" id="dealModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modalBody">
+                <!-- Modal content rendered by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div class="footer-disclosure">
+                Affiliate Disclosure: CommonCents is a participant in the Amazon Services LLC Associates Program and other affiliate programs. As an Amazon Associate, we earn from qualifying purchases. We may receive a commission when you click our links and make purchases at no additional cost to you.
+            </div>
+            <div class="footer-brand">Common<span class="highlight"><span class="cent-sign">C</span>ents</span></div>
+            <p class="footer-tagline">Making every cent count with the best deals online.</p>
+            <nav class="footer-nav">
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/terms">Terms</a>
+                <a href="/cookies">Cookies</a>
+            </nav>
+            <p class="footer-copyright">&copy; 2025 CommonCents. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/data.js"></script>
+    <script src="/app.js"></script>
+</body>
+</html>
