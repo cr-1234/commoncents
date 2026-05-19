@@ -35,7 +35,7 @@ const closeModal    = document.querySelector('#dealModal .close-modal');
 function initApp() {
     lucide.createIcons();
     renderDeals();
-    setupEventListeners('click', handleSearch);
+    searchBtn.addEventListener('click', handleSearch);
     searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') handleSearch(); });
 
     [...navLinks, ...categoryLinks].forEach(link => {
