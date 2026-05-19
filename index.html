@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CommonCents | Best Deals on Tech, Tools, Household & More</title>
     <meta name="description" content="Save money with daily curated deals on tech, tools, household, and more. CommonCents curates the best online deals so every cent counts.">
-    <meta name="keywords" content="deals, coupons, discounts, tech deals, tool deals, household deals, credit card deals, savings">
+    <meta name="keywords" content="deals, coupons, discounts, tech deals, tool deals, household deals, grocery deals, savings, amazon giveaway">
 
     <!-- Open Graph -->
     <meta property="og:title" content="CommonCents | Best Deals on Tech, Tools, Household & More">
@@ -61,7 +61,8 @@
                 <a href="#" class="nav-link" data-category="tech">Tech</a>
                 <a href="#" class="nav-link" data-category="tools">Tools</a>
                 <a href="#" class="nav-link" data-category="household">Household</a>
-                <a href="#" class="nav-link" data-category="credit-cards">Credit Cards</a>
+                <a href="#" class="nav-link" data-category="groceries">Groceries</a>
+                <a href="#" class="nav-link giveaway-nav-link" id="openGiveaway">🎁 Giveaway</a>
             </nav>
         </div>
     </header>
@@ -77,8 +78,13 @@
                     <li><a href="#" data-category="tech">Tech</a></li>
                     <li><a href="#" data-category="tools">Tools</a></li>
                     <li><a href="#" data-category="household">Household</a></li>
-                    <li><a href="#" data-category="credit-cards">Credit Cards</a></li>
+                    <li><a href="#" data-category="groceries">Groceries</a></li>
                 </ul>
+            </div>
+            <div class="sidebar-widget">
+                <h3>🎁 Giveaway</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">Enter for a chance to win an Amazon Gift Card! Drawing held weekly or monthly based on entries.</p>
+                <button class="btn btn-primary full-width" id="openGiveawaySidebar">Enter Now</button>
             </div>
 
         </aside>
@@ -109,6 +115,29 @@
             <span class="close-modal">&times;</span>
             <div id="modalBody">
                 <!-- Modal content rendered by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Giveaway Modal -->
+    <div class="modal" id="giveawayModal">
+        <div class="modal-content" style="max-width:520px; text-align:center;">
+            <span class="close-modal" id="closeGiveaway">&times;</span>
+            <div style="padding: 1rem 0 2rem;">
+                <div style="font-size:4rem; margin-bottom:1rem;">🎁</div>
+                <h2 style="font-size:1.8rem; margin-bottom:0.5rem; color:var(--highlight);">Amazon Gift Card Giveaway!</h2>
+                <p style="color:var(--text-secondary); margin-bottom:0.5rem; font-size:0.95rem;">Enter your email for a chance to win! The more unique entries we get, the more frequent the giveaway — weekly or monthly.</p>
+                <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1.5rem;">🏆 <strong style="color:var(--text-primary);">Current entries: <span id="entryCount">0</span></strong></p>
+                <div id="giveawayForm">
+                    <input type="email" id="giveawayEmail" placeholder="Enter your email address" style="width:100%; padding:0.85rem 1rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); font-size:1rem; margin-bottom:0.75rem;">
+                    <button id="giveawaySubmitBtn" class="btn btn-primary full-width" style="font-size:1rem; padding:0.85rem;">🎉 Enter Giveaway</button>
+                </div>
+                <div id="giveawaySuccess" style="display:none;">
+                    <div style="font-size:3rem; margin-bottom:0.5rem;">🎉</div>
+                    <h3 style="color:var(--highlight); margin-bottom:0.5rem;">You're entered!</h3>
+                    <p style="color:var(--text-secondary); font-size:0.9rem;">Good luck! We'll contact you at your email if you win.</p>
+                </div>
+                <p style="margin-top:1.5rem; font-size:0.75rem; color:var(--text-secondary);">No purchase necessary. One entry per email address. By entering you agree to receive occasional deal emails from CommonCents.</p>
             </div>
         </div>
     </div>
