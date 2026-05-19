@@ -82,7 +82,7 @@ function initApp() {
         submitBtn.addEventListener('click', () => {
             const emailInput = document.getElementById('giveawayEmail');
             const email      = emailInput.value.trim().toLowerCase();
-            if (!/^[^s@]+@[^s@]+.[^s@]+$/.test(email)) {
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 emailInput.style.borderColor = '#ef4444';
                 emailInput.focus();
                 return;
@@ -333,7 +333,7 @@ function openModal(deal) {
     document.getElementById('postComment&submit').addEventListener('click', () => {
         const emailVal = document.getElementById('commentEmail').value.trim();
         const textVal  = document.getElementById('commentText').value.trim();
-        if (!emailVal || !textVal || !/^[^s@]+@[^s@]+.[^s@]+$/.test(emailVal)) { alert('Please enter a valid email and comment.'); return; }
+        if (!emailVal || !textVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) { alert('Please enter a valid email and comment.'); return; }
         deal.comments.unshift({ user: emailVal.split('@')[0], text: textVal, time: 'Just now' });
         openModal(deal);
     });
