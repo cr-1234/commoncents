@@ -47,6 +47,21 @@
     color: var(--text-primary);
 }
 
+.giveaway-nav-link {
+    background: linear-gradient(135deg, var(--highlight), #b8962e);
+    color: #000 !important;
+    padding: 0.35rem 0.85rem !important;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    animation: pulse-giveaway 2s ease-in-out infinite;
+}
+
+@keyframes pulse-giveaway {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(212, 175, 55, 0); }
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
