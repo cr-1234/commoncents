@@ -199,27 +199,27 @@ function createDealCard(deal) {
     const article = document.createElement('article');
     article.className = 'deal-card';
     article.innerHTML = `
-        <div class="card-image"><img src="\${encodeURI(deal.image)}" alt="\${deal.title}" loading="lazy"></div>
+        <div class="card-image"><img src="${encodeURI(deal.image)}" alt="${deal.title}" loading="lazy"></div>
         <div class="card-content">
             <div class="card-meta">
-                <span class="card-category">\${friendlyCategory(deal.category)}</span>
-                <span class="card-source">&#8226; \${getStoreName(deal.url)}</span>
+                <span class="card-category">${friendlyCategory(deal.category)}</span>
+                <span class="card-source">&#8226; ${getStoreName(deal.url)}</span>
             </div>
-            <h3 class="card-title">\${deal.title}</h3>
+            <h3 class="card-title">${deal.title}</h3>
             <div class="card-price">
-                $\${deal.price}
-                \${deal.originalPrice ? \`<span class="original-price">$\${deal.originalPrice}</span>\` : ''}
-                \${deal.discount ? \`<span class="discount-badge">\${deal.discount}</span>\` : ''}
+                $${deal.price}
+                ${deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
+                ${deal.discount ? `<span class="discount-badge">${deal.discount}</span>` : ''}
             </div>
-            <a href="\${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="view-deal-btn full-width" style="margin-bottom:0.85rem; display:block;">View Deal</a>
+            <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="view-deal-btn full-width" style="margin-bottom:0.85rem; display:block;">View Deal</a>
             <div class="vote-container">
-                <button class="vote-btn upvote-btn \${deal.votes.up > 0 ? 'active' : ''}" data-id="\${deal.id}">
+                <button class="vote-btn upvote-btn ${deal.votes.up > 0 ? 'active' : ''}" data-id="${deal.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                    <span>\${deal.votes.up}</span>
+                    <span>${deal.votes.up}</span>
                 </button>
-                <button class="vote-btn downvote-btn \${deal.votes.down > 0 ? 'active' : ''}" data-id="\${deal.id}">
+                <button class="vote-btn downvote-btn ${deal.votes.down > 0 ? 'active' : ''}" data-id="${deal.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-                    <span>\${deal.votes.down}</span>
+                    <span>${deal.votes.down}</span>
                 </button>
             </div>
         </div>`;
@@ -235,7 +235,7 @@ function handleVote(e, deal, type) {
     const btn       = e.currentTarget;
     const container = btn.closest('.vote-container');
     const otherType = type === 'up' ? 'down' : 'up';
-    const otherBtn  = container.querySelector(`.\${otherType}vote-btn`);
+    const otherBtn  = container.querySelector(`.${otherType}vote-btn`);
     const countSpan = btn.querySelector('span');
     const otherCount = otherBtn.querySelector('span');
     btn.classList.add('pop');
@@ -269,13 +269,13 @@ function createSparks(btn) {
         const spark = document.createElement('div');
         spark.className = 'spark';
         const angle = 220 + Math.random() * 100, dist = 40 + Math.random() * 60;
-        spark.style.setProperty('--tx', `\${Math.cos(angle * Math.PI / 180) * dist}px`);
-        spark.style.setProperty('--ty', `\${-1 * Math.sin(angle * Math.PI / 180) * dist}px`);
+        spark.style.setProperty('--tx', `${Math.cos(angle * Math.PI / 180) * dist}px`);
+        spark.style.setProperty('--ty', `${-1 * Math.sin(angle * Math.PI / 180) * dist}px`);
         const size = 3 + Math.random() * 4;
-        spark.style.width  = `\${size}px`;
-        spark.style.height = `\${size}px`;
-        spark.style.left   = `\${centerX + window.scrollX}px`;
-        spark.style.top    = `\${centerY + window.scrollY}px`;
+        spark.style.width  = `${size}px`;
+        spark.style.height = `${size}px`;
+        spark.style.left   = `${centerX + window.scrollX}px`;
+        spark.style.top    = `${centerY + window.scrollY}px`;
         document.body.appendChild(spark);
         setTimeout(() => spark.remove(), 800);
     }
@@ -283,39 +283,39 @@ function createSparks(btn) {
 
 function openModal(deal) {
     if (!deal.comments) deal.comments = [];
-    const commentsHTML = deal.comments.map(c => \`
+    const commentsHTML = deal.comments.map(c => `
         <div style="max-width:500px; margin:0 auto; padding-bottom:1rem; border-bottom:1px solid var(--border-color);">
             <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
-                <strong style="color:var(--text-primary);">\${c.user}</strong>
-                <span style="color:var(--text-secondary); font-size:0.85rem;">\${c.time}</span>
+                <strong style="color:var(--text-primary);">${c.user}</strong>
+                <span style="color:var(--text-secondary); font-size:0.85rem;">${c.time}</span>
             </div>
-            <p style="color:var(--text-secondary); font-size:0.95rem;">\${c.text}</p>
-        </div>\`).join('');
-    modalBody.innerHTML = \`
+            <p style="color:var(--text-secondary); font-size:0.95rem;">${c.text}</p>
+        </div>`).join('');
+    modalBody.innerHTML = `
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;" id="modalGrid">
-            <div><img src="\${encodeURI(deal.image)}" alt="\${deal.title}" style="width:100%; border-radius:8px;"></div>
+            <div><img src="${encodeURI(deal.image)}" alt="${deal.title}" style="width:100%; border-radius:8px;"></div>
             <div>
-                <div class="card-category" style="display:inline-block; margin-bottom:0.5rem;">\${friendlyCategory(deal.category)}</div>
-                <h2 style="margin-bottom:0.75rem; font-size:1.4rem;">\${deal.title}</h2>
-                <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7; font-size:0.93rem;">\${deal.description}</p>
+                <div class="card-category" style="display:inline-block; margin-bottom:0.5rem;">${friendlyCategory(deal.category)}</div>
+                <h2 style="margin-bottom:0.75rem; font-size:1.4rem;">${deal.title}</h2>
+                <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7; font-size:0.93rem;">${deal.description}</p>
                 <div class="card-price" style="font-size:1.8rem; margin-bottom:1.25rem;">
-                    $\${deal.price}
-                    \${deal.originalPrice ? \`<span class="original-price" style="font-size:1rem;">$\${deal.originalPrice}</span>\` : ''}
+                    $${deal.price}
+                    ${deal.originalPrice ? `<span class="original-price" style="font-size:1rem;">$${deal.originalPrice}</span>` : ''}
                 </div>
-                <a href="\${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="view-deal-btn full-width modal-deal-btn" style="margin-bottom:1.25rem; display:block;">Get This Deal</a>
+                <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="view-deal-btn full-width modal-deal-btn" style="margin-bottom:1.25rem; display:block;">Get This Deal</a>
                 <div class="vote-container" style="margin-bottom:1.25rem;">
-                    <button class="vote-btn upvote-btn \${deal.votes.up > 0 ? 'active' : ''}">
+                    <button class="vote-btn upvote-btn ${deal.votes.up > 0 ? 'active' : ''}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                        <span>\${deal.votes.up}</span>
+                        <span>${deal.votes.up}</span>
                     </button>
-                    <button class="vote-btn downvote-btn \${deal.votes.down > 0 ? 'active' : ''}">
+                    <button class="vote-btn downvote-btn ${deal.votes.down > 0 ? 'active' : ''}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-                        <span>\${deal.votes.down}</span>
+                        <span>${deal.votes.down}</span>
                     </button>
                 </div>
                 <div style="border-top:1px solid var(--border-color); padding-top:1rem;">
                     <h3 style="margin-bottom:0.75rem; font-size:1rem;">Comments</h3>
-                    <div id="commentsList" style="max-height:130px; overflow-y:auto; margin-bottom:0.75rem;">\${commentsHTML || '<p style="color:var(--text-secondary); font-size:0.85rem;">No comments yet.</p>'}</div>
+                    <div id="commentsList" style="max-height:130px; overflow-y:auto; margin-bottom:0.75rem;">${commentsHTML || '<p style="color:var(--text-secondary); font-size:0.85rem;">No comments yet.</p>'}</div>
                     <div style="background:var(--bg-body); padding:0.75rem; border-radius:8px;">
                         <input type="email" id="commentEmail" placeholder="Email (required)" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary);">
                         <textarea id="commentText" rows="2" placeholder="Comment text" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
@@ -323,7 +323,7 @@ function openModal(deal) {
                     </div>
                 </div>
             </div>
-        </div>\`;
+        </div>`;
     body = modalBody;
     body.querySelector('.modal-deal-btn').addEventListener('click', (e) => createConfetti(e.clientX, e.clientY));
     body.querySelector('.upvote-btn').addEventListener('click', (e) => handleVote(e, deal, 'up'));
@@ -347,9 +347,9 @@ function createConfetti(x, y) {
         c.style.left = x + 'px';
         c.style.top  = y + 'px';
         c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        c.style.setProperty('--tx', \`\${(Math.random() - 0.5) * 350}px\`);
-        c.style.setProperty('--ty', \`\${(Math.random() - 0.5) * 350}px\`);
-        c.style.setProperty('--rotation', \`\${Math.random() * 720}deg\`);
+        c.style.setProperty('--tx', `${(Math.random() - 0.5) * 350}px`);
+        c.style.setProperty('--ty', `${(Math.random() - 0.5) * 350}px`);
+        c.style.setProperty('--rotation', `${Math.random() * 720}deg`);
         document.body.appendChild(c);
         setTimeout(() => c.remove(), 1000);
     }
