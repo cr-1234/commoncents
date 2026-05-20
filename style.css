@@ -20,18 +20,21 @@
 
 /* -- Light Mode --------------------------------------------------- */
 .light-mode {
-    --bg-body:      #f0f2f7;
+    --bg-body:      #faf9f6;
     --bg-card:      #ffffff;
-    --bg-header:    rgba(240,242,247,0.75);
-    --text-primary: #0f172a;
-    --text-secondary:#64748b;
-    --silver:       #64748b;
-    --border-color: rgba(0,0,0,0.08);
-    --shadow-md:    0 8px 32px rgba(0,0,0,0.12);
-    --glass-bg:     rgba(255,255,255,0.55);
-    --glass-border: rgba(255,255,255,0.85);
-    --glass-shine:  rgba(255,255,255,0.95);
+    --bg-header:    rgba(250, 249, 246, 0.85);
+    --text-primary: #1a1a1a;
+    --text-secondary:#737373;
+    --highlight:    #b58f4a;
+    --highlight-hover:#9a7538;
+    --silver:       #737373;
+    --border-color: rgba(0,0,0,0.06);
+    --shadow-md:    0 8px 32px rgba(0,0,0,0.08);
+    --glass-bg:     rgba(255,255,255,0.7);
+    --glass-border: rgba(255,255,255,1);
+    --glass-shine:  rgba(255,255,255,1);
 }
+
 
 /* -- Theme Toggle Icons via CSS (no JS display juggling) ---------- */
 .theme-btn .sun-icon  { display: inline; }
