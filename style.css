@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
 /* ── CSS Variables ─────────────────────────────────────────── */
 :root {
     --bg-body:      #000000;
@@ -11,6 +13,7 @@
     --border-color: rgba(255,255,255,0.08);
     --shadow-md:    0 8px 32px rgba(0,0,0,0.5);
     --font-main:    'Inter', sans-serif;
+    --font-display: 'Poppins', sans-serif;
 
     /* Apple-Style Liquid Glass & Metallic Gold tokens */
     --glass-bg:     rgba(255,255,255,0.08);
@@ -19,26 +22,36 @@
     --glass-blur:   blur(40px) saturate(200%);
     --gold-gradient:linear-gradient(135deg, #d4af37 0%, #fef0a5 25%, #d4af37 50%, #997a15 75%, #fef0a5 100%);
     --glass-inner-border: inset 0 0 0 1px rgba(255,255,255,0.1);
+    
+    /* Logo Colors */
+    --silver-logo:  #ffffff;
+    --gold-logo:    #d4af37;
+    
     color-scheme: dark;
 }
 
-/* -- VIP Light Mode (Gold & Black) -------------------------------- */
+/* -- Silver & Gold Light Mode -------------------------------- */
 .light-mode {
-    --bg-body:      #D4AF37;
-    --bg-card:      #E5C370;
-    --bg-header:    rgba(212, 175, 55, 0.85);
-    --text-primary: #000000;
-    --text-secondary:#222222;
-    --highlight:    #000000;
-    --highlight-hover:#333333;
-    --silver:       #444444;
-    --border-color: rgba(0,0,0,0.15);
-    --shadow-md:    0 8px 32px rgba(0,0,0,0.15);
-    --glass-bg:     rgba(0,0,0,0.1);
-    --glass-border: rgba(0,0,0,0.0);
-    --glass-shine:  rgba(255,255,255,0.15);
-    --glass-inner-border: inset 0 0 0 1px rgba(0,0,0,0.1);
-    --gold-gradient:linear-gradient(135deg, #000000 0%, #444444 25%, #000000 50%, #222222 75%, #444444 100%);
+    --bg-body:      #e8ecf0;
+    --bg-card:      #ffffff;
+    --bg-header:    rgba(232, 236, 240, 0.85);
+    --text-primary: #0f172a;
+    --text-secondary:#475569;
+    --highlight:    #d4af37;
+    --highlight-hover:#b8860b;
+    --silver:       #94a3b8;
+    --border-color: rgba(15, 23, 42, 0.08);
+    --shadow-md:    0 8px 32px rgba(15, 23, 42, 0.08);
+    --glass-bg:     rgba(255, 255, 255, 0.4);
+    --glass-border: rgba(15, 23, 42, 0.05);
+    --glass-shine:  rgba(255, 255, 255, 0.6);
+    --glass-inner-border: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    --gold-gradient:linear-gradient(135deg, #d4af37 0%, #fef0a5 25%, #d4af37 50%, #997a15 75%, #fef0a5 100%);
+    
+    /* Logo Colors */
+    --silver-logo:  #475569;
+    --gold-logo:    #d4af37;
+    
     color-scheme: light;
 }
 
@@ -53,6 +66,7 @@
 /* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body      { font-family: var(--font-main); background-color: var(--bg-body); color: var(--text-primary); line-height: 1.6; transition: background-color 0.3s, color 0.3s; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-display, var(--font-main)); }
 a         { text-decoration: none; color: inherit; transition: color 0.2s; }
 ul        { list-style: none; }
 .container{ max-width: 1200px; margin: 0 auto; padding: 0 20px; }
@@ -89,7 +103,62 @@ ul        { list-style: none; }
 
 .header-content { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
 
-.logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+/* Logo Styling */
+.logo-link {
+    text-decoration: none;
+    display: inline-block;
+    color: inherit;
+    transition: transform 0.2s ease;
+}
+.logo-link:hover {
+    transform: translateY(-1px);
+}
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+.logo-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.logo-text-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.logo-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    line-height: 1.05;
+}
+.logo-tagline {
+    font-family: var(--font-display);
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--text-secondary);
+    margin-top: 0.15rem;
+    text-transform: uppercase;
+    opacity: 0.85;
+}
+.txt-white {
+    color: var(--text-primary);
+}
+.txt-gold {
+    color: var(--highlight);
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 8px rgba(212,175,55,0.25));
+}
+.logo-icon path {
+    transition: stroke 0.3s;
+}
+
 .highlight  { color: var(--highlight); }
 
 @keyframes shimmer {
@@ -264,11 +333,25 @@ ul        { list-style: none; }
 .dropdown-items.show { display: flex; }
 .dropdown-item {
     padding: 0.75rem 1rem; cursor: pointer; color: var(--text-primary);
-    transition: background 0.2s, color 0.2s; font-size: 0.95rem;
+    transition: all 0.25s ease; font-size: 0.95rem;
+    border-left: 2px solid transparent;
 }
-.dropdown-item:hover, .dropdown-item.active {
-    background: rgba(212,175,55,0.25); /* Gold hover! No more blue! */
-    color: var(--highlight); font-weight: 600;
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+.light-mode .dropdown-item:hover {
+    background: rgba(15, 23, 42, 0.04);
+    box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.05), inset 0 0 0 1px rgba(15, 23, 42, 0.02);
+}
+.dropdown-item.active {
+    background: rgba(212, 175, 55, 0.12);
+    color: var(--highlight);
+    font-weight: 600;
+    border-left-color: var(--highlight);
 }
 
 /* ── Feed ───────────────────────────────────────────────────── */
