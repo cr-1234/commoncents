@@ -2,6 +2,20 @@
 let currentCategory = 'all';
 let searchQuery = '';
 
+// Weekly Tracking Helpers
+function getWeeklyKey(base) {
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + 4 - (d.getDay()||7));
+    const yearStart = new Date(d.getFullYear(),0,1);
+    const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+    return base + '_' + d.getFullYear() + '_W' + weekNo;
+}
+function getGiveawayEntries() { return JSON.parse(localStorage.getItem(getWeeklyKey('giveawayEntries')) || '[]'); }
+function setGiveawayEntries(entries) { localStorage.setItem(getWeeklyKey('giveawayEntries'), JSON.stringify(entries)); }
+function getMyEmail() { return localStorage.getItem(getWeeklyKey('giveawayMyEmail')); }
+function setMyEmail(email) { localStorage.setItem(getWeeklyKey('giveawayMyEmail'), email); }
+
 // Prize amount scales with entries
 function calculatePrize(count) {
     if (count >= 10000) return '$100';
@@ -14,7 +28,7 @@ function calculatePrize(count) {
 
 // Update giveaway entry count and prize display
 function updateEntryCount() {
-    const entries = JSON.parse(localStorage.getItem('giveawayEntries') || '[]');
+    const entries = getGiveawayEntries();
     const countEl = document.getElementById('entryCount');
     const prizeEl = document.getElementById('prizeAmount');
     const tiers   = document.querySelectorAll('.prize-tier');
@@ -90,8 +104,8 @@ function setupEventListeners() {
     function openGiveawayModal(e) {
         if (e) e.preventDefault();
         updateEntryCount();
-        const myEmail = localStorage.getItem('giveawayMyEmail');
-        const entries = JSON.parse(localStorage.getItem('giveawayEntries') || '[]');
+        const myEmail = getMyEmail();
+        const entries = getGiveawayEntries();
         if (myEmail && entries.includes(myEmail)) {
             document.getElementById('giveawayForm').style.display    = 'none';
             document.getElementById('giveawaySuccess').style.display = 'block';
@@ -123,12 +137,12 @@ function setupEventListeners() {
             emailInput.style.borderColor = '';
 
             // Save unique email
-            const entries = JSON.parse(localStorage.getItem('giveawayEntries') || '[]');
+            const entries = getGiveawayEntries();
             if (!entries.includes(email)) {
                 entries.push(email);
-                localStorage.setItem('giveawayEntries', JSON.stringify(entries));
+                setGiveawayEntries(entries);
             }
-            localStorage.setItem('giveawayMyEmail', email);
+            setMyEmail(email);
 
             updateEntryCount();
             document.getElementById('giveawayForm').style.display    = 'none';
@@ -336,7 +350,7 @@ function openModal(deal) {
                 <strong style="color:var(--text-primary);">${c.user}</strong>
                 <span style="color:var(--text-secondary); font-size:0.85rem;">${c.time}</span>
             </div>
-            <p style="color:var(--text-secondary); font-size:0.95rem;">${c.text}</p>
+            <p style="color:var(--text-secondary); font-size:0.95rem; white-space:pre-wrap;">${c.text}</p>
         </div>`).join('');
 
     modalBody.innerHTML = `
