@@ -5,8 +5,8 @@
     --bg-header:    rgba(0, 0, 0, 0.75);
     --text-primary: #f8f8f8;
     --text-secondary:#a1a1aa;
-    --highlight:    #cba258;
-    --highlight-hover:#e3cb98;
+    --highlight:    #d4af37;
+    --highlight-hover:#fce590;
     --silver:       #cbd5e1;
     --border-color: rgba(255,255,255,0.08);
     --shadow-md:    0 8px 32px rgba(0,0,0,0.5);
@@ -17,7 +17,7 @@
     --glass-border: rgba(255,255,255,0.0);
     --glass-shine:  rgba(255,255,255,0.1);
     --glass-blur:   blur(40px) saturate(200%);
-    --gold-gradient:linear-gradient(135deg, #FFDF73 0%, #CFA043 25%, #E5C370 50%, #B88126 75%, #FBE58A 100%);
+    --gold-gradient:linear-gradient(135deg, #d4af37 0%, #fef0a5 25%, #d4af37 50%, #997a15 75%, #fef0a5 100%);
     --glass-inner-border: inset 0 0 0 1px rgba(255,255,255,0.1);
     color-scheme: dark;
 }
@@ -29,8 +29,8 @@
     --bg-header:    rgba(250, 249, 246, 0.85);
     --text-primary: #1a1a1a;
     --text-secondary:#737373;
-    --highlight:    #cba258;
-    --highlight-hover:#e3cb98;
+    --highlight:    #d4af37;
+    --highlight-hover:#fce590;
     --silver:       #737373;
     --border-color: rgba(0,0,0,0.06);
     --shadow-md:    0 8px 32px rgba(0,0,0,0.08);
@@ -90,12 +90,20 @@ ul        { list-style: none; }
 
 .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
 .highlight  { color: var(--highlight); }
+
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
 .gold-text  {
     background: var(--gold-gradient);
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: var(--highlight); /* fallback */
-    text-shadow: 0 2px 10px rgba(203,162,88,0.25);
+    text-shadow: 0 2px 10px rgba(212,175,55,0.25);
+    animation: shimmer 4s linear infinite;
 }
 .cent-sign  { display: inline-block; position: relative; }
 .cent-sign::after {
@@ -225,17 +233,41 @@ ul        { list-style: none; }
     50%      { box-shadow: 0 0 0 7px rgba(203,162,88,0);  }
 }
 
-/* ── Feed ───────────────────────────────────────────────────── */
-.feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.sort-options select {
+/* ── Custom Dropdown ────────────────────────────────────────── */
+.custom-dropdown {
+    position: relative;
+    width: 200px;
+}
+.dropdown-selected {
     padding: 0.5rem 1rem; border-radius: 8px;
     background: var(--glass-bg); backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     color: var(--text-primary); border: 1px solid var(--glass-border);
     box-shadow: inset 0 1px 0 var(--glass-shine), var(--glass-inner-border), 0 4px 16px rgba(0,0,0,0.1);
-    outline: none; cursor: pointer;
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    user-select: none;
 }
-.sort-options select option { background: var(--bg-card); color: var(--text-primary); }
+.dropdown-items {
+    position: absolute; top: 110%; left: 0; right: 0;
+    background: var(--bg-card); border: 1px solid var(--glass-border);
+    border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    overflow: hidden; z-index: 100;
+    display: none;
+    flex-direction: column;
+}
+.dropdown-items.show { display: flex; }
+.dropdown-item {
+    padding: 0.75rem 1rem; cursor: pointer; color: var(--text-primary);
+    transition: background 0.2s, color 0.2s;
+}
+.dropdown-item:hover, .dropdown-item.active {
+    background: rgba(212,175,55,0.15); /* Gold hover! No more blue! */
+    color: var(--highlight);
+}
+
+/* ── Feed ───────────────────────────────────────────────────── */
+.feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+
 
 /* ── Deal Grid ──────────────────────────────────────────────── */
 .deal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }

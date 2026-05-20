@@ -82,16 +82,44 @@ function setupEventListeners() {
     });
 
     closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) modal.style.display = 'none';
-    });
-
     // Theme toggle — icons handled entirely by CSS class, not inline style
     const themeToggle = document.getElementById('themeToggle');
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
         localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    });
+
+    // ── Custom Dropdown ─────────────────────────────────────────────────
+    const sortDropdown = document.getElementById('sortDropdown');
+    const dropdownSelected = document.getElementById('dropdownSelected');
+    const dropdownItems = document.getElementById('dropdownItems');
+    const dropdownSelectedText = document.getElementById('dropdownSelectedText');
+
+    if (dropdownSelected) {
+        dropdownSelected.addEventListener('click', (e) => {
+            dropdownItems.classList.toggle('show');
+            e.stopPropagation();
+        });
+    }
+
+    if (dropdownItems) {
+        dropdownItems.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                dropdownItems.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+                item.classList.add('active');
+                dropdownSelectedText.textContent = item.textContent;
+                dropdownItems.classList.remove('show');
+                renderDeals();
+            });
+        });
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+        if (dropdownItems && dropdownItems.classList.contains('show') && !sortDropdown.contains(e.target)) {
+            dropdownItems.classList.remove('show');
+        }
     });
 
     // ── Giveaway modal ──────────────────────────────────────────────────
@@ -227,12 +255,27 @@ function setCategory(category) {
 // Render Functions
 function renderDeals() {
     dealGrid.innerHTML = '';
-    const filtered = deals.filter(deal => {
+    let filtered = deals.filter(deal => {
         const matchCat    = currentCategory === 'all' || deal.category === currentCategory;
         const matchSearch = deal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             deal.description.toLowerCase().includes(searchQuery.toLowerCase());
         return matchCat && matchSearch;
     });
+
+    const activeSort = document.querySelector('.dropdown-item.active');
+    const sortValue = activeSort ? activeSort.dataset.value : 'newest';
+
+    if (sortValue === 'newest') {
+        filtered.sort((a, b) => b.id - a.id);
+    } else if (sortValue === 'popular') {
+        filtered.sort((a, b) => (b.votes.up - b.votes.down) - (a.votes.up - a.votes.down));
+    } else if (sortValue === 'price-low') {
+        filtered.sort((a, b) => a.price - b.price);
+    } else if (sortValue === 'price-high') {
+        filtered.sort((a, b) => b.price - a.price);
+    } else if (sortValue === 'discount') {
+        filtered.sort((a, b) => parseInt(b.discount) - parseInt(a.discount));
+    }
     if (filtered.length === 0) {
         dealGrid.innerHTML = '<div class="no-results">No deals found matching your criteria.</div>';
         return;

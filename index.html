@@ -85,14 +85,18 @@
         <main class="feed-section">
             <div class="feed-header">
                 <h1 style="font-size:1.5rem;">Today's Best Deals</h1>
-                <div class="sort-options">
-                    <select id="sortSelect">
-                        <option value="newest">Newest</option>
-                        <option value="popular">Most Popular</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="discount">Biggest Discount</option>
-                    </select>
+                <div class="sort-options custom-dropdown" id="sortDropdown">
+                    <div class="dropdown-selected" id="dropdownSelected">
+                        <span id="dropdownSelectedText">Newest</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="dropdown-items" id="dropdownItems">
+                        <div class="dropdown-item active" data-value="newest">Newest</div>
+                        <div class="dropdown-item" data-value="popular">Most Popular</div>
+                        <div class="dropdown-item" data-value="price-low">Price: Low to High</div>
+                        <div class="dropdown-item" data-value="price-high">Price: High to Low</div>
+                        <div class="dropdown-item" data-value="discount">Biggest Discount</div>
+                    </div>
                 </div>
             </div>
             <div class="deal-grid" id="dealGrid"></div>
