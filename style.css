@@ -1,21 +1,22 @@
 /* -- CSS Variables ------------------------------------------------ */
 :root {
-    --bg-body:      #0a0a0f;
-    --bg-card:      #111118;
-    --bg-header:    rgba(10, 10, 15, 0.75);
-    --text-primary: #f1f5f9;
-    --text-secondary:#94a3b8;
-    --highlight:    #d4af37;
-    --highlight-hover:#b8962e;
+        --bg-body:      #000000;
+    --bg-card:      #0f0f0f;
+    --bg-header:    rgba(0, 0, 0, 0.75);
+    --text-primary: #f8f8f8;
+    --text-secondary:#a1a1aa;
+    --highlight:    #cba258;
+    --highlight-hover:#e3cb98;
     --silver:       #cbd5e1;
     --border-color: rgba(255,255,255,0.08);
     --shadow-md:    0 8px 32px rgba(0,0,0,0.5);
     --font-main:    'Inter', sans-serif;
-    --glass-bg:     rgba(255,255,255,0.06);
-    --glass-border: rgba(255,255,255,0.13);
-    --glass-shine:  rgba(255,255,255,0.18);
+    --glass-bg:     rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.1);
+    --glass-shine:  rgba(255,255,255,0.15);
     --glass-blur:   blur(22px) saturate(180%);
 }
+
 
 /* -- Light Mode --------------------------------------------------- */
 .light-mode {
