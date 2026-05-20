@@ -2,11 +2,12 @@ let currentCategory = 'all';
 let searchQuery = '';
 
 function calculatePrize(count) {
-    if (count >= 200) return '$100';
-    if (count >= 100) return '$75';
-    if (count >= 50)  return '$50';
-    if (count >= 25)  return '$25';
-    return '$10';
+    if (count >= 10000) return '$100';
+    if (count >= 5000) return '$75';
+    if (count >= 500)  return '$50';
+    if (count >= 250)  return '$25';
+   if (count >= 100)  return '$10'; 
+    return '$5';
 }
 
 function updateEntryCount() {
@@ -18,7 +19,7 @@ function updateEntryCount() {
     if (countEl) countEl.textContent = entries.length;
     if (prizeEl) prizeEl.textContent = prize;
     if (tiers.length) {
-        const map = { '$10': 0, '$25': 1, '$50': 2, '$75': 3, '$100': 4 };
+        const map = { '$5': 1, '$10': 2, '$25': 3, '$50': 4, '$75': 5, '$100': 6 };
         tiers.forEach((t, i) => t.classList.toggle('active', i === map[prize]));
     }
 }
