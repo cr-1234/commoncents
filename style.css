@@ -1,6 +1,6 @@
-/* -- CSS Variables ------------------------------------------------ */
+/* ── CSS Variables ─────────────────────────────────────────── */
 :root {
-        --bg-body:      #000000;
+    --bg-body:      #000000;
     --bg-card:      #0f0f0f;
     --bg-header:    rgba(0, 0, 0, 0.75);
     --text-primary: #f8f8f8;
@@ -11,12 +11,13 @@
     --border-color: rgba(255,255,255,0.08);
     --shadow-md:    0 8px 32px rgba(0,0,0,0.5);
     --font-main:    'Inter', sans-serif;
+
+    /* Liquid Glass tokens */
     --glass-bg:     rgba(255,255,255,0.04);
     --glass-border: rgba(255,255,255,0.1);
     --glass-shine:  rgba(255,255,255,0.15);
     --glass-blur:   blur(22px) saturate(180%);
 }
-
 
 /* -- Light Mode --------------------------------------------------- */
 .light-mode {
@@ -35,21 +36,34 @@
     --glass-shine:  rgba(255,255,255,1);
 }
 
-
-/* -- Theme Toggle Icons via CSS (no JS display juggling) ---------- */
+/* ── Theme Toggle Icons via CSS (no JS display juggling) ─────── */
+/* Dark mode  → show sun (click to go light)  */
+/* Light mode → show moon (click to go dark)  */
 .theme-btn .sun-icon  { display: inline; }
 .theme-btn .moon-icon { display: none;   }
 .light-mode .theme-btn .sun-icon  { display: none;   }
 .light-mode .theme-btn .moon-icon { display: inline; }
 
-/* -- Reset -------------------------------------------------------- */
+/* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body      { font-family: var(--font-main); background-color: var(--bg-body); color: var(--text-primary); line-height: 1.6; transition: background-color 0.3s, color 0.3s; }
 a         { text-decoration: none; color: inherit; transition: color 0.2s; }
 ul        { list-style: none; }
 .container{ max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-/* -- Header ------------------------------------------------------- */
+/* ── Liquid Glass Mixin ─────────────────────────────────────── */
+.glass {
+    background:  var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.3),
+        inset 0 1px 0 var(--glass-shine),
+        inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
 .site-header {
     position: sticky; top: 0; z-index: 100;
     background-color: var(--bg-header);
@@ -60,21 +74,31 @@ ul        { list-style: none; }
     padding: 1rem 0;
     transition: background-color 0.3s;
 }
+
 .header-content { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+
 .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
 .highlight  { color: var(--highlight); }
 .cent-sign  { display: inline-block; position: relative; }
-.cent-sign::after { content: ''; position: absolute; top: 18%; bottom: 18%; left: 50%; width: 2px; background-color: currentColor; transform: translateX(-50%); }
+.cent-sign::after {
+    content: ''; position: absolute; top: 18%; bottom: 18%; left: 50%;
+    width: 2px; background-color: currentColor; transform: translateX(-50%);
+}
 
-/* -- Liquid Glass Theme Button ------------------------------------ */
+/* ── Liquid Glass Theme Button ──────────────────────────────── */
 .theme-btn {
-    background: var(--glass-bg);
+    background:  var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25), inset 0 1px 0 var(--glass-shine), inset 0 -1px 0 rgba(0,0,0,0.15);
+    box-shadow:
+        0 4px 16px rgba(0,0,0,0.25),
+        inset 0 1px 0 var(--glass-shine),
+        inset 0 -1px 0 rgba(0,0,0,0.15);
     color: var(--text-secondary);
-    cursor: pointer; padding: 0.5rem; border-radius: 50%;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
     width: 40px; height: 40px;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
@@ -82,155 +106,315 @@ ul        { list-style: none; }
 }
 .theme-btn:hover {
     transform: scale(1.12);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.35), inset 0 1px 0 var(--glass-shine), 0 0 0 1px var(--highlight);
+    box-shadow:
+        0 8px 24px rgba(0,0,0,0.35),
+        inset 0 1px 0 var(--glass-shine),
+        0 0 0 1px var(--highlight);
     color: var(--highlight);
 }
 .theme-btn svg { width: 18px; height: 18px; }
 
-/* -- Search Bar --------------------------------------------------- */
+/* ── Search Bar ─────────────────────────────────────────────── */
 .search-bar { flex: 1; max-width: 500px; position: relative; display: flex; align-items: center; }
 .search-bar input {
     width: 100%; padding: 0.75rem 1rem; padding-right: 3rem;
-    border-radius: 12px; border: 1px solid var(--border-color);
-    background: var(--glass-bg); backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    color: var(--text-primary); transition: border-color 0.2s, box-shadow 0.2s;
-}
-.search-bar input:focus { outline: none; border-color: var(--highlight); box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
-.search-bar button { position: absolute; right: 0.5rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.5rem; display: flex; align-items: center; }
-
-/* -- Mobile Nav --------------------------------------------------- */
-.main-nav { display: none; }
-
-/* -- Layout ------------------------------------------------------- */
-.main-content { display: grid; grid-template-columns: 260px 1fr; gap: 2rem; align-items: start; padding-top: 2rem; padding-bottom: 2rem; }
-.sidebar { position: sticky; top: 6rem; }
-.sidebar-widget { margin-bottom: 2rem; }
-.sidebar-widget > h3 { font-size: 1rem; margin-bottom: 0.85rem; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; display: block; letter-spacing: 0.03em; }
-
-/* -- Category List with Liquid Glass Hover ------------------------ */
-.category-list li { margin-bottom: 0.25rem; }
-.category-list a { color: var(--text-secondary); display: block; padding: 0.45rem 0.75rem; border-radius: 8px; transition: all 0.2s; border: 1px solid transparent; font-size: 0.9rem; }
-.category-list a:hover,
-.category-list a.active {
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
-    border-color: rgba(212,175,55,0.3);
-    box-shadow: inset 0 1px 0 var(--glass-shine), 0 2px 8px rgba(0,0,0,0.15);
-    color: var(--highlight); padding-left: 1rem;
+    color: var(--text-primary);
+    box-shadow: inset 0 1px 0 var(--glass-shine), 0 4px 16px rgba(0,0,0,0.1);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-bar input:focus { outline: none; border-color: var(--highlight); box-shadow: inset 0 1px 0 var(--glass-shine), 0 0 0 3px rgba(203,162,88,0.15); }
+.search-bar button { position: absolute; right: 0.5rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.5rem; display: flex; align-items: center; }
+
+/* ── Mobile Nav ─────────────────────────────────────────────── */
+.main-nav { display: none; }
+
+/* ── Layout ─────────────────────────────────────────────────── */
+.main-content {
+    display: grid; grid-template-columns: 260px 1fr;
+    gap: 2rem; align-items: start; padding-top: 2rem; padding-bottom: 2rem;
+}
+.sidebar { position: sticky; top: 6rem; }
+.sidebar-widget { margin-bottom: 2rem; }
+.sidebar-widget > h3 {
+    font-size: 1rem; margin-bottom: 0.85rem; color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; display: block;
+    letter-spacing: 0.03em;
 }
 
-/* -- Giveaway Sidebar Widget -------------------------------------- */
-.giveaway-sidebar-widget {
-    background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(184,150,46,0.04) 100%);
-    border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; padding: 1.25rem;
-    box-shadow: inset 0 1px 0 rgba(212,175,55,0.15);
+/* ── Category List with Liquid Glass Hover ──────────────────── */
+.category-list li { margin-bottom: 0.25rem; }
+.category-list a {
+    color: var(--text-secondary); display: block;
+    padding: 0.45rem 0.75rem; border-radius: 12px;
+    transition: all 0.2s; border: 1px solid transparent;
+    font-size: 0.9rem;
 }
-.giveaway-sidebar-badge { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; color: var(--highlight); margin-bottom: 0.5rem; text-transform: uppercase; }
-.giveaway-sidebar-title { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); line-height: 1.3; margin-bottom: 0.6rem; border: none; padding: 0; }
-.giveaway-sidebar-prize { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; }
+.category-list a:hover,
+.category-list a.active {
+    background:  var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-color: var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-shine), 0 4px 16px rgba(0,0,0,0.15);
+    color: var(--highlight);
+    padding-left: 1rem;
+}
+
+/* ── Giveaway Sidebar Widget ────────────────────────────────── */
+.giveaway-sidebar-widget {
+    background: linear-gradient(135deg, rgba(203,162,88,0.08) 0%, rgba(184,150,46,0.04) 100%);
+    border: 1px solid rgba(203,162,88,0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: inset 0 1px 0 rgba(203,162,88,0.15);
+}
+.giveaway-sidebar-badge {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
+    color: var(--highlight); margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+.giveaway-sidebar-title {
+    font-size: 1.15rem; font-weight: 700; color: var(--text-primary);
+    line-height: 1.3; margin-bottom: 0.6rem;
+}
+.giveaway-sidebar-prize {
+    font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;
+}
 .giveaway-sidebar-btn {
     background: linear-gradient(135deg, var(--highlight) 0%, var(--highlight-hover) 100%);
-    color: #000; font-weight: 700; font-size: 0.85rem; border: none; border-radius: 8px;
-    padding: 0.65rem 1rem; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em;
-    box-shadow: 0 2px 12px rgba(212,175,55,0.3);
+    color: #000; font-weight: 700; font-size: 0.85rem;
+    border: none; border-radius: 8px; padding: 0.65rem 1rem;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em;
+    box-shadow: 0 2px 12px rgba(203,162,88,0.3);
 }
-.giveaway-sidebar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(212,175,55,0.45); }
+.giveaway-sidebar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(203,162,88,0.45); }
 
-/* -- Giveaway Nav Link -------------------------------------------- */
+/* ── Giveaway Nav Link ──────────────────────────────────────── */
 .giveaway-nav-link {
     background: linear-gradient(135deg, var(--highlight), var(--highlight-hover));
     color: #000 !important; font-weight: 700 !important; font-size: 0.82rem;
     padding: 0.3rem 0.8rem !important; border-radius: 20px;
-    animation: pulse-glow 2.5s ease-in-out infinite; letter-spacing: 0.03em;
+    animation: pulse-glow 2.5s ease-in-out infinite;
+    letter-spacing: 0.03em;
 }
 @keyframes pulse-glow {
-    0%,100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.5); }
-    50%      { box-shadow: 0 0 0 7px rgba(212,175,55,0); }
+    0%,100% { box-shadow: 0 0 0 0 rgba(203,162,88,0.5); }
+    50%      { box-shadow: 0 0 0 7px rgba(203,162,88,0);  }
 }
 
-/* -- Feed --------------------------------------------------------- */
+/* ── Feed ───────────────────────────────────────────────────── */
 .feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.sort-options select { padding: 0.5rem 1rem; border-radius: 8px; background: var(--glass-bg); backdrop-filter: var(--glass-blur); color: var(--text-primary); border: 1px solid var(--border-color); }
+.sort-options select {
+    padding: 0.5rem 1rem; border-radius: 8px;
+    background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+    color: var(--text-primary); border: 1px solid var(--border-color);
+}
 
-/* -- Deal Grid ---------------------------------------------------- */
+/* ── Deal Grid ──────────────────────────────────────────────── */
 .deal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 
-/* -- Deal Card ---------------------------------------------------- */
+/* ── Deal Card ──────────────────────────────────────────────── */
 .deal-card {
-    background-color: var(--bg-card); border-radius: 14px; overflow: hidden;
+    background-color: var(--bg-card);
+    border-radius: 14px; overflow: hidden;
     border: 1px solid var(--border-color);
     transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s, border-color 0.22s;
     display: flex; flex-direction: column; cursor: pointer; position: relative;
 }
-.deal-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(212,175,55,0.35); border-color: rgba(212,175,55,0.4); }
+.deal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(203,162,88,0.35);
+    border-color: rgba(203,162,88,0.4);
+}
 .deal-card::before {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(212,175,55,0.08) 0%, transparent 70%);
+    background: radial-gradient(circle at 50% 0%, rgba(203,162,88,0.08) 0%, transparent 70%);
     opacity: 0; transition: opacity 0.3s; pointer-events: none;
 }
 .deal-card:hover::before { opacity: 1; }
+
 .card-image { height: 210px; background-color: #1a1a2a; position: relative; overflow: hidden; }
 .card-image img { width: 100%; height: 100%; object-fit: contain; padding: 0.5rem; background-color: #fff; }
 .card-content { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
 .card-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-.card-category { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); background: var(--glass-bg); padding: 0.2rem 0.5rem; border-radius: 4px; }
+.card-category {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-secondary); background: var(--glass-bg); padding: 0.2rem 0.5rem; border-radius: 4px;
+}
 .card-source { font-size: 0.75rem; color: var(--highlight); font-weight: 600; }
-.card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-title {
+    font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
 .card-price { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.85rem; flex-wrap: wrap; }
 .original-price { font-size: 0.88rem; text-decoration: line-through; color: var(--text-secondary); }
-.discount-badge { background: rgba(212,175,55,0.12); color: var(--highlight); padding: 0.2rem 0.45rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
-.view-deal-btn { background: linear-gradient(135deg, var(--highlight) 0%, var(--highlight-hover) 100%); color: #000; border: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; box-shadow: 0 2px 10px rgba(212,175,55,0.25); display: block; }
-.view-deal-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(212,175,55,0.4); }
+.discount-badge {
+    background: rgba(203,162,88,0.12); color: var(--highlight);
+    padding: 0.2rem 0.45rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;
+}
+.view-deal-btn {
+    background: linear-gradient(135deg, var(--highlight) 0%, var(--highlight-hover) 100%);
+    color: #000; border: none; padding: 0.6rem 1rem; border-radius: 8px;
+    font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
+    box-shadow: 0 2px 10px rgba(203,162,88,0.25);
+}
+.view-deal-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(203,162,88,0.4); }
 .vote-container { display: flex; align-items: center; gap: 0.5rem; margin-top: auto; padding-top: 0.75rem; }
-.vote-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 0.25rem; font-size: 0.9rem; transition: color 0.2s; padding: 0.25rem; }
+.vote-btn {
+    background: none; border: none; color: var(--text-secondary);
+    cursor: pointer; display: flex; align-items: center; gap: 0.25rem;
+    font-size: 0.9rem; transition: color 0.2s; padding: 0.25rem;
+}
 .vote-btn:hover { color: var(--text-primary); }
 .vote-btn.active.upvote-btn   { color: var(--highlight); }
 .vote-btn.active.downvote-btn { color: #ef4444; }
 
-/* -- Buttons ------------------------------------------------------ */
+/* ── Buttons ────────────────────────────────────────────────── */
 .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; text-align: center; }
 .btn-primary { background: linear-gradient(135deg, var(--highlight), var(--highlight-hover)); color: #000; }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(212,175,55,0.4); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(203,162,88,0.4); }
 .full-width { width: 100%; }
 
-/* -- Modal Base --------------------------------------------------- */
-.modal { display: none; position: fixed; z-index: 1000; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); justify-content: center; align-items: flex-start; overflow-y: auto; }
-.modal-content { background-color: var(--bg-card); margin: 5% auto; padding: 2rem; border: 1px solid var(--glass-border); box-shadow: inset 0 1px 0 var(--glass-shine), 0 30px 60px rgba(0,0,0,0.5); width: 90%; max-width: 800px; border-radius: 16px; position: relative; }
-.close-modal { position: absolute; right: 1.25rem; top: 0.9rem; font-size: 2rem; font-weight: 700; color: var(--text-secondary); cursor: pointer; transition: color 0.2s; line-height: 1; }
+/* ── Modal Base ─────────────────────────────────────────────── */
+.modal {
+    display: none; position: fixed; z-index: 1000; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    justify-content: center; align-items: flex-start; overflow-y: auto;
+}
+.modal-content {
+    background-color: var(--bg-card);
+    margin: 5% auto; padding: 2rem;
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-shine), 0 30px 60px rgba(0,0,0,0.5);
+    width: 90%; max-width: 800px; border-radius: 16px; position: relative;
+}
+.close-modal {
+    position: absolute; right: 1.25rem; top: 0.9rem; font-size: 2rem;
+    font-weight: 700; color: var(--text-secondary); cursor: pointer; transition: color 0.2s; line-height: 1;
+}
 .close-modal:hover { color: var(--text-primary); }
 
-/* -- Classy Giveaway Modal ---------------------------------------- */
-.giveaway-modal-content { max-width: 480px; padding: 0; overflow: hidden; background: var(--bg-card); }
-.giveaway-header-bar { background: linear-gradient(135deg, #1a1308 0%, #2a1f06 50%, #1a1308 100%); border-bottom: 1px solid rgba(212,175,55,0.25); padding: 1rem 1.75rem 0.85rem; display: flex; align-items: center; justify-content: center; }
-.giveaway-badge-tag { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.18em; color: var(--highlight); text-transform: uppercase; background: rgba(212,175,55,0.1); padding: 0.3rem 0.85rem; border-radius: 20px; border: 1px solid rgba(212,175,55,0.25); }
+/* ── Classy Giveaway Modal ──────────────────────────────────── */
+.giveaway-modal-content {
+    max-width: 480px;
+    padding: 0;
+    overflow: hidden;
+    background: var(--bg-card);
+}
+.giveaway-header-bar {
+    background: linear-gradient(135deg, #1a1308 0%, #2a1f06 50%, #1a1308 100%);
+    border-bottom: 1px solid rgba(203,162,88,0.25);
+    padding: 1rem 1.75rem 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+}
+.giveaway-badge-tag {
+    font-size: 0.65rem; font-weight: 800; letter-spacing: 0.18em;
+    color: var(--highlight); text-transform: uppercase;
+    background: rgba(203,162,88,0.1);
+    padding: 0.3rem 0.85rem; border-radius: 20px;
+    border: 1px solid rgba(203,162,88,0.25);
+}
 .giveaway-body { padding: 1.75rem; text-align: center; }
-.giveaway-title { font-size: 1.6rem; font-weight: 700; line-height: 1.2; color: var(--text-primary); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+.giveaway-title {
+    font-size: 1.6rem; font-weight: 700; line-height: 1.2;
+    color: var(--text-primary); margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
 .giveaway-subtitle { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
-.giveaway-prize-block { background: linear-gradient(135deg, rgba(212,175,55,0.07) 0%, rgba(212,175,55,0.03) 100%); border: 1px solid rgba(212,175,55,0.15); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: inset 0 1px 0 rgba(212,175,55,0.12); }
-.prize-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 0.35rem; }
-.prize-amount { font-size: 3.2rem; font-weight: 800; color: var(--highlight); line-height: 1; margin-bottom: 0.4rem; letter-spacing: -0.03em; }
+
+/* Prize block */
+.giveaway-prize-block {
+    background: linear-gradient(135deg, rgba(203,162,88,0.07) 0%, rgba(203,162,88,0.03) 100%);
+    border: 1px solid rgba(203,162,88,0.15);
+    border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;
+    box-shadow: inset 0 1px 0 rgba(203,162,88,0.12);
+}
+.prize-label {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-secondary); margin-bottom: 0.35rem;
+}
+.prize-amount {
+    font-size: 3.2rem; font-weight: 800; color: var(--highlight);
+    line-height: 1; margin-bottom: 1rem; letter-spacing: -0.03em;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    display: inline-block;
+    box-shadow: inset 0 1px 0 var(--glass-shine), 0 8px 24px rgba(0,0,0,0.2);
+}
 .prize-scale-note { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.85rem; }
 .prize-scale-note strong { color: var(--text-primary); }
-.prize-scale-bar { display: flex; justify-content: space-between; gap: 4px; }
-.prize-tier { flex: 1; font-size: 0.65rem; font-weight: 700; padding: 0.25rem 0; border-radius: 4px; text-align: center; background: rgba(255,255,255,0.04); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.06); transition: all 0.2s; }
-.prize-tier.active { background: rgba(212,175,55,0.15); color: var(--highlight); border-color: rgba(212,175,55,0.3); }
+.prize-scale-bar {
+    display: flex; justify-content: space-between; gap: 4px;
+}
+.prize-tier {
+    flex: 1; font-size: 0.65rem; font-weight: 700; padding: 0.25rem 0;
+    border-radius: 4px; text-align: center;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.2s;
+}
+.prize-tier.active {
+    background: rgba(203,162,88,0.15);
+    color: var(--highlight); border-color: rgba(203,162,88,0.3);
+}
+
+/* Form */
 .giveaway-form-block { text-align: left; }
-.giveaway-input { width: 100%; padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--glass-bg); backdrop-filter: var(--glass-blur); color: var(--text-primary); font-size: 0.95rem; margin-bottom: 0.75rem; transition: border-color 0.2s, box-shadow 0.2s; }
-.giveaway-input:focus { outline: none; border-color: var(--highlight); box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
-.giveaway-submit-btn { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, var(--highlight) 0%, var(--highlight-hover) 100%); color: #000; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.02em; border: none; border-radius: 10px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 18px rgba(212,175,55,0.3); }
-.giveaway-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(212,175,55,0.45); }
-.giveaway-legal { font-size: 0.72rem; color: var(--text-secondary); text-align: center; margin-top: 0.85rem; line-height: 1.5; }
+.giveaway-input {
+    width: 100%; padding: 0.85rem 1rem;
+    border-radius: 10px; border: 1px solid var(--border-color);
+    background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+    color: var(--text-primary); font-size: 0.95rem; margin-bottom: 0.75rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.giveaway-input:focus { outline: none; border-color: var(--highlight); box-shadow: 0 0 0 3px rgba(203,162,88,0.15); }
+.giveaway-submit-btn {
+    width: 100%; padding: 0.9rem;
+    background: linear-gradient(135deg, var(--highlight) 0%, var(--highlight-hover) 100%);
+    color: #000; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.02em;
+    border: none; border-radius: 10px; cursor: pointer;
+    transition: all 0.2s; box-shadow: 0 4px 18px rgba(203,162,88,0.3);
+}
+.giveaway-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(203,162,88,0.45); }
+.giveaway-legal {
+    font-size: 0.72rem; color: var(--text-secondary); text-align: center;
+    margin-top: 0.85rem; line-height: 1.5;
+}
+
+/* Success */
 .giveaway-success-block { text-align: center; padding: 0.5rem 0; }
-.success-checkmark { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.08)); border: 2px solid rgba(212,175,55,0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--highlight); margin: 0 auto 1rem; font-weight: 700; }
+.success-checkmark {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(203,162,88,0.2), rgba(203,162,88,0.08));
+    border: 2px solid rgba(203,162,88,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; color: var(--highlight);
+    margin: 0 auto 1rem; font-weight: 700;
+}
 .success-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem; }
 .success-subtitle { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.25rem; }
-.amazon-browse-btn { display: inline-block; padding: 0.7rem 1.5rem; background: linear-gradient(135deg, var(--highlight), var(--highlight-hover)); color: #000; font-weight: 700; font-size: 0.9rem; border-radius: 8px; text-decoration: none; box-shadow: 0 3px 14px rgba(212,175,55,0.35); transition: all 0.2s; margin-bottom: 0.65rem; }
-.amazon-browse-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(212,175,55,0.5); }
+.amazon-browse-btn {
+    display: inline-block; padding: 0.7rem 1.5rem;
+    background: linear-gradient(135deg, var(--highlight), var(--highlight-hover));
+    color: #000; font-weight: 700; font-size: 0.9rem;
+    border-radius: 8px; text-decoration: none;
+    box-shadow: 0 3px 14px rgba(203,162,88,0.35);
+    transition: all 0.2s; margin-bottom: 0.65rem;
+}
+.amazon-browse-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(203,162,88,0.5); }
 .success-note { font-size: 0.75rem; color: var(--text-secondary); }
 
-/* -- Footer ------------------------------------------------------- */
+/* ── Footer ─────────────────────────────────────────────────── */
 .site-footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); padding: 3rem 0; margin-top: 4rem; }
 .footer-content { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
 .footer-brand { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
@@ -239,25 +423,51 @@ ul        { list-style: none; }
 .footer-nav a { color: var(--text-secondary); font-size: 0.9rem; }
 .footer-nav a:hover { color: var(--highlight); }
 .footer-copyright { color: var(--text-secondary); font-size: 0.8rem; }
-.footer-disclosure { max-width: 750px; margin: 0 auto; padding: 0.85rem 1.25rem; background: rgba(212,175,55,0.04); border: 1px solid rgba(212,175,55,0.1); border-radius: 8px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; text-align: center; }
+.footer-disclosure {
+    max-width: 750px; margin: 0 auto; padding: 0.85rem 1.25rem;
+    background: rgba(203,162,88,0.04); border: 1px solid rgba(203,162,88,0.1);
+    border-radius: 8px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; text-align: center;
+}
 
-/* -- Confetti and Sparks ------------------------------------------ */
-.confetti { position: fixed; width: 9px; height: 9px; z-index: 9999; pointer-events: none; animation: conf-fall 1s ease-out forwards; border-radius: 2px; }
-@keyframes conf-fall { 0% { transform: translate(0,0) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) rotate(var(--rotation)); opacity: 0; } }
-.spark { position: fixed; width: 4px; height: 4px; background-color: var(--highlight); border-radius: 50%; pointer-events: none; animation: spark-fly 0.8s ease-out forwards; }
-@keyframes spark-fly { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
+/* ── Confetti & Sparks ──────────────────────────────────────── */
+.confetti {
+    position: fixed; width: 9px; height: 9px;
+    z-index: 9999; pointer-events: none;
+    animation: conf-fall 1s ease-out forwards;
+    border-radius: 2px;
+}
+@keyframes conf-fall {
+    0%   { transform: translate(0,0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) rotate(var(--rotation)); opacity: 0; }
+}
+.spark {
+    position: fixed; width: 4px; height: 4px;
+    background-color: var(--highlight); border-radius: 50%;
+    pointer-events: none; animation: spark-fly 0.8s ease-out forwards;
+}
+@keyframes spark-fly {
+    0%   { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
 
-/* -- No Results --------------------------------------------------- */
-.no-results { grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-secondary); font-size: 1.1rem; }
+/* ── No Results ─────────────────────────────────────────────── */
+.no-results {
+    grid-column: 1 / -1; text-align: center; padding: 3rem;
+    color: var(--text-secondary); font-size: 1.1rem;
+}
 
-/* -- Responsive --------------------------------------------------- */
+/* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 900px) {
     .main-content { grid-template-columns: 1fr; }
     .sidebar { display: none; }
     .deal-grid { grid-template-columns: 1fr; }
     .header-content { flex-wrap: wrap; }
     .search-bar { order: 3; width: 100%; max-width: 100%; margin-top: 1rem; }
-    .main-nav { display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.5rem; width: 100%; order: 4; margin-top: 0.75rem; white-space: nowrap; align-items: center; }
+    .main-nav {
+        display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.5rem;
+        width: 100%; order: 4; margin-top: 0.75rem; white-space: nowrap; align-items: center;
+    }
     .nav-link { color: var(--text-secondary); font-weight: 500; font-size: 0.88rem; }
     .nav-link.active { color: var(--highlight); }
+    .modal-content { margin: 2% auto; }
 }

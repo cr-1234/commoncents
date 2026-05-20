@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CommonCents | Best Deals on Tech, Tools, Household &amp; More</title>
+    <title>CommonCents | Best Deals on Tech, Tools, Household & More</title>
     <meta name="description" content="Save money with daily curated deals on tech, tools, household, gifts, and more. CommonCents curates the best online deals so every cent counts.">
     <meta name="keywords" content="deals, discounts, tech deals, tool deals, household deals, grocery deals, gift ideas, savings, amazon giveaway">
-    <meta property="og:title" content="CommonCents | Best Deals on Tech, Tools, Household &amp; More">
+    <meta property="og:title" content="CommonCents | Best Deals on Tech, Tools, Household & More">
     <meta property="og:description" content="Save money with daily curated deals on tech, tools, household, and more.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://commoncentsdeals.netlify.app/">
     <meta property="og:site_name" content="CommonCents">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="CommonCents | Best Deals on Tech, Tools, Household &amp; More">
+    <meta name="twitter:title" content="CommonCents | Best Deals on Tech, Tools, Household & More">
     <meta name="twitter:description" content="Save money with daily curated deals on tech, tools, household, and more.">
     <script type="application/ld+json">
     {
@@ -23,7 +23,7 @@
         "url": "https://commoncentsdeals.netlify.app/"
     }
     </script>
-    <link rel="canonical" href="https://commoncentsdeals.netlify.app/">
+    <link rel="canonical" href="https://cr-1234.github.io/commoncents/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -39,8 +39,15 @@
                 <button id="searchBtn"><i data-lucide="search"></i></button>
             </div>
             <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">
-                <i data-lucide="sun" class="sun-icon"></i>
-                <i data-lucide="moon" class="moon-icon"></i>
+                <svg class="sun-icon custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                    <circle cx="12" cy="12" r="4.5"/>
+                    <path d="M12 2l1.5 3h-3L12 2ZM12 22l-1.5-3h3L12 22ZM4.22 4.22l2.83 1.41-1.41 2.83-1.42-4.24ZM19.78 19.78l-2.83-1.41 1.41-2.83 1.42 4.24ZM2 12l3-1.5v3L2 12ZM22 12l-3 1.5v-3L22 12ZM4.22 19.78l1.41-2.83 2.83 1.41-4.24 1.42ZM19.78 4.22l-1.41 2.83-2.83-1.41 4.24-1.42Z"/>
+                </svg>
+                <svg class="moon-icon custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                    <path d="M12 21a9 9 0 0 1-6.36-15.36A9 9 0 0 0 15.36 12 9 9 0 0 0 21 5.64 9 9 0 0 1 12 21Z" />
+                    <path d="M17 7l1 1.5 1.5 1-1.5 1L17 12l-1-1.5-1.5-1 1.5-1L17 7Z" />
+                    <path d="M21 14l.5 1 1 .5-1 .5-.5 1-.5-1-1-.5 1-.5.5-1Z" />
+                </svg>
             </button>
             <nav class="main-nav">
                 <a href="#" class="nav-link active" data-category="all">All Deals</a>
@@ -72,7 +79,7 @@
             <div class="sidebar-widget giveaway-sidebar-widget">
                 <div class="giveaway-sidebar-badge">WEEKLY DRAWING</div>
                 <h3 class="giveaway-sidebar-title">Win an Amazon<br>Gift Card</h3>
-                <p class="giveaway-sidebar-prize">Prize grows with entries</p>
+                <p class="giveaway-sidebar-prize" id="sidebarPrize">Prize starts at $5 · grows with entries</p>
                 <button class="btn giveaway-sidebar-btn full-width" id="openGiveawaySidebar">Enter the Drawing</button>
             </div>
         </aside>
@@ -102,38 +109,49 @@
         </div>
     </div>
 
-    <!-- Giveaway Modal -->
+    <!-- Giveaway Modal — Classy redesign -->
     <div class="modal" id="giveawayModal">
         <div class="modal-content giveaway-modal-content">
             <span class="close-modal" id="closeGiveaway">&times;</span>
+
             <div class="giveaway-header-bar">
                 <span class="giveaway-badge-tag">WEEKLY DRAWING</span>
             </div>
+
             <div class="giveaway-body">
                 <h2 class="giveaway-title">The CommonCents<br>Gift Card Giveaway</h2>
                 <p class="giveaway-subtitle">One winner drawn every Sunday. Enter once, stay in every week.</p>
+
                 <div class="giveaway-prize-block">
                     <div class="prize-label">This Week's Prize</div>
-                    <div class="prize-amount" id="prizeAmount">$10</div>
-                    <div class="prize-scale-note">Prize grows with entries &mdash; <strong id="entryCount">0</strong> people entered</div>
+                    <div class="prize-amount liquid-glass-pill" id="prizeAmount">$5</div>
+                    <div class="prize-scale-note">
+                        Prize grows with entries &mdash; <strong id="entryCount">0</strong> people entered
+                    </div>
                     <div class="prize-scale-bar">
-                        <span class="prize-tier active">$10</span>
+                        <span class="prize-tier active">$5</span>
+                        <span class="prize-tier">$10</span>
                         <span class="prize-tier">$25</span>
                         <span class="prize-tier">$50</span>
                         <span class="prize-tier">$75</span>
                         <span class="prize-tier">$100</span>
                     </div>
                 </div>
+
                 <div id="giveawayForm" class="giveaway-form-block">
                     <input type="email" id="giveawayEmail" placeholder="your@email.com" class="giveaway-input">
                     <button id="giveawaySubmitBtn" class="giveaway-submit-btn">Enter This Week's Drawing</button>
                     <p class="giveaway-legal">One entry per email. No purchase necessary. Drawing held every Sunday.</p>
                 </div>
+
                 <div id="giveawaySuccess" class="giveaway-success-block" style="display:none;">
-                    <div class="success-checkmark">&#10003;</div>
+                    <div class="success-checkmark">✓</div>
                     <h3 class="success-title">You're in the drawing!</h3>
                     <p class="success-subtitle">We'll email you if you win. Good luck!</p>
-                    <a href="https://www.amazon.com/gift-cards/b?node=2238192011&tag=commoncents0050-20" target="_blank" rel="noopener noreferrer" class="amazon-browse-btn">Browse Amazon Gift Cards &rarr;</a>
+                    <a href="https://www.amazon.com/?tag=commoncents0050-20"
+                       target="_blank" rel="noopener noreferrer" class="amazon-browse-btn">
+                        Shop Amazon Daily Deals &rarr;
+                    </a>
                     <p class="success-note">You might find one you love while you wait!</p>
                 </div>
             </div>
