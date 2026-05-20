@@ -377,7 +377,7 @@ function openModal(deal) {
                 </div>
                 <div style="border-top:1px solid var(--border-color); padding-top:1.5rem;">
                     <h3 style="margin-bottom:1rem;">Comments</h3>
-                    <div style="max-height:150px; overflow-y:auto; margin-bottom:1rem;">${commentsHTML}</div>
+                    <div style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${commentsHTML}</div>
                     <div style="background:var(--bg-body); padding:1rem; border-radius:8px;">
                         <input type="email" id="commentEmail" placeholder="Your email (required)" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary);">
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
