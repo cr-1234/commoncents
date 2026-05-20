@@ -79,26 +79,36 @@ ul        { list-style: none; }
 
 /* ── Liquid Glass Mixin ─────────────────────────────────────── */
 .glass {
-    background:  var(--glass-bg);
+    position: relative;
+    background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     box-shadow:
         0 8px 32px rgba(0,0,0,0.3),
-        inset 0 1px 0 var(--glass-shine),
+        inset 0 1.5px 0 var(--glass-shine),
+        inset 0 -1px 0 rgba(0,0,0,0.1),
         var(--glass-inner-border);
+    /* iOS 26 style: subtle refraction distortion on the glass surface */
+    filter: url(#liquid-glass-soft) brightness(1.02);
+    overflow: hidden;
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
 .site-header {
     position: sticky; top: 0; z-index: 100;
     background-color: var(--bg-header);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
     border-bottom: 1px solid var(--glass-border);
-    box-shadow: 0 1px 0 var(--glass-shine), 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow:
+        0 1px 0 var(--glass-shine),
+        0 4px 24px rgba(0,0,0,0.2),
+        inset 0 -1px 0 rgba(0,0,0,0.08);
     padding: 1rem 0;
     transition: background-color 0.3s;
+    /* Stronger refraction for the header bar */
+    filter: url(#liquid-glass-refraction) brightness(1.01);
 }
 
 .header-content { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
@@ -106,12 +116,16 @@ ul        { list-style: none; }
 /* Logo Styling */
 .logo-link {
     text-decoration: none;
-    display: inline-block;
+    display: flex;
+    align-items: center;
     color: inherit;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 .logo-link:hover {
     transform: translateY(-1px);
+    opacity: 0.9;
 }
 .logo-container {
     display: flex;
@@ -183,13 +197,14 @@ ul        { list-style: none; }
 
 /* ── Liquid Glass Theme Button ──────────────────────────────── */
 .theme-btn {
-    background:  var(--glass-bg);
+    background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     box-shadow:
         0 4px 16px rgba(0,0,0,0.25),
-        inset 0 1px 0 var(--glass-shine),
+        inset 0 1.5px 0 var(--glass-shine),
+        inset 0 -1px 0 rgba(0,0,0,0.1),
         var(--glass-inner-border);
     color: var(--text-secondary);
     cursor: pointer;
@@ -199,14 +214,16 @@ ul        { list-style: none; }
     display: flex; align-items: center; justify-content: center;
     transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
     flex-shrink: 0;
+    filter: url(#liquid-glass-soft) brightness(1.02);
 }
 .theme-btn:hover {
     transform: scale(1.12);
     box-shadow:
         0 8px 24px rgba(0,0,0,0.35),
-        inset 0 1px 0 var(--glass-shine),
+        inset 0 1.5px 0 var(--glass-shine),
         0 0 0 1px var(--highlight);
     color: var(--highlight);
+    filter: url(#liquid-glass-soft) brightness(1.06);
 }
 .theme-btn svg { width: 18px; height: 18px; }
 
@@ -220,10 +237,20 @@ ul        { list-style: none; }
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     color: var(--text-primary);
-    box-shadow: inset 0 1px 0 var(--glass-shine), var(--glass-inner-border), 0 4px 16px rgba(0,0,0,0.1);
+    box-shadow:
+        inset 0 1.5px 0 var(--glass-shine),
+        inset 0 -1px 0 rgba(0,0,0,0.08),
+        var(--glass-inner-border),
+        0 4px 16px rgba(0,0,0,0.1);
     transition: border-color 0.2s, box-shadow 0.2s;
+    filter: url(#liquid-glass-soft) brightness(1.01);
 }
-.search-bar input:focus { outline: none; border-color: var(--highlight); box-shadow: inset 0 1px 0 var(--glass-shine), 0 0 0 3px rgba(203,162,88,0.15); }
+.search-bar input:focus {
+    outline: none;
+    border-color: var(--highlight);
+    box-shadow: inset 0 1.5px 0 var(--glass-shine), 0 0 0 3px rgba(212,175,55,0.18);
+    filter: url(#liquid-glass-soft) brightness(1.03);
+}
 .search-bar button { position: absolute; right: 0.5rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.5rem; display: flex; align-items: center; }
 
 /* ── Mobile Nav ─────────────────────────────────────────────── */
