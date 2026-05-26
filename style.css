@@ -7,38 +7,38 @@
     --bg-header:    rgba(0, 0, 0, 0.75);
     --text-primary: #f8f8f8;
     --text-secondary:#a1a1aa;
-    --highlight:    #d4af37;
-    --highlight-hover:#fce590;
+    --highlight:    #f8fafc;
+    --highlight-hover:#ffffff;
     --silver:       #cbd5e1;
     --border-color: rgba(255,255,255,0.08);
     --shadow-md:    0 8px 32px rgba(0,0,0,0.5);
     --font-main:    'Inter', sans-serif;
     --font-display: 'Poppins', sans-serif;
 
-    /* Apple-Style Liquid Glass & Metallic Gold tokens */
+    /* Apple-Style Liquid Glass & Metallic Silver/Chrome tokens */
     --glass-bg:     rgba(255,255,255,0.08);
     --glass-border: rgba(255,255,255,0.0);
     --glass-shine:  rgba(255,255,255,0.1);
     --glass-blur:   blur(40px) saturate(200%);
-    --gold-gradient:linear-gradient(135deg, #d4af37 0%, #fef0a5 25%, #d4af37 50%, #997a15 75%, #fef0a5 100%);
+    --gold-gradient:linear-gradient(135deg, #cbd5e1 0%, #ffffff 25%, #cbd5e1 50%, #94a3b8 75%, #ffffff 100%);
     --glass-inner-border: inset 0 0 0 1px rgba(255,255,255,0.1);
     
     /* Logo Colors */
     --silver-logo:  #ffffff;
-    --gold-logo:    #d4af37;
+    --gold-logo:    #ffffff;
     
     color-scheme: dark;
 }
 
-/* -- Silver & Gold Light Mode -------------------------------- */
+/* -- Silver Chrome Light Mode --------------------------------- */
 .light-mode {
     --bg-body:      #e8ecf0;
     --bg-card:      #ffffff;
     --bg-header:    rgba(232, 236, 240, 0.85);
     --text-primary: #0f172a;
     --text-secondary:#475569;
-    --highlight:    #d4af37;
-    --highlight-hover:#b8860b;
+    --highlight:    #0f172a;
+    --highlight-hover:#334155;
     --silver:       #94a3b8;
     --border-color: rgba(15, 23, 42, 0.08);
     --shadow-md:    0 8px 32px rgba(15, 23, 42, 0.08);
@@ -46,11 +46,11 @@
     --glass-border: rgba(15, 23, 42, 0.05);
     --glass-shine:  rgba(255, 255, 255, 0.6);
     --glass-inner-border: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-    --gold-gradient:linear-gradient(135deg, #d4af37 0%, #fef0a5 25%, #d4af37 50%, #997a15 75%, #fef0a5 100%);
+    --gold-gradient:linear-gradient(135deg, #0f172a 0%, #475569 50%, #0f172a 100%);
     
     /* Logo Colors */
     --silver-logo:  #475569;
-    --gold-logo:    #d4af37;
+    --gold-logo:    #475569;
     
     color-scheme: light;
 }
@@ -158,15 +158,12 @@ ul        { list-style: none; }
 .txt-white {
     color: var(--text-primary);
 }
-.txt-gold {
+.txt-shiny {
     color: var(--highlight);
     background: var(--gold-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 8px rgba(212,175,55,0.25));
-}
-.logo-icon path {
-    transition: stroke 0.3s;
+    filter: drop-shadow(0 2px 8px rgba(255,255,255,0.15));
 }
 
 .highlight  { color: var(--highlight); }
@@ -176,13 +173,13 @@ ul        { list-style: none; }
     100% { background-position: 200% center; }
 }
 
-.gold-text  {
+.gold-text, .shiny-text {
     background: var(--gold-gradient);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: var(--highlight); /* fallback */
-    text-shadow: 0 2px 10px rgba(212,175,55,0.25);
+    text-shadow: 0 2px 10px rgba(255,255,255,0.15);
     animation: shimmer 4s linear infinite;
 }
 .cent-sign  { display: inline-block; position: relative; }
