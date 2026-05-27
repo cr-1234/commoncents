@@ -66,6 +66,12 @@ function initApp() {
 
 // Event Listeners
 function setupEventListeners() {
+    // Dynamic Mouse Glow tracking
+    document.addEventListener('mousemove', (e) => {
+        document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+        document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+    });
+
     searchBtn.addEventListener('click', handleSearch);
     searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') handleSearch();
@@ -283,9 +289,34 @@ function renderDeals() {
     filtered.forEach(deal => dealGrid.appendChild(createDealCard(deal)));
 }
 
+function apply3DTilt(card) {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 8; // Max 10 deg
+        const rotateY = (centerX - x) / 8;
+
+        card.style.transform = `translateY(-5px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        card.style.setProperty('--card-mouse-x', `${x}px`);
+        card.style.setProperty('--card-mouse-y', `${y}px`);
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0px) rotateX(0deg) rotateY(0deg)';
+        card.style.removeProperty('--card-mouse-x');
+        card.style.removeProperty('--card-mouse-y');
+    });
+}
+
 function createDealCard(deal) {
     const article = document.createElement('article');
     article.className = 'deal-card';
+    apply3DTilt(article);
     article.innerHTML = `
         <div class="card-image">
             <img src="${deal.image}" alt="${deal.title}" loading="lazy">

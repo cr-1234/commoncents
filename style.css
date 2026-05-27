@@ -2,55 +2,55 @@
 
 /* ── CSS Variables ─────────────────────────────────────────── */
 :root {
-    --bg-body:      #000000;
-    --bg-card:      #0f0f0f;
-    --bg-header:    rgba(0, 0, 0, 0.75);
-    --text-primary: #f8f8f8;
+    --bg-body:      #0A0A0A;
+    --bg-card:      #121212;
+    --bg-header:    rgba(10, 10, 10, 0.75);
+    --text-primary: #ffffff;
     --text-secondary:#a1a1aa;
-    --highlight:    #f8fafc;
-    --highlight-hover:#ffffff;
+    --highlight:    #D4AF37;
+    --highlight-hover:#E0C04A;
     --silver:       #cbd5e1;
     --border-color: rgba(255,255,255,0.08);
-    --shadow-md:    0 8px 32px rgba(0,0,0,0.5);
+    --shadow-md:    0 12px 40px rgba(0,0,0,0.65);
     --font-main:    'Inter', sans-serif;
     --font-display: 'Poppins', sans-serif;
 
-    /* Apple-Style Liquid Glass & Metallic Silver/Chrome tokens */
-    --glass-bg:     rgba(255,255,255,0.08);
-    --glass-border: rgba(255,255,255,0.0);
-    --glass-shine:  rgba(255,255,255,0.1);
-    --glass-blur:   blur(40px) saturate(200%);
-    --gold-gradient:linear-gradient(135deg, #cbd5e1 0%, #ffffff 25%, #cbd5e1 50%, #94a3b8 75%, #ffffff 100%);
-    --glass-inner-border: inset 0 0 0 1px rgba(255,255,255,0.1);
+    /* Apple-Style Glassmorphism & Metallic Gold tokens */
+    --glass-bg:     rgba(20,20,20,0.55);
+    --glass-border: rgba(255,255,255,0.1);
+    --glass-shine:  rgba(255,255,255,0.15);
+    --glass-blur:   blur(20px);
+    --gold-gradient:linear-gradient(135deg, #F6E8A8 0%, #D4AF37 50%, #B37F15 100%);
+    --glass-inner-border: inset 0 0 0 1px rgba(255,255,255,0.05);
     
     /* Logo Colors */
     --silver-logo:  #ffffff;
-    --gold-logo:    #ffffff;
+    --gold-logo:    #D4AF37;
     
     color-scheme: dark;
 }
 
-/* -- Silver Chrome Light Mode --------------------------------- */
+/* -- Premium Gold Light Mode ---------------------------------- */
 .light-mode {
-    --bg-body:      #e8ecf0;
+    --bg-body:      #f4f4f5;
     --bg-card:      #ffffff;
-    --bg-header:    rgba(232, 236, 240, 0.85);
-    --text-primary: #0f172a;
-    --text-secondary:#475569;
-    --highlight:    #0f172a;
-    --highlight-hover:#334155;
+    --bg-header:    rgba(244, 244, 245, 0.85);
+    --text-primary: #0A0A0A;
+    --text-secondary:#52525b;
+    --highlight:    #C19F4A;
+    --highlight-hover:#A67F2E;
     --silver:       #94a3b8;
     --border-color: rgba(15, 23, 42, 0.08);
     --shadow-md:    0 8px 32px rgba(15, 23, 42, 0.08);
-    --glass-bg:     rgba(255, 255, 255, 0.4);
+    --glass-bg:     rgba(255, 255, 255, 0.45);
     --glass-border: rgba(15, 23, 42, 0.05);
-    --glass-shine:  rgba(255, 255, 255, 0.6);
-    --glass-inner-border: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-    --gold-gradient:linear-gradient(135deg, #0f172a 0%, #475569 50%, #0f172a 100%);
+    --glass-shine:  rgba(255, 255, 255, 0.55);
+    --glass-inner-border: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+    --gold-gradient:linear-gradient(135deg, #D4AF37 0%, #C19F4A 50%, #8F6B22 100%);
     
     /* Logo Colors */
-    --silver-logo:  #475569;
-    --gold-logo:    #475569;
+    --silver-logo:  #52525b;
+    --gold-logo:    #C19F4A;
     
     color-scheme: light;
 }
@@ -65,7 +65,22 @@
 
 /* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body      { font-family: var(--font-main); background-color: var(--bg-body); color: var(--text-primary); line-height: 1.6; transition: background-color 0.3s, color 0.3s; }
+body      { font-family: var(--font-main); background-color: var(--bg-body); color: var(--text-primary); line-height: 1.6; transition: background-color 0.3s, color 0.3s; position: relative; }
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle 450px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(212, 175, 55, 0.05) 0%, transparent 80%);
+    pointer-events: none;
+    z-index: -1;
+    transition: background 0.1s ease;
+}
+.light-mode body::before {
+    background: radial-gradient(circle 450px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(193, 159, 74, 0.03) 0%, transparent 80%);
+}
 h1, h2, h3, h4, h5, h6 { font-family: var(--font-display, var(--font-main)); }
 a         { text-decoration: none; color: inherit; transition: color 0.2s; }
 ul        { list-style: none; }
@@ -379,24 +394,24 @@ ul        { list-style: none; }
 
 
 /* ── Deal Grid ──────────────────────────────────────────────── */
-.deal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.deal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; perspective: 1200px; }
 
 /* ── Deal Card ──────────────────────────────────────────────── */
 .deal-card {
     background-color: var(--bg-card);
     border-radius: 14px; overflow: hidden;
     border: 1px solid var(--border-color);
-    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s, border-color 0.22s;
+    transition: transform 0.1s ease, box-shadow 0.22s, border-color 0.22s;
     display: flex; flex-direction: column; cursor: pointer; position: relative;
+    transform-style: preserve-3d;
 }
 .deal-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(203,162,88,0.35);
-    border-color: rgba(203,162,88,0.4);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.65), 0 0 0 1px var(--highlight);
+    border-color: var(--highlight);
 }
 .deal-card::before {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(203,162,88,0.08) 0%, transparent 70%);
+    background: radial-gradient(circle 120px at var(--card-mouse-x, 50%) var(--card-mouse-y, 0%), rgba(212, 175, 55, 0.15) 0%, transparent 80%);
     opacity: 0; transition: opacity 0.3s; pointer-events: none;
 }
 .deal-card:hover::before { opacity: 1; }
