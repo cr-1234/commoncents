@@ -26,37 +26,18 @@ const categories = [
 const deals = [
     {
         id: 1,
-        title: "Apple AirPods Pro (2nd Generation)",
-        price: 189.00,
-        originalPrice: 249.00,
-        discount: "24% OFF",
-        image: "https://m.media-amazon.com/images/I/71zny7BTRlL._AC_SL1500_.jpg",
+        title: "Placeholder Deal 1",
+        price: 99.99,
+        originalPrice: 149.99,
+        discount: "33% OFF",
+        image: "https://via.placeholder.com/300x200.png?text=Deal+1",
         category: "tech",
         votes: { up: 0, down: 0 },
-        url: "https://www.amazon.com/dp/B0BDHWDR12?tag=commoncents0050-20",
-        description: "Active Noise Cancellation, Adaptive Transparency, Personalized Spatial Audio. Up to 30 hours total listening time with MagSafe Charging Case. One of Apple's best deals."
+        url: "https://example.com/deal1",
+        description: "This is a placeholder deal description for deal 1."
     },
     {
         id: 2,
-        title: "Instant Pot Duo 7-in-1 Electric Pressure Cooker, 6 Qt",
-        price: 79.99,
-        originalPrice: 99.99,
-        discount: "20% OFF",
-        image: "https://m.media-amazon.com/images/I/71V1c4e5g2L._AC_SL1500_.jpg",
-        category: "household",
-        votes: { up: 0, down: 0 },
-        url: "https://www.amazon.com/dp/B00FLYWNYQ?tag=commoncents0050-20",
-        description: "7-in-1 multi-use cooker: pressure cooker, slow cooker, rice cooker, steamer, sauté, yogurt maker & warmer. Cooks up to 70% faster than traditional methods."
-    },
-    {
-        id: 3,
-        title: "Anker 10,000mAh Slim Portable Charger",
-        price: 25.99,
-        originalPrice: 35.99,
-        discount: "28% OFF",
-        image: "https://m.media-amazon.com/images/I/61MpMTCCzWL._AC_SL1500_.jpg",
-        category: "tech",
-        votes: { up: 0, down: 0 },
         url: "https://www.amazon.com/dp/B07QXV6N1B?tag=commoncents0050-20",
         description: "Ultra-slim 10,000mAh power bank charges iPhone 15 over twice. Two charging ports for simultaneous charging. MultiProtect safety system included."
     },

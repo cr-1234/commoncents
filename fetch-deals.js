@@ -6,11 +6,7 @@ const SECRET_KEY = process.env.AMAZON_SECRET_KEY;
 const PARTNER_TAG = process.env.AMAZON_PARTNER_TAG;
 
 if (!ACCESS_KEY || !SECRET_KEY || !PARTNER_TAG) {
-  console.error("--- DEBUG INFO ---");
-  if (!ACCESS_KEY) console.error("Missing: AMAZON_ACCESS_KEY");
-  if (!SECRET_KEY) console.error("Missing: AMAZON_SECRET_KEY");
-  if (!PARTNER_TAG) console.error("Missing: AMAZON_PARTNER_TAG");
-  console.error("------------------");
+  console.error("Missing Amazon PA-API credentials. Please set AMAZON_ACCESS_KEY, AMAZON_SECRET_KEY, and AMAZON_PARTNER_TAG.");
   process.exit(1);
 }
 
@@ -128,5 +124,3 @@ const deals = ${JSON.stringify(deals, null, 4)};
 }
 
 updateDataJs();
-
-

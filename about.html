@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | CommonCents</title>
+    <meta name="description" content="Learn about CommonCents, our mission to bring the best deals and savings to you.">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-content">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search deals...">
+                <button id="searchBtn"><i data-lucide="search"></i></button>
+            </div>
+            <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">
+                <svg class="sun-icon custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><circle cx="12" cy="12" r="4.5"/><path d="M12 2l1.5 3h-3L12 2ZM12 22l-1.5-3h3L12 22ZM4.22 4.22l2.83 1.41-1.41 2.83-1.42-4.24ZM19.78 19.78l-2.83-1.41 1.41-2.83 1.42 4.24ZM2 12l3-1.5v3L2 12ZM22 12l-3 1.5v-3L22 12ZM4.22 19.78l1.41-2.83 2.83 1.41-4.24 1.42ZM19.78 4.22l-1.41 2.83-2.83-1.41 4.24-1.42Z"/></svg>
+                <svg class="moon-icon custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link" data-category="all">All Deals</a>
+                <a href="index.html" class="nav-link" data-category="tech">Tech</a>
+                <a href="index.html" class="nav-link" data-category="tools">Tools</a>
+                <a href="index.html" class="nav-link" data-category="household">Household</a>
+                <a href="index.html" class="nav-link" data-category="groceries">Groceries</a>
+                <a href="index.html" class="nav-link" data-category="gifts-him">Gifts for Him</a>
+                <a href="index.html" class="nav-link" data-category="gifts-her">Gifts for Her</a>
+                <a href="index.html" class="nav-link giveaway-nav-link" id="openGiveaway">Giveaway</a>
+            </nav>
+        </div>
+    </header>
+    <main class="container" style="margin-top:2rem; margin-bottom:2rem; max-width:800px;">
+        <h1 style="color:var(--gold);">About CommonCents</h1>
+        <p style="color:var(--text-primary); line-height:1.6;">
+            At <strong>CommonCents</strong> we believe every cent counts. Our mission is to scour the web for the hottest deals on tech, tools, household items, gifts and more, curating a daily selection that helps you save money while enjoying premium products.
+        </p>
+        <p style="color:var(--text-primary); line-height:1.6;">
+            Built with a sleek black‑and‑gold aesthetic, our site combines modern design, glass‑morphism cards and subtle animations to give you a premium browsing experience.
+        </p>
+    </main>
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div class="footer-disclosure">
+                Affiliate Disclosure: CommonCents participates in the Amazon Associates Program and other affiliate programs. We earn commissions at no extra cost to you.
+            </div>
+            <div class="footer-brand" style="font-family: var(--font-display); letter-spacing: 0.05em; font-weight: 800; font-size: 1.4rem; margin-bottom: 0.25rem;">
+                <span class="txt-shiny">COMMON CENTS</span>
+            </div>
+            <p class="footer-tagline">Making every cent count with the best deals online.</p>
+            <nav class="footer-nav">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+                <a href="cookies.html">Cookies</a>
+            </nav>
+            <p class="footer-copyright">© 2025 CommonCents. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
