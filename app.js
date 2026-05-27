@@ -66,12 +66,6 @@ function initApp() {
 
 // Event Listeners
 function setupEventListeners() {
-    // Dynamic Mouse Glow tracking
-    document.addEventListener('mousemove', (e) => {
-        document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-        document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
-    });
-
     searchBtn.addEventListener('click', handleSearch);
     searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') handleSearch();
@@ -184,7 +178,7 @@ function setupEventListeners() {
 
             // Big confetti celebration
             for (let i = 0; i < 6; i++) {
-                setTimeout(() => createConfetti(window.innerWidth / 2, window.innerHeight / 3), i * 100);
+                setTimeout(() => createConfetti(e.clientX, e.clientY), i * 100);
             }
         });
     }
@@ -316,7 +310,7 @@ function apply3DTilt(card) {
 function createDealCard(deal) {
     const article = document.createElement('article');
     article.className = 'deal-card';
-    apply3DTilt(article);
+    // apply3DTilt(article); // removed tilt effect
     article.innerHTML = `
         <div class="card-image">
             <img src="${deal.image}" alt="${deal.title}" loading="lazy">
@@ -354,6 +348,11 @@ function createDealCard(deal) {
 
     article.addEventListener('click', (e) => {
         if (e.target.closest('a') || e.target.closest('button')) return;
+        createConfetti(e.clientX, e.clientY); // confetti at card click
+        // Add glass effect to modal when it opens
+        modal.style.display = 'flex';
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) modalContent.classList.add('glass');
         openModal(deal);
     });
 
@@ -467,6 +466,12 @@ function openModal(deal) {
     const modalDealBtn = modalBody.querySelector('.modal-deal-btn');
     modalDealBtn.addEventListener('click', (e) => {
         createConfetti(e.clientX, e.clientY);
+    });
+    // Remove glass class when modal closed via close button
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) modalContent.classList.remove('glass');
     });
 
     modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
