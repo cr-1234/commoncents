@@ -3,13 +3,18 @@ let currentCategory = 'all';
 let searchQuery = '';
 
 // Weekly Tracking Helpers
-// Giveaway storage – using static keys for persistence across sessions
-const GIVEAWAY_ENTRIES_KEY = 'giveawayEntries';
-const GIVEAWAY_EMAIL_KEY = 'giveawayMyEmail';
-function getGiveawayEntries() { return JSON.parse(localStorage.getItem(GIVEAWAY_ENTRIES_KEY) || '[]'); }
-function setGiveawayEntries(entries) { localStorage.setItem(GIVEAWAY_ENTRIES_KEY, JSON.stringify(entries)); }
-function getMyEmail() { return localStorage.getItem(GIVEAWAY_EMAIL_KEY); }
-function setMyEmail(email) { localStorage.setItem(GIVEAWAY_EMAIL_KEY, email); }
+function getWeeklyKey(base) {
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + 4 - (d.getDay()||7));
+    const yearStart = new Date(d.getFullYear(),0,1);
+    const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+    return base + '_' + d.getFullYear() + '_W' + weekNo;
+}
+function getGiveawayEntries() { return JSON.parse(localStorage.getItem(getWeeklyKey('giveawayEntries')) || '[]'); }
+function setGiveawayEntries(entries) { localStorage.setItem(getWeeklyKey('giveawayEntries'), JSON.stringify(entries)); }
+function getMyEmail() { return localStorage.getItem(getWeeklyKey('giveawayMyEmail')); }
+function setMyEmail(email) { localStorage.setItem(getWeeklyKey('giveawayMyEmail'), email); }
 
 // Prize amount scales with entries
 function calculatePrize(count) {
@@ -155,7 +160,7 @@ function setupEventListeners() {
     if (giveawaySubmitBtn) {
         giveawaySubmitBtn.addEventListener('click', () => {
             const emailInput = document.getElementById('giveawayEmail');
-            const email = emailInput.value.trim().toLowerCase();
+            const email      = emailInput.value.trim().toLowerCase();
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
             if (!emailRegex.test(email)) {
@@ -165,56 +170,22 @@ function setupEventListeners() {
             }
             emailInput.style.borderColor = '';
 
-            // Fetch user IP
-            fetch('https://api.ipify.org?format=json')
-                .then(r => r.json())
-                .then(data => {
-                    const ip = data.ip;
-                    const map = JSON.parse(localStorage.getItem('giveawayIPEntries') || '{}');
-                    const existingEmails = map[ip] || [];
-                    // If IP already has a different email entered, block
-                    if (existingEmails.length && !existingEmails.includes(email)) {
-                        alert('⚠️ One entry per IP address. Please use the same email as previous entry.');
-                        return;
-                    }
-                    // Save email under this IP
-                    if (!existingEmails.includes(email)) {
-                        existingEmails.push(email);
-                        map[ip] = existingEmails;
-                        localStorage.setItem('giveawayIPEntries', JSON.stringify(map));
-                    }
-                    // Save unique email globally (existing logic)
-                    const entries = getGiveawayEntries();
-                    if (!entries.includes(email)) {
-                        entries.push(email);
-                        setGiveawayEntries(entries);
-                    }
-                    setMyEmail(email);
+            // Save unique email
+            const entries = getGiveawayEntries();
+            if (!entries.includes(email)) {
+                entries.push(email);
+                setGiveawayEntries(entries);
+            }
+            setMyEmail(email);
 
-                    updateEntryCount();
-                    document.getElementById('giveawayForm').style.display = 'none';
-                    document.getElementById('giveawaySuccess').style.display = 'block';
+            updateEntryCount();
+            document.getElementById('giveawayForm').style.display    = 'none';
+            document.getElementById('giveawaySuccess').style.display = 'block';
 
-                    // Big confetti celebration
-                    for (let i = 0; i < 6; i++) {
-                        setTimeout(() => createConfetti(window.innerWidth / 2, window.innerHeight / 3), i * 100);
-                    }
-                })
-                .catch(() => {
-                    // If IP fetch fails, proceed without IP restriction
-                    const entries = getGiveawayEntries();
-                    if (!entries.includes(email)) {
-                        entries.push(email);
-                        setGiveawayEntries(entries);
-                    }
-                    setMyEmail(email);
-                    updateEntryCount();
-                    document.getElementById('giveawayForm').style.display = 'none';
-                    document.getElementById('giveawaySuccess').style.display = 'block';
-                    for (let i = 0; i < 6; i++) {
-                        setTimeout(() => createConfetti(window.innerWidth / 2, window.innerHeight / 3), i * 100);
-                    }
-                });
+            // Big confetti celebration
+            for (let i = 0; i < 6; i++) {
+                setTimeout(() => createConfetti(window.innerWidth / 2, window.innerHeight / 3), i * 100);
+            }
         });
     }
 
@@ -319,25 +290,6 @@ function renderDeals() {
 }
 
 function apply3DTilt(card) {
-    // Tilt effect disabled per user request; keep a subtle lift on hover
-    card.addEventListener('mousemove', (e) => {
-        // No rotation applied; optional slight translate for feedback
-        card.style.transform = 'translateY(-5px)';
-    });
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-    });
-}
-    // Tilt effect disabled per user request
-    card.addEventListener('mousemove', (e) => {
-        // No rotation applied
-    });
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-        card.style.removeProperty('--card-mouse-x');
-        card.style.removeProperty('--card-mouse-y');
-    });
-}
     card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -346,8 +298,8 @@ function apply3DTilt(card) {
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
         
-    const rotateX = (y - centerY) / 15; // Reduced intensity
-    const rotateY = (centerX - x) / 15;
+        const rotateX = (y - centerY) / 8; // Max 10 deg
+        const rotateY = (centerX - x) / 8;
 
         card.style.transform = `translateY(-5px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
         card.style.setProperty('--card-mouse-x', `${x}px`);
@@ -363,7 +315,7 @@ function apply3DTilt(card) {
 
 function createDealCard(deal) {
     const article = document.createElement('article');
-    article.className = 'deal-card glass';
+    article.className = 'deal-card';
     apply3DTilt(article);
     article.innerHTML = `
         <div class="card-image">
@@ -574,36 +526,3 @@ function getAffiliateUrl(url) {
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
-
-function renderSavingsChart() {
-    const canvas = document.getElementById('savingsChart');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    // Calculate total potential savings from deals (original price minus current price)
-    const totalSavings = deals.reduce((sum, deal) => {
-        const original = deal.originalPrice ?? deal.price;
-        return sum + (original - deal.price);
-    }, 0);
-    const totalSpend = deals.reduce((sum, deal) => sum + deal.price, 0);
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Savings', 'Spend'],
-            datasets: [{
-                data: [totalSavings, totalSpend],
-                backgroundColor: ['#3b82f6', '#cbd5e1'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom' },
-                title: { display: true, text: 'Potential Savings vs Spend' }
-            }
-        }
-    });
-}
-
-// Initialize Savings Tracker after DOM load
-renderSavingsChart();
