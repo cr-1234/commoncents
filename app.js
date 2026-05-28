@@ -66,12 +66,6 @@ function initApp() {
 
 // Event Listeners
 function setupEventListeners() {
-    // Dynamic Mouse Glow tracking
-    document.addEventListener('mousemove', (e) => {
-        document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-        document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
-    });
-
     searchBtn.addEventListener('click', handleSearch);
     searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') handleSearch();
@@ -182,10 +176,7 @@ function setupEventListeners() {
             document.getElementById('giveawayForm').style.display    = 'none';
             document.getElementById('giveawaySuccess').style.display = 'block';
 
-            // Big confetti celebration
-            for (let i = 0; i < 6; i++) {
-                setTimeout(() => createConfetti(window.innerWidth / 2, window.innerHeight / 3), i * 100);
-            }
+            
         });
     }
 
@@ -304,34 +295,10 @@ function renderDeals() {
     filtered.forEach(deal => dealGrid.appendChild(createDealCard(deal)));
 }
 
-function apply3DTilt(card) {
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = (y - centerY) / 8; // Max 10 deg
-        const rotateY = (centerX - x) / 8;
-
-        card.style.transform = `translateY(-5px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        card.style.setProperty('--card-mouse-x', `${x}px`);
-        card.style.setProperty('--card-mouse-y', `${y}px`);
-    });
-
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'translateY(0px) rotateX(0deg) rotateY(0deg)';
-        card.style.removeProperty('--card-mouse-x');
-        card.style.removeProperty('--card-mouse-y');
-    });
-}
-
 function createDealCard(deal) {
     const article = document.createElement('article');
     article.className = 'deal-card';
-    apply3DTilt(article);
+    
     article.innerHTML = `
         <div class="card-image">
             <img src="${deal.image}" alt="${deal.title}" loading="lazy">
@@ -360,13 +327,6 @@ function createDealCard(deal) {
             </div>
         </div>`;
 
-    const dealLink = article.querySelector('.view-deal-btn');
-    dealLink.addEventListener('click', (e) => {
-        createConfetti(e.clientX, e.clientY);
-        dealLink.style.transform = 'scale(1.05)';
-        setTimeout(() => dealLink.style.transform = 'scale(1)', 200);
-    });
-
     article.addEventListener('click', (e) => {
         if (e.target.closest('a') || e.target.closest('button')) return;
         openModal(deal);
@@ -386,9 +346,6 @@ function handleVote(e, deal, type) {
     const countSpan    = btn.querySelector('span');
     const otherCount   = otherBtn.querySelector('span');
 
-    btn.classList.add('pop');
-    setTimeout(() => btn.classList.remove('pop'), 300);
-
     // If already active, toggle off
     if (btn.classList.contains('active')) {
         btn.classList.remove('active');
@@ -401,36 +358,11 @@ function handleVote(e, deal, type) {
         }
         btn.classList.add('active');
         deal.votes[type]++;
-        if (type === 'up') {
-            createSparks(btn);
-            const rect = btn.getBoundingClientRect();
-            createConfetti(rect.left + rect.width / 2, rect.top);
-            createConfetti(rect.left + rect.width / 2, rect.top);
-        }
     }
     countSpan.textContent = deal.votes[type];
 }
 
-function createSparks(btn) {
-    const rect    = btn.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top  + rect.height / 2;
-    for (let i = 0; i < 20; i++) {
-        const spark    = document.createElement('div');
-        spark.className = 'spark';
-        const angle    = 220 + Math.random() * 100;
-        const distance = 40  + Math.random() * 60;
-        spark.style.setProperty('--tx', `${Math.cos(angle * Math.PI / 180) * distance}px`);
-        spark.style.setProperty('--ty', `${Math.sin(angle * Math.PI / 180) * distance}px`);
-        const size = 3 + Math.random() * 4;
-        spark.style.width  = `${size}px`;
-        spark.style.height = `${size}px`;
-        spark.style.left   = `${centerX + window.scrollX}px`;
-        spark.style.top    = `${centerY + window.scrollY}px`;
-        document.body.appendChild(spark);
-        setTimeout(() => spark.remove(), 800);
-    }
-}
+
 
 function openModal(deal) {
     if (!deal.comments) deal.comments = [];
@@ -480,11 +412,6 @@ function openModal(deal) {
     if (window.innerWidth < 768) modalBody.querySelector('.modal-grid').style.gridTemplateColumns = '1fr';
     modal.style.display = 'flex';
 
-    const modalDealBtn = modalBody.querySelector('.modal-deal-btn');
-    modalDealBtn.addEventListener('click', (e) => {
-        createConfetti(e.clientX, e.clientY);
-    });
-
     modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
     modalBody.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
 
@@ -498,23 +425,6 @@ function openModal(deal) {
         deal.comments.unshift({ user: emailVal.split('@')[0], text: textVal, time: 'Just now' });
         openModal(deal);
     });
-}
-
-// Confetti celebration effect
-function createConfetti(x, y) {
-    const colors = ['#cba258', '#cbd5e1', '#3b82f6', '#f8fafc', '#f472b6'];
-    for (let i = 0; i < 30; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.left = x + 'px';
-        confetti.style.top  = y + 'px';
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.setProperty('--tx', `${(Math.random() - 0.5) * 350}px`);
-        confetti.style.setProperty('--ty', `${(Math.random() - 0.5) * 350}px`);
-        confetti.style.setProperty('--rotation', `${Math.random() * 720}deg`);
-        document.body.appendChild(confetti);
-        setTimeout(() => confetti.remove(), 1000);
-    }
 }
 
 function getStoreName(url) {

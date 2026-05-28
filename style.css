@@ -25,7 +25,7 @@
     --glass-inner-border: inset 0 0 0 1px rgba(255,255,255,0.05);
     
     /* Logo Colors */
-    --silver-logo:  #ffffff;
+    --silver-logo:  #b0b0b0;
     --gold-logo:    #D4AF37;
     
     color-scheme: dark;
@@ -323,7 +323,7 @@ ul        { list-style: none; }
     background: var(--glass-bg); backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border); box-shadow: inset 0 1px 0 var(--glass-shine), var(--glass-inner-border), 0 8px 32px rgba(0,0,0,0.5);
-    border-radius: 8px; 
+    border-radius: var(--border-radius);
     overflow: hidden; z-index: 100;
     display: none;
     flex-direction: column;
