@@ -1,12 +1,11 @@
 {
-  "name": "commoncents-auto",
+  "name": "commoncents",
   "version": "1.0.0",
-  "description": "Automated deal fetcher for CommonCents",
-  "main": "fetch-deals.js",
+  "description": "CommonCents UI with unified border radius",
   "scripts": {
-    "update-deals": "node fetch-deals.js"
+    "dev": "live-server --port=8080 --open=./index.html"
   },
-  "dependencies": {
-    "amazon-paapi": "^1.0.6"
+  "devDependencies": {
+    "live-server": "^1.2.2"
   }
 }
