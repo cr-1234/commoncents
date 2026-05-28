@@ -59,7 +59,7 @@
             <a href="index.html" class="logo-link">
                 <div class="logo-container">
                     <div class="logo-text-group">
-                        <div class="logo-title"><span class="txt-silver">Common</span> <span class="txt-shiny">CENTS</span></div>
+                        <div class="logo-title"><span class="txt-shiny">COMMONCENTS</span></div>
                         <div class="logo-tagline">PREMIUM DEALS. SMARTER CHOICES.</div>
                     </div>
                 </div>
@@ -68,16 +68,8 @@
                 <input type="text" id="searchInput" placeholder="Search deals...">
                 <button id="searchBtn"><i data-lucide="search"></i></button>
             </div>
-            <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">
-                <svg class="sun-icon custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                    <circle cx="12" cy="12" r="4.5"/>
-                    <path d="M12 2l1.5 3h-3L12 2ZM12 22l-1.5-3h3L12 22ZM4.22 4.22l2.83 1.41-1.41 2.83-1.42-4.24ZM19.78 19.78l-2.83-1.41 1.41-2.83 1.42 4.24ZM2 12l3-1.5v3L2 12ZM22 12l-3 1.5v-3L22 12ZM4.22 19.78l1.41-2.83 2.83 1.41-4.24 1.42ZM19.78 4.22l-1.41 2.83-2.83-1.41 4.24-1.42Z"/>
-                </svg>
-                <svg class="moon-icon custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-            </button>
             <nav class="main-nav">
+                <a href="#" class="nav-link giveaway-nav-link" id="openGiveaway">Giveaway</a>
                 <a href="#" class="nav-link active" data-category="all">All Deals</a>
                 <a href="#" class="nav-link" data-category="tech">Tech</a>
                 <a href="#" class="nav-link" data-category="tools">Tools</a>
@@ -85,7 +77,6 @@
                 <a href="#" class="nav-link" data-category="groceries">Groceries</a>
                 <a href="#" class="nav-link" data-category="gifts-him">Gifts for Him</a>
                 <a href="#" class="nav-link" data-category="gifts-her">Gifts for Her</a>
-                <a href="#" class="nav-link giveaway-nav-link" id="openGiveaway">Giveaway</a>
             </nav>
         </div>
     </header>
@@ -109,6 +100,13 @@
                 <h3 class="giveaway-sidebar-title">Win an Amazon<br>Gift Card</h3>
                 <p class="giveaway-sidebar-prize" id="sidebarPrize">Prize starts at $5 · grows with entries</p>
                 <button class="btn giveaway-sidebar-btn full-width" id="openGiveawaySidebar">Enter the Drawing</button>
+            </div>
+            <div class="sidebar-widget quick-post-widget" style="background: linear-gradient(135deg, rgba(203,162,88,0.06) 0%, rgba(203,162,88,0.02) 100%); border: 1px solid rgba(203,162,88,0.15); border-radius: var(--border-radius); padding: 1.25rem; margin-top: 1.5rem; box-shadow: inset 0 1px 0 rgba(203,162,88,0.1);">
+                <div class="giveaway-sidebar-badge" style="color: var(--highlight);">FAST SUBMIT</div>
+                <h3 class="giveaway-sidebar-title" style="font-size: 1.15rem; margin-bottom: 0.5rem;">Quick Post Deal</h3>
+                <p class="giveaway-sidebar-prize" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;">Paste your Amazon Associates link below to instantly generate a deal card on the site.</p>
+                <input type="text" id="quickLinkInput" placeholder="Paste Amazon link..." class="giveaway-input" style="font-size: 0.85rem; padding: 0.65rem 0.85rem; margin-bottom: 0.75rem; border-radius: 9999px !important;">
+                <button class="btn btn-primary full-width" id="quickPostBtn" style="font-size: 0.85rem; padding: 0.65rem 1rem; border-radius: 9999px !important;">Generate Deal Card</button>
             </div>
         </aside>
 
@@ -196,15 +194,15 @@
                 Affiliate Disclosure: CommonCents is a participant in the Amazon Services LLC Associates Program and other affiliate programs. As an Amazon Associate, we earn from qualifying purchases. We may receive a commission when you click our links and make purchases at no additional cost to you.
             </div>
             <div class="footer-brand" style="font-family: var(--font-display); letter-spacing: 0.05em; font-weight: 800; font-size: 1.4rem; margin-bottom: 0.25rem;">
-                <span class="txt-shiny">COMMON CENTS</span>
+                <span class="txt-shiny">COMMONCENTS</span>
             </div>
             <p class="footer-tagline">Making every cent count with the best deals online.</p>
             <nav class="footer-nav">
-                <a href="/about">About</a>
-                <a href="/contact">Contact</a>
-                <a href="/privacy">Privacy</a>
-                <a href="/terms">Terms</a>
-                <a href="/cookies">Cookies</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+                <a href="cookies.html">Cookies</a>
             </nav>
             <p class="footer-copyright">&copy; 2025 CommonCents. All rights reserved.</p>
         </div>

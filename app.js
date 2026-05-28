@@ -54,6 +54,15 @@ const closeModal    = document.querySelector('.close-modal');
 // Initialize
 function initApp() {
     lucide.createIcons(); // Must be first so icons are rendered before we touch display
+    
+    // Load custom deals from localStorage and add them to deals array
+    const customDeals = JSON.parse(localStorage.getItem('customDeals') || '[]');
+    customDeals.forEach(cd => {
+        if (!deals.some(d => d.id === cd.id)) {
+            deals.unshift(cd);
+        }
+    });
+
     renderDeals();
     setupEventListeners();
     updateEntryCount();
@@ -84,11 +93,13 @@ function setupEventListeners() {
     closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
     // Theme toggle — icons handled entirely by CSS class, not inline style
     const themeToggle = document.getElementById('themeToggle');
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-        const isLight = document.body.classList.contains('light-mode');
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    });
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
+    }
 
     // ── Custom Dropdown ─────────────────────────────────────────────────
     const sortDropdown = document.getElementById('sortDropdown');
@@ -183,6 +194,25 @@ function setupEventListeners() {
     // Submit Deal Button
     const submitDealBtn = document.getElementById('submitDealBtn');
     if (submitDealBtn) submitDealBtn.addEventListener('click', openSubmitDealModal);
+
+    // Quick Post Button
+    const quickPostBtn = document.getElementById('quickPostBtn');
+    if (quickPostBtn) {
+        quickPostBtn.addEventListener('click', () => {
+            const input = document.getElementById('quickLinkInput');
+            let url = input.value.trim();
+            if (!url) {
+                alert('⚠️ Please paste a link first!');
+                return;
+            }
+            // Ensure affiliate tag is appended if it's an amazon link
+            url = getAffiliateUrl(url);
+
+            // Open a beautiful pre-filled simplified submit modal
+            openQuickSubmitModal(url);
+            input.value = ''; // clear input
+        });
+    }
 }
 
 function openSubmitDealModal() {
@@ -306,7 +336,7 @@ function createDealCard(deal) {
         <div class="card-content">
             <div class="card-meta">
                 <span class="card-category">${deal.category.replace('gifts-him','Gifts for Him').replace('gifts-her','Gifts for Her')}</span>
-                <span class="txt-silver">Common</span><span class="txt-shiny">CENTS</span>
+                <span class="card-source">${getStoreName(deal.url)}</span>
             </div>
             <h3 class="card-title">${deal.title}</h3>
             <div class="card-price">
@@ -424,6 +454,88 @@ function openModal(deal) {
         }
         deal.comments.unshift({ user: emailVal.split('@')[0], text: textVal, time: 'Just now' });
         openModal(deal);
+    });
+}
+
+function openQuickSubmitModal(url) {
+    const store = getStoreName(url) || 'Store';
+    modalBody.innerHTML = `
+        <div style="max-width:500px; margin:0 auto; padding-bottom:1.5rem;">
+            <h2 style="margin-bottom:0.5rem; text-align:center; color:var(--text-primary); font-family:var(--font-display);">Quick Generate Deal</h2>
+            <p style="color:var(--text-secondary); font-size:0.9rem; text-align:center; margin-bottom:1.5rem;">We'll automatically set up the affiliate tracking link for ${store}. Just fill out the title & price below!</p>
+            <form id="quickSubmissionForm">
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Product Title</label>
+                    <input type="text" id="quickTitle" required placeholder="e.g., Echo Dot (5th Gen) Smart Speaker" style="width:100%; padding:0.75rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                    <div>
+                        <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Deal Price ($)</label>
+                        <input type="number" step="0.01" id="quickPrice" required placeholder="39.99" style="width:100%; padding:0.75rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Category</label>
+                        <select id="quickCategory" style="width:100%; padding:0.75rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none; height:45px;">
+                            <option value="tech">Tech</option>
+                            <option value="tools">Tools</option>
+                            <option value="household">Household</option>
+                            <option value="groceries">Groceries</option>
+                            <option value="gifts-him">Gifts for Him</option>
+                            <option value="gifts-her">Gifts for Her</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Optional Image URL (or leave blank for generic placeholder)</label>
+                    <input type="url" id="quickImage" placeholder="https://..." style="width:100%; padding:0.75rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                </div>
+                <button type="submit" class="btn btn-primary full-width" style="border-radius:9999px !important; padding:0.75rem; font-weight:700;">Publish to Website</button>
+            </form>
+        </div>`;
+    modal.style.display = 'flex';
+    document.getElementById('quickSubmissionForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('quickTitle').value.trim();
+        const priceVal = parseFloat(document.getElementById('quickPrice').value);
+        const category = document.getElementById('quickCategory').value;
+        let image = document.getElementById('quickImage').value.trim();
+        
+        // If image is blank, assign a beautiful high-quality generic placeholder based on the category!
+        if (!image) {
+            const placeholders = {
+                tech: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&auto=format&fit=crop",
+                tools: "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=500&auto=format&fit=crop",
+                household: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500&auto=format&fit=crop",
+                groceries: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop",
+                "gifts-him": "https://images.unsplash.com/photo-1508962914676-134849a727f0?w=500&auto=format&fit=crop",
+                "gifts-her": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=500&auto=format&fit=crop"
+            };
+            image = placeholders[category] || "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&auto=format&fit=crop";
+        }
+
+        const newDeal = {
+            id: Date.now(),
+            title,
+            price: priceVal,
+            originalPrice: Math.round(priceVal * 1.25),
+            discount: "20% OFF",
+            image,
+            category,
+            votes: { up: 1, down: 0 },
+            url,
+            description: `Great deal on ${title} at ${store}! Generated via fast Associates link submit.`,
+        };
+
+        // Add to active deals memory
+        deals.unshift(newDeal);
+
+        // Save to customDeals localStorage to persist permanently
+        const customDeals = JSON.parse(localStorage.getItem('customDeals') || '[]');
+        customDeals.unshift(newDeal);
+        localStorage.setItem('customDeals', JSON.stringify(customDeals));
+
+        renderDeals();
+        modal.style.display = 'none';
     });
 }
 

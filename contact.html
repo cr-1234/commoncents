@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | CommonCents</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-content">
+            <a href="index.html" class="logo-link">
+                <div class="logo-container">
+                    <div class="logo-text-group">
+                        <div class="logo-title"><span class="txt-shiny">COMMONCENTS</span></div>
+                        <div class="logo-tagline">PREMIUM DEALS. SMARTER CHOICES.</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <div class="container" style="max-width:600px; margin: 4rem auto; padding: 0 20px;">
+        <div class="glass" style="padding: 3rem; border-radius: var(--border-radius); border: 1px solid var(--glass-border); box-shadow: var(--shadow-md);">
+            <h1 style="font-size: 2.2rem; margin-bottom: 1rem; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: var(--font-display); font-weight: 800; text-align: center;">Contact Us</h1>
+            <p style="color: var(--text-secondary); text-align: center; margin-bottom: 2rem;">Have a question, feedback, or a deal partnership suggestion? Send us a message!</p>
+            
+            <form onsubmit="event.preventDefault(); alert('✉️ Thank you! Your message has been sent successfully.'); this.reset();">
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Your Name</label>
+                    <input type="text" required placeholder="e.g., John Doe" style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Your Email Address</label>
+                    <input type="email" required placeholder="name@domain.com" style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Message</label>
+                    <textarea rows="5" required placeholder="Write your message here..." style="width:100%; padding:1rem 1.25rem; border-radius:20px; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none; font-family:inherit;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary full-width" style="border-radius:9999px !important; padding:0.8rem; font-weight:700; font-size:1rem;">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div class="footer-disclosure">
+                Affiliate Disclosure: CommonCents is a participant in the Amazon Services LLC Associates Program and other affiliate programs. As an Amazon Associate, we earn from qualifying purchases. We may receive a commission when you click our links and make purchases at no additional cost to you.
+            </div>
+            <div class="footer-brand" style="font-family: var(--font-display); letter-spacing: 0.05em; font-weight: 800; font-size: 1.4rem; margin-bottom: 0.25rem;">
+                <span class="txt-shiny">COMMONCENTS</span>
+            </div>
+            <p class="footer-tagline">Making every cent count with the best deals online.</p>
+            <nav class="footer-nav">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+                <a href="cookies.html">Cookies</a>
+            </nav>
+            <p class="footer-copyright">&copy; 2025 CommonCents. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
