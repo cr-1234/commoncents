@@ -235,13 +235,28 @@ function openSubmitDealModal() {
     modal.style.display = 'flex';
     document.getElementById('dealSubmissionForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        const btn = e.target.querySelector('button');
-        btn.textContent = 'Submitting...';
-        btn.disabled = true;
-        setTimeout(() => {
-            alert('✅ Deal submitted! We will review it shortly.');
-            modal.style.display = 'none';
-        }, 1500);
+        const form = e.target;
+        const title = form.querySelector('input[type=text]').value.trim();
+        const priceVal = parseFloat(form.querySelector('input[type=number]').value);
+        const category = form.querySelector('select').value;
+        const url = form.querySelector('input[type=url]').value.trim();
+        const description = form.querySelector('textarea').value.trim();
+        const image = 'https://via.placeholder.com/300x200?text=Deal';
+        const newDeal = {
+            id: Date.now(),
+            title,
+            price: priceVal,
+            originalPrice: Math.round(priceVal * 1.2),
+            discount: '',
+            image,
+            category,
+            votes: { up: 0, down: 0 },
+            url,
+            description,
+        };
+        deals.unshift(newDeal);
+        renderDeals();
+        modal.style.display = 'none';
     });
 }
 
@@ -324,7 +339,7 @@ function createDealCard(deal) {
         <div class="card-content">
             <div class="card-meta">
                 <span class="card-category">${deal.category.replace('gifts-him','Gifts for Him').replace('gifts-her','Gifts for Her')}</span>
-                <span class="card-source">• ${getStoreName(deal.url)}</span>
+                <span class="txt-silver">Common</span><span class="txt-shiny">CENTS</span>
             </div>
             <h3 class="card-title">${deal.title}</h3>
             <div class="card-price">
@@ -374,6 +389,7 @@ function handleVote(e, deal, type) {
     btn.classList.add('pop');
     setTimeout(() => btn.classList.remove('pop'), 300);
 
+    // If already active, toggle off
     if (btn.classList.contains('active')) {
         btn.classList.remove('active');
         deal.votes[type]--;
