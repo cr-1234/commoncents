@@ -30,30 +30,7 @@
     color-scheme: dark;
 }
 
-/* -- Premium Gold Light Mode ---------------------------------- */
-.light-mode {
-    --bg-body:      #f4f4f5;
-    --bg-card:      #ffffff;
-    --bg-header:    rgba(244, 244, 245, 0.85);
-    --text-primary: #0A0A0A;
-    --text-secondary:#52525b;
-    --highlight:    #C19F4A;
-    --highlight-hover:#A67F2E;
-    --silver:       #94a3b8;
-    --border-color: rgba(15, 23, 42, 0.08);
-    --shadow-md:    0 8px 32px rgba(15, 23, 42, 0.08);
-    --glass-bg:     rgba(255, 255, 255, 0.45);
-    --glass-border: rgba(15, 23, 42, 0.05);
-    --glass-shine:  rgba(255, 255, 255, 0.55);
-    --glass-inner-border: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
-    --gold-gradient:linear-gradient(135deg, #D4AF37 0%, #C19F4A 50%, #8F6B22 100%);
-    
-    /* Logo Colors */
-    --silver-logo:  #52525b;
-    --gold-logo:    #C19F4A;
-    
-    color-scheme: light;
-}
+
 
 /* ── Theme Toggle Icons via CSS (no JS display juggling) ─────── */
 /* Dark mode  → show sun (click to go light)  */
