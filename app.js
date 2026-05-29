@@ -2,6 +2,9 @@
 let currentCategory = 'all';
 let searchQuery = '';
 
+// Paste your Google Sheet published CSV URL below:
+const SPREADSHEET_CSV_URL = '';
+
 // Weekly Tracking Helpers
 function getWeeklyKey(base) {
     const d = new Date();
@@ -71,6 +74,9 @@ function initApp() {
     if (localStorage.getItem('theme') === 'light') {
         document.body.classList.add('light-mode');
     }
+
+    // Load dynamic deals from Google Sheets if configured
+    loadGoogleSheetDeals();
 }
 
 // Event Listeners
@@ -461,6 +467,85 @@ function getAffiliateUrl(url) {
         }
         return url;
     } catch (e) { return url; }
+}
+
+async function loadGoogleSheetDeals() {
+    if (!SPREADSHEET_CSV_URL) return;
+    try {
+        const response = await fetch(SPREADSHEET_CSV_URL);
+        const csvText = await response.text();
+        const sheetDeals = parseCSV(csvText);
+        // Add parsed deals to the main deals array
+        sheetDeals.forEach(deal => {
+            // Avoid duplicates
+            if (!deals.some(d => d.id === deal.id)) {
+                deals.unshift(deal);
+            }
+        });
+        renderDeals();
+    } catch (error) {
+        console.error('Error loading Google Sheet deals:', error);
+    }
+}
+
+function parseCSV(text) {
+    const lines = text.split(/\r?\n/);
+    if (lines.length < 2) return [];
+    
+    // Simple CSV parser handling quotes
+    const headers = parseCSVLine(lines[0]);
+    const results = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const values = parseCSVLine(lines[i]);
+        const deal = {};
+        
+        headers.forEach((header, index) => {
+            let val = values[index] || '';
+            const key = header.trim();
+            if (key === 'price' || key === 'originalPrice') {
+                deal[key] = parseFloat(val) || 0;
+            } else if (key === 'id') {
+                deal[key] = parseInt(val) || (Date.now() + i);
+            } else {
+                deal[key] = val;
+            }
+        });
+        
+        // Ensure required fields exist
+        if (deal.title && deal.url) {
+            // Ensure ID is unique/valid
+            if (!deal.id) {
+                deal.id = deal.title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + (deal.price || 0);
+            }
+            if (!deal.votes) {
+                deal.votes = { up: 0, down: 0 };
+            }
+            results.push(deal);
+        }
+    }
+    return results;
+}
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    result.push(current.trim());
+    return result.map(val => val.replace(/^"|"$/g, '').replace(/""/g, '"'));
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
