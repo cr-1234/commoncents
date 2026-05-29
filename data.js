@@ -9,7 +9,6 @@ const deals = [
         category: "Electronics",
         price: 189.99,
         original_price: 249.00,
-        discount: "24%",
         image: "https://m.media-amazon.com/images/I/61SUj2aKoEL._AC_SL1500_.jpg",
         link: "https://www.amazon.com/dp/B0BDHWDR12?tag=commoncents0c-20",
         featured: true
@@ -20,7 +19,6 @@ const deals = [
         category: "Home & Kitchen",
         price: 79.99,
         original_price: 119.99,
-        discount: "33%",
         image: "https://m.media-amazon.com/images/I/71+8uTMDRlL._AC_SL1500_.jpg",
         link: "https://www.amazon.com/dp/B07VT2S7FG?tag=commoncents0c-20",
         featured: true
@@ -31,7 +29,6 @@ const deals = [
         category: "Tools",
         price: 99.00,
         original_price: 179.00,
-        discount: "45%",
         image: "https://m.media-amazon.com/images/I/81UX5lGnLBL._AC_SL1500_.jpg",
         link: "https://www.amazon.com/dp/B07Q3GQY4V?tag=commoncents0c-20",
         featured: false
@@ -42,7 +39,6 @@ const deals = [
         category: "Outdoors",
         price: 219.99,
         original_price: 299.99,
-        discount: "27%",
         image: "https://m.media-amazon.com/images/I/61i421VnFYL._AC_SL1500_.jpg",
         link: "https://www.amazon.com/dp/B082TMBYR6?tag=commoncents0c-20",
         featured: true
@@ -53,7 +49,6 @@ const deals = [
         category: "Fashion",
         price: 29.99,
         original_price: 59.50,
-        discount: "50%",
         image: "https://m.media-amazon.com/images/I/81QpkIctqPL._AC_UX679_.jpg",
         link: "https://www.amazon.com/dp/B0018OR118?tag=commoncents0c-20",
         featured: false
@@ -64,7 +59,6 @@ const deals = [
         category: "Electronics",
         price: 199.00,
         original_price: 249.00,
-        discount: "20%",
         image: "https://m.media-amazon.com/images/I/71YlH-4MUQL._AC_SL1500_.jpg",
         link: "https://www.amazon.com/dp/B0BDJ7P4V8?tag=commoncents0c-20",
         featured: false
@@ -75,7 +69,6 @@ const deals = [
         category: "Home & Kitchen",
         price: 69.95,
         original_price: 99.95,
-        discount: "30%",
         image: "https://m.media-amazon.com/images/I/71w3oakROAL._AC_SL1500_.jpg",
         link: "https://www.amazon.com/dp/B00FLYWNYQ?tag=commoncents0c-20",
         featured: false
@@ -86,7 +79,6 @@ const deals = [
         category: "Tools",
         price: 99.00,
         original_price: 159.00,
-        discount: "38%",
         image: "https://m.media-amazon.com/images/I/71E+6UN-VlL._AC_SL1500_.jpg",
         link: "https://www.amazon.com/dp/B01D61SS2I?tag=commoncents0c-20",
         featured: false
@@ -97,7 +89,6 @@ const deals = [
         category: "Outdoors",
         price: 39.99,
         original_price: 59.99,
-        discount: "33%",
         image: "https://m.media-amazon.com/images/I/81hV4fWTqEL._AC_SL1500_.jpg",
         link: "https://www.amazon.com/dp/B004E4AZRQ?tag=commoncents0c-20",
         featured: false
@@ -108,7 +99,6 @@ const deals = [
         category: "Fashion",
         price: 24.99,
         original_price: 45.00,
-        discount: "44%",
         image: "https://m.media-amazon.com/images/I/71cKQ5x7VhL._AC_UY741_.jpg",
         link: "https://www.amazon.com/dp/B07Q2QZ2ZV?tag=commoncents0c-20",
         featured: false
@@ -119,7 +109,6 @@ const deals = [
         category: "Electronics",
         price: 347.99,
         original_price: 477.99,
-        discount: "27%",
         image: "https://m.media-amazon.com/images/I/71LJJrYU3XL._AC_SL1500_.jpg",
         link: "https://www.amazon.com/dp/B0B1VQ3V3V?tag=commoncents0c-20",
         featured: false
@@ -130,7 +119,6 @@ const deals = [
         category: "Home & Kitchen",
         price: 49.99,
         original_price: 79.99,
-        discount: "38%",
         image: "https://m.media-amazon.com/images/I/61-k-WgZYlL._AC_SL1000_.jpg",
         link: "https://www.amazon.com/dp/B08J7M1K7N?tag=commoncents0c-20",
         featured: false
