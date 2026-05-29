@@ -13,9 +13,93 @@ const categories = [
    ==============================================================================
    To add your own deal to the site, follow these steps:
    
-   1. Find the `const deals = [` line just below this comment.
+   1. Find the `const deals = [
+    {
+        id: 101,
+        title: "Anker PowerCore 10000 Portable Charger",
+        category: "tech",
+        price: 21.99,
+        originalPrice: 35.99,
+        discount: 39,
+        rating: 4.6,
+        reviews: 87432,
+        image: "https://m.media-amazon.com/images/I/61D1VVjRj-L._AC_SL1500_.jpg",
+        url: "https://www.amazon.com/dp/B0194WDVHI?tag=commoncents0050-20",
+        description: "Ultra-compact 10000mAh portable charger with PowerIQ charging technology",
+        dateAdded: "2026-05-29"
+    },
+    {
+        id: 102,
+        title: "DEWALT 20V MAX Cordless Drill Driver Kit",
+        category: "tools",
+        price: 99.00,
+        originalPrice: 149.00,
+        discount: 34,
+        rating: 4.8,
+        reviews: 25671,
+        image: "https://m.media-amazon.com/images/I/71Rv5r1BUUL._AC_SL1500_.jpg",
+        url: "https://www.amazon.com/dp/B00IJ0AL1S?tag=commoncents0050-20",
+        description: "Compact 1/2-inch drill with 2 batteries, charger, and bag",
+        dateAdded: "2026-05-29"
+    },
+    {
+        id: 103,
+        title: "Bedsure Satin Pillowcases Set of 2",
+        category: "household",
+        price: 8.99,
+        originalPrice: 19.99,
+        discount: 55,
+        rating: 4.5,
+        reviews: 198543,
+        image: "https://m.media-amazon.com/images/I/71pWzhdypkL._AC_SL1500_.jpg",
+        url: "https://www.amazon.com/dp/B07G5TY3QT?tag=commoncents0050-20",
+        description: "Silky satin pillowcases for hair and skin - Standard size",
+        dateAdded: "2026-05-29"
+    },` line just below this comment.
    2. Copy one of the existing deal blocks (from the `{` to the `},`).
-   3. Paste it right under `const deals = [`.
+   3. Paste it right under `const deals = [
+    {
+        id: 101,
+        title: "Anker PowerCore 10000 Portable Charger",
+        category: "tech",
+        price: 21.99,
+        originalPrice: 35.99,
+        discount: 39,
+        rating: 4.6,
+        reviews: 87432,
+        image: "https://m.media-amazon.com/images/I/61D1VVjRj-L._AC_SL1500_.jpg",
+        url: "https://www.amazon.com/dp/B0194WDVHI?tag=commoncents0050-20",
+        description: "Ultra-compact 10000mAh portable charger with PowerIQ charging technology",
+        dateAdded: "2026-05-29"
+    },
+    {
+        id: 102,
+        title: "DEWALT 20V MAX Cordless Drill Driver Kit",
+        category: "tools",
+        price: 99.00,
+        originalPrice: 149.00,
+        discount: 34,
+        rating: 4.8,
+        reviews: 25671,
+        image: "https://m.media-amazon.com/images/I/71Rv5r1BUUL._AC_SL1500_.jpg",
+        url: "https://www.amazon.com/dp/B00IJ0AL1S?tag=commoncents0050-20",
+        description: "Compact 1/2-inch drill with 2 batteries, charger, and bag",
+        dateAdded: "2026-05-29"
+    },
+    {
+        id: 103,
+        title: "Bedsure Satin Pillowcases Set of 2",
+        category: "household",
+        price: 8.99,
+        originalPrice: 19.99,
+        discount: 55,
+        rating: 4.5,
+        reviews: 198543,
+        image: "https://m.media-amazon.com/images/I/71pWzhdypkL._AC_SL1500_.jpg",
+        url: "https://www.amazon.com/dp/B07G5TY3QT?tag=commoncents0050-20",
+        description: "Silky satin pillowcases for hair and skin - Standard size",
+        dateAdded: "2026-05-29"
+    },`.
    4. Change the "id" to a unique number (like 999).
    5. Update the "title", "price", "originalPrice", "discount", "image", "url", 
       and "description" to match your new product!
@@ -24,6 +108,48 @@ const categories = [
 ============================================================================== */
 
 const deals = [
+    {
+        id: 101,
+        title: "Anker PowerCore 10000 Portable Charger",
+        category: "tech",
+        price: 21.99,
+        originalPrice: 35.99,
+        discount: 39,
+        rating: 4.6,
+        reviews: 87432,
+        image: "https://m.media-amazon.com/images/I/61D1VVjRj-L._AC_SL1500_.jpg",
+        url: "https://www.amazon.com/dp/B0194WDVHI?tag=commoncents0050-20",
+        description: "Ultra-compact 10000mAh portable charger with PowerIQ charging technology",
+        dateAdded: "2026-05-29"
+    },
+    {
+        id: 102,
+        title: "DEWALT 20V MAX Cordless Drill Driver Kit",
+        category: "tools",
+        price: 99.00,
+        originalPrice: 149.00,
+        discount: 34,
+        rating: 4.8,
+        reviews: 25671,
+        image: "https://m.media-amazon.com/images/I/71Rv5r1BUUL._AC_SL1500_.jpg",
+        url: "https://www.amazon.com/dp/B00IJ0AL1S?tag=commoncents0050-20",
+        description: "Compact 1/2-inch drill with 2 batteries, charger, and bag",
+        dateAdded: "2026-05-29"
+    },
+    {
+        id: 103,
+        title: "Bedsure Satin Pillowcases Set of 2",
+        category: "household",
+        price: 8.99,
+        originalPrice: 19.99,
+        discount: 55,
+        rating: 4.5,
+        reviews: 198543,
+        image: "https://m.media-amazon.com/images/I/71pWzhdypkL._AC_SL1500_.jpg",
+        url: "https://www.amazon.com/dp/B07G5TY3QT?tag=commoncents0050-20",
+        description: "Silky satin pillowcases for hair and skin - Standard size",
+        dateAdded: "2026-05-29"
+    },
     {
         id: 1,
         title: "Apple AirPods Pro (2nd Generation)",
