@@ -1,126 +1,162 @@
-const fs = require('fs');
-const amazonPaapi = require('amazon-paapi');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 
-const ACCESS_KEY = process.env.AMAZON_ACCESS_KEY;
-const SECRET_KEY = process.env.AMAZON_SECRET_KEY;
-const PARTNER_TAG = process.env.AMAZON_PARTNER_TAG;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-if (!ACCESS_KEY || !SECRET_KEY || !PARTNER_TAG) {
-  console.error("Missing Amazon PA-API credentials. Please set AMAZON_ACCESS_KEY, AMAZON_SECRET_KEY, and AMAZON_PARTNER_TAG.");
+// Amazon PA-API 5.0 config
+const accessKey = process.env.AMAZON_ACCESS_KEY;
+const secretKey = process.env.AMAZON_SECRET_KEY;
+const partnerTag = process.env.AMAZON_PARTNER_TAG;
+const region = 'us-east-1';
+const host = 'webservices.amazon.com';
+const uri = '/paapi5/searchitems';
+
+if (!accessKey || !secretKey || !partnerTag) {
+  console.error('Missing Amazon API credentials. Check GitHub Secrets.');
   process.exit(1);
 }
 
-const commonParameters = {
-  AccessKey: ACCESS_KEY,
-  SecretKey: SECRET_KEY,
-  PartnerTag: PARTNER_TAG,
-  PartnerType: 'Associates',
-  Marketplace: 'www.amazon.com'
-};
-
-// We will fetch items from a few categories
-const searchQueries = [
-  { keywords: 'Laptop deals', category: 'tech' },
-  { keywords: 'Power tools deals', category: 'tools' },
-  { keywords: 'Smart home deals', category: 'household' }
+// Keywords to search for deals - customize these
+const keywords = [
+  'tech deals',
+  'tools under 100',
+  'household essentials',
+  'gifts for him',
+  'gifts for her'
 ];
 
-async function fetchDeals() {
-  let allDeals = [];
-  let dealId = 1;
-
-  for (const query of searchQueries) {
-    const requestParameters = {
-      Keywords: query.keywords,
-      SearchIndex: 'All',
-      ItemCount: 4,
-      Resources: [
-        'ItemInfo.Title',
-        'ItemInfo.Features',
-        'Offers.Listings.Price',
-        'Offers.Listings.SavingBasis',
-        'Images.Primary.Large',
-        'ItemInfo.Classifications'
-      ]
-    };
-
-    try {
-      console.log(`Searching Amazon for: ${query.keywords}`);
-      const data = await amazonPaapi.SearchItems(commonParameters, requestParameters);
-      
-      if (data.SearchResult && data.SearchResult.Items) {
-        for (const item of data.SearchResult.Items) {
-          const title = item.ItemInfo?.Title?.DisplayValue || "Amazon Deal";
-          const url = item.DetailPageURL;
-          const image = item.Images?.Primary?.Large?.URL || "/images/placeholder.png";
-          
-          let price = 0;
-          let originalPrice = 0;
-          let discount = "";
-
-          const offers = item.Offers?.Listings;
-          if (offers && offers.length > 0) {
-            price = offers[0].Price?.Amount || 0;
-            originalPrice = offers[0].SavingBasis?.Amount || price;
-            
-            if (originalPrice > price) {
-              const savings = originalPrice - price;
-              const percentage = Math.round((savings / originalPrice) * 100);
-              discount = `${percentage}% OFF`;
-            }
-          }
-
-          if (price === 0) continue; // Skip items without a price
-
-          const description = item.ItemInfo?.Features?.DisplayValues?.[0] || "Check out this great deal on Amazon today!";
-
-          allDeals.push({
-            id: dealId++,
-            title: title.length > 60 ? title.substring(0, 57) + "..." : title,
-            price: price,
-            originalPrice: originalPrice,
-            discount: discount,
-            image: image,
-            category: query.category,
-            votes: { up: 0, down: 0 },
-            url: url,
-            description: description.length > 150 ? description.substring(0, 147) + "..." : description
-          });
-        }
-      }
-    } catch (error) {
-      console.error(`Error fetching for ${query.keywords}:`, error);
-    }
-    
-    // Add a small delay between requests to avoid rate limits
-    await new Promise(resolve => setTimeout(resolve, 2000));
-  }
-
-  return allDeals;
+// Helper: AWS V4 signing for PA-API
+function sign(key, msg) {
+  return crypto.createHmac('sha256', key).update(msg).digest();
 }
 
-async function updateDataJs() {
-  const deals = await fetchDeals();
+function getSignatureKey(key, dateStamp, regionName, serviceName) {
+  const kDate = sign('AWS4' + key, dateStamp);
+  const kRegion = sign(kDate, regionName);
+  const kService = sign(kRegion, serviceName);
+  const kSigning = sign(kService, 'aws4_request');
+  return kSigning;
+}
+
+async function searchItems(keyword) {
+  const payload = {
+    Keywords: keyword,
+    Resources: [
+      'Images.Primary.Large',
+      'ItemInfo.Title',
+      'Offers.Listings.Price',
+      'Offers.Listings.SavingBasis',
+      'CustomerReviews.Count',
+      'CustomerReviews.StarRating'
+    ],
+    PartnerTag: partnerTag,
+    PartnerType: 'Associates',
+    Marketplace: 'www.amazon.com',
+    ItemCount: 3,
+    MinSavingPercent: 20
+  };
+
+  const payloadStr = JSON.stringify(payload);
+  const amzDate = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
+  const dateStamp = amzDate.substr(0, 8);
   
-  if (deals.length === 0) {
-    console.warn("No deals fetched. data.js will not be updated.");
-    return;
+  const canonicalHeaders = `content-encoding:amz-1.0\ncontent-type:application/json; charset=utf-8\nhost:${host}\nx-amz-date:${amzDate}\nx-amz-target:com.amazon.paapi5.v1.ProductAdvertisingAPIv1.SearchItems\n`;
+  const signedHeaders = 'content-encoding;content-type;host;x-amz-date;x-amz-target';
+  const payloadHash = crypto.createHash('sha256').update(payloadStr).digest('hex');
+  const canonicalRequest = `POST\n${uri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+  
+  const algorithm = 'AWS4-HMAC-SHA256';
+  const credentialScope = `${dateStamp}/${region}/ProductAdvertisingAPI/aws4_request`;
+  const stringToSign = `${algorithm}\n${amzDate}\n${credentialScope}\n${crypto.createHash('sha256').update(canonicalRequest).digest('hex')}`;
+  
+  const signingKey = getSignatureKey(secretKey, dateStamp, region, 'ProductAdvertisingAPI');
+  const signature = crypto.createHmac('sha256', signingKey).update(stringToSign).digest('hex');
+  
+  const authorizationHeader = `${algorithm} Credential=${accessKey}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+  const response = await fetch(`https://${host}${uri}`, {
+    method: 'POST',
+    headers: {
+      'Content-Encoding': 'amz-1.0',
+      'Content-Type': 'application/json; charset=utf-8',
+      'Host': host,
+      'X-Amz-Date': amzDate,
+      'X-Amz-Target': 'com.amazon.paapi5.v1.ProductAdvertisingAPIv1.SearchItems',
+      'Authorization': authorizationHeader
+    },
+    body: payloadStr
+  });
+
+  if (!response.ok) {
+    console.error(`API error for "${keyword}": ${response.status} ${await response.text()}`);
+    return [];
   }
 
-  const fileContent = `const categories = [
-    { id: 'all', name: 'All Deals' },
-    { id: 'tech', name: 'Tech' },
-    { id: 'tools', name: 'Tools' },
-    { id: 'household', name: 'Household' },
-    { id: 'groceries', name: 'Groceries' },
-    { id: 'credit-cards', name: 'Credit Cards' }
-];
+  const data = await response.json();
+  return data.SearchResult?.Items || [];
+}
 
-const deals = ${JSON.stringify(deals, null, 4)};
+function formatDeal(item, idStart) {
+  const listing = item.Offers?.Listings?.[0];
+  const price = listing?.Price?.Amount || 0;
+  const savings = listing?.SavingBasis?.Amount || price;
+  const discount = savings > price ? Math.round(((savings - price) / savings) * 100) : 0;
+  
+  return {
+    id: idStart,
+    title: item.ItemInfo?.Title?.DisplayValue || 'Unknown Product',
+    category: 'tech', // You can map keywords to categories
+    price: price,
+    originalPrice: savings,
+    discount: discount,
+    rating: item.CustomerReviews?.StarRating?.Value || 4.5,
+    reviews: item.CustomerReviews?.Count || 0,
+    image: item.Images?.Primary?.Large?.URL || '',
+    url: item.DetailPageURL + `?tag=${partnerTag}`,
+    description: item.ItemInfo?.Title?.DisplayValue || '',
+    dateAdded: new Date().toISOString().split('T')[0]
+  };
+}
+
+async function main() {
+  console.log('Fetching deals from Amazon PA-API...');
+  let allDeals = [];
+  let idCounter = 1000;
+
+  for (const keyword of keywords) {
+    console.log(`Searching: ${keyword}`);
+    try {
+      const items = await searchItems(keyword);
+      const deals = items.map(item => formatDeal(item, idCounter++));
+      allDeals.push(...deals);
+      await new Promise(r => setTimeout(r, 1000)); // Rate limit
+    } catch (e) {
+      console.error(`Failed for ${keyword}:`, e.message);
+    }
+  }
+
+  if (allDeals.length === 0) {
+    console.error('No deals found. Check API credentials or keywords.');
+    process.exit(1);
+  }
+
+  const dataJsContent = `// Auto-generated by GitHub Actions - ${new Date().toISOString()}
+const deals = ${JSON.stringify(allDeals, null, 2)};
+
+if (typeof module !== 'undefined') {
+  module.exports = deals;
+}
 `;
 
-  fs.writeFileSync('data.js', fileContent);
-  console.log("Successfully updated data.js with new Amazon deals!");
+  const outputPath = path.join(__dirname, '..', 'data.js');
+  fs.writeFileSync(outputPath, dataJsContent);
+  console.log(`Successfully wrote ${allDeals.length} deals to data.js`);
 }
 
-updateDataJs();
+main().catch(e => {
+  console.error('Fatal error:', e);
+  process.exit(1);
+});
