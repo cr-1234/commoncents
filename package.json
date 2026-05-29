@@ -3,16 +3,9 @@
   "version": "1.0.0",
   "description": "CommonCents UI with unified border radius",
   "scripts": {
-    "dev": "live-server --port=8080 --open=./index.html",
-    "update-deals": "node scripts/update-deals.js"
+    "dev": "live-server --port=8080 --open=./index.html"
   },
   "devDependencies": {
     "live-server": "^1.2.2"
-  },
-  "type": "module",
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "node-fetch": "^3.3.2",
-    "crypto": "^1.0.1"
   }
 }
