@@ -2,7 +2,7 @@ name: Auto Fetch Deals
 
 on:
   schedule:
-    - cron: '0 0,12 * * *'
+    - cron: '0 0,12 * * *' # Runs 12am + 12pm UTC
   workflow_dispatch:
 
 env:
@@ -11,23 +11,27 @@ env:
 jobs:
   update-deals:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '24'
+          node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
 
       - name: Check Secrets
         run: |
-          if [ -z "${{ secrets.AMAZON_ACCESS_KEY }}" ]; then echo "ACCESS KEY IS MISSING"; else echo "ACCESS KEY FOUND"; fi
-          if [ -z "${{ secrets.AMAZON_SECRET_KEY }}" ]; then echo "SECRET KEY IS MISSING"; else echo "SECRET KEY FOUND"; fi
-          if [ -z "${{ secrets.AMAZON_PARTNER_TAG }}" ]; then echo "PARTNER TAG IS MISSING"; else echo "PARTNER TAG FOUND"; fi
+          if [ -z "${{ secrets.AMAZON_ACCESS_KEY }}" ]; then echo "ACCESS KEY IS MISSING"; exit 1; else echo "ACCESS KEY FOUND"; fi
+          if [ -z "${{ secrets.AMAZON_SECRET_KEY }}" ]; then echo "SECRET KEY IS MISSING"; exit 1; else echo "SECRET KEY FOUND"; fi
+          if [ -z "${{ secrets.AMAZON_PARTNER_TAG }}" ]; then echo "PARTNER TAG IS MISSING"; exit 1; else echo "PARTNER TAG FOUND"; fi
 
       - name: Fetch new deals
         env:
@@ -42,4 +46,3 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data.js
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update deals via Amazon API" && git push)
-
