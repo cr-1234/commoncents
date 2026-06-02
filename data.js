@@ -23,7 +23,6 @@ const categories = [
    It will instantly show up on the website as the newest deal!
 ============================================================================== */
 
-const deals = [];
 const deals = [
 {
     id: 1,
