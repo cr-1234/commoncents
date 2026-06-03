@@ -2,7 +2,7 @@ const deals = [
 {
     id: 1,
     title: "Multi-Function Screw Extractor Pliers",
-    category: "household",
+    category: "tools",
     price: 13.95,  // changed from 13.99 to make 7% exact
     originalPrice: 15,
     image: "https://m.media-amazon.com/images/I/71QHf6Xjy1L._AC_SX679_.jpg",
