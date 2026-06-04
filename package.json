@@ -1,9 +1,11 @@
 {
   "name": "commoncents",
   "version": "1.0.0",
+  "type": "module",
   "description": "CommonCents UI with unified border radius",
   "scripts": {
-    "dev": "live-server --port=8080 --open=./index.html"
+    "dev": "live-server --port=8080 --open=./index.html",
+    "update-deals": "node scripts/update-deals.js"
   },
   "devDependencies": {
     "live-server": "^1.2.2"
