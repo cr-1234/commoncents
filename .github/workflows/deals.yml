@@ -1,9 +1,6 @@
 name: Auto Fetch Deals
 
-off:
-  schedule:
-    - cron: '0 0,12 * * *' # Runs 12am + 12pm UTC
-  workflow_dispatch:
+on: {}  # Workflow is disabled
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
