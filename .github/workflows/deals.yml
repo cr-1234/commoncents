@@ -1,6 +1,6 @@
 name: Auto Fetch Deals
 
-on:
+off:
   schedule:
     - cron: '0 0,12 * * *' # Runs 12am + 12pm UTC
   workflow_dispatch:
