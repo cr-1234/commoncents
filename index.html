@@ -78,6 +78,11 @@
                 <a href="#" class="nav-link" data-category="gifts-him">Gifts for Him</a>
                 <a href="#" class="nav-link" data-category="gifts-her">Gifts for Her</a>
             </nav>
+            <div class="auth-area" id="authArea">
+                <span class="auth-email" id="authEmail" style="display:none;"></span>
+                <button type="button" class="auth-btn" id="signInBtn">Sign in</button>
+                <button type="button" class="auth-btn auth-btn-out" id="signOutBtn" style="display:none;">Sign out</button>
+            </div>
         </div>
     </header>
 
@@ -123,10 +128,17 @@
             <div class="interest-picker" id="interestPicker">
                 <div class="interest-picker-head">
                     <span class="interest-picker-title">Build your feed — deals from every site, only what you care about</span>
-                    <button type="button" class="my-feed-btn" id="myFeedBtn">My Feed</button>
+                    <button type="button" class="my-feed-btn" id="feedDoneBtn">Done</button>
                 </div>
                 <div class="interest-chips" id="interestChips"></div>
                 <p class="feed-status" id="feedStatus"></p>
+                <div class="feed-slim" id="feedSlim">
+                    <span class="feed-slim-text" id="feedSlimText"></span>
+                    <span class="feed-slim-actions">
+                        <button type="button" class="feed-slim-btn" id="feedBackBtn" style="display:none;">Back to my feed</button>
+                        <button type="button" class="feed-slim-btn" id="feedChangeBtn">Change</button>
+                    </span>
+                </div>
             </div>
             <div class="deal-grid" id="dealGrid"></div>
         </main>
@@ -172,6 +184,7 @@
 
                 <div id="giveawayForm" class="giveaway-form-block">
                     <input type="email" id="giveawayEmail" placeholder="your@email.com" class="giveaway-input">
+                    <p class="giveaway-account-note" id="giveawayAccountNote" style="display:none;"></p>
                     <button id="giveawaySubmitBtn" class="giveaway-submit-btn">Enter This Week's Drawing</button>
                     <p class="giveaway-legal">One entry per person per week. Come back on different days — every 2 visit days earns +1 bonus entry (up to 5 extra chances). Bonuses add chances, never change the prize. No purchase necessary. Drawing every Sunday at noon ET.</p>
                     <p class="giveaway-legal" id="giveawayError" style="display:none;color:#ef4444;"></p>
@@ -212,9 +225,30 @@
         </div>
     </footer>
 
+    <!-- Sign-in modal -->
+    <div class="modal" id="authModal" style="display:none;">
+        <div class="modal-content auth-modal-content">
+            <span class="close-modal" id="authClose">&times;</span>
+            <h2 class="auth-title" id="authTitle">Sign in</h2>
+            <p class="auth-sub">Your feed picks save to your account, and entering the weekly drawing is one tap — no typing your email.</p>
+            <button type="button" class="auth-google-btn" id="authGoogleBtn">Continue with Google</button>
+            <div class="auth-divider"><span>or</span></div>
+            <form id="authForm">
+                <input type="email" id="authEmailInput" placeholder="your@email.com" class="giveaway-input" autocomplete="email">
+                <input type="password" id="authPasswordInput" placeholder="Password" class="giveaway-input" autocomplete="current-password">
+                <p class="giveaway-legal" id="authError" style="display:none;color:#ef4444;"></p>
+                <button type="submit" id="authSubmitBtn" class="giveaway-submit-btn">Sign in</button>
+            </form>
+            <button type="button" class="auth-toggle" id="authToggleMode">New here? Create an account</button>
+        </div>
+    </div>
+
     <script src="data.js"></script>
     <script src="feed-data.js"></script>
     <script src="giveaway-backend.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
     <script src="tailored-feed.js"></script>
     <script src="app.js"></script>
 </body>

@@ -4,7 +4,14 @@
 // ...). Their homepage then shows ONLY deals matching their interests,
 // gathered from all the deal sites we collect — one place, no wading
 // through everything else. Choices are saved on the visitor's own device
-// (no account, no signup) and can be changed anytime.
+// (no account needed); signed-in visitors get the same picks saved to
+// their account instead (see auth.js). Changeable anytime.
+//
+// Layout: while you're picking, the full chip picker shows. Once you
+// have picks and tap Done, the picker collapses to a slim one-line bar
+// ("Your feed: Tech + Baby & Kids — 10 deals · Change") so it stays out
+// of the way; "Change" brings the chips back. Browsing a category keeps
+// the slim bar, with a "Back to my feed" button.
 //
 // Also the on-site half of deal alerts: deals collected since your last
 // visit get a "NEW FOR YOU" badge. (Email alerts are a later add-on.)
@@ -60,10 +67,25 @@
     }
 
     var mode = getInterests().length ? 'mine' : 'browse';
+    var expanded = getInterests().length === 0; // picker starts open only for new visitors
     var prevVisit = parseInt(lsGet('ccLastVisit') || '0', 10) || 0;
     lsSet('ccLastVisit', String(Date.now()));
 
-    // Consulted by app.js renderDeals()/createDealCard().
+    function notifyChange() {
+        if (window.CC_AUTH && CC_AUTH.noteInterestsChanged) {
+            try { CC_AUTH.noteInterestsChanged(getInterests()); } catch (e) {}
+        }
+    }
+    function matchCount() {
+        if (typeof deals === 'undefined') return 0;
+        var mine = getInterests();
+        return deals.filter(function (d) {
+            var di = dealInterests(d);
+            return mine.some(function (k) { return di[k]; });
+        }).length;
+    }
+
+    // Consulted by app.js renderDeals()/createDealCard() and auth.js.
     window.CC_FEED = {
         mode: function () { return mode; },
         match: function (deal) {
@@ -76,36 +98,55 @@
             if (!deal.ts) return false;
             var ts = Date.parse(deal.ts);
             return !isNaN(ts) && ts > prevVisit;
+        },
+        getInterests: getInterests,
+        setInterests: function (keys, fromAccount) {
+            var valid = (keys || []).filter(function (k) {
+                return INTERESTS.some(function (i) { return i.key === k; });
+            });
+            lsSet('ccInterests', JSON.stringify(valid));
+            mode = valid.length ? 'mine' : 'browse';
+            expanded = valid.length === 0;
+            if (!fromAccount) notifyChange();
+            paintAll();
+            if (typeof renderDeals === 'function') renderDeals();
         }
     };
 
-    document.addEventListener('DOMContentLoaded', function () {
-        var chipsEl = document.getElementById('interestChips');
-        var statusEl = document.getElementById('feedStatus');
-        var myFeedBtn = document.getElementById('myFeedBtn');
-        if (!chipsEl) return;
-
-        function updateStatus() {
-            if (!statusEl) return;
-            var mine = getInterests();
+    var els = {};
+    function paintAll() {
+        if (!els.picker) return;
+        var mine = getInterests();
+        els.picker.classList.toggle('slim', !expanded && mine.length > 0);
+        // slim bar text + back button visibility
+        if (els.slimText) {
             if (mode === 'mine' && mine.length) {
-                var n = 0;
-                if (typeof deals !== 'undefined') {
-                    n = deals.filter(function (d) { return CC_FEED.match(d); }).length;
-                }
-                statusEl.textContent = 'Your feed: ' + mine.map(labelFor).join(' + ')
-                    + ' — ' + n + ' deal' + (n === 1 ? '' : 's')
-                    + '. Tap a category any time to browse everything.';
+                var n = matchCount();
+                els.slimText.textContent = 'Your feed: ' + mine.map(labelFor).join(' + ')
+                    + ' — ' + n + ' deal' + (n === 1 ? '' : 's');
             } else if (mine.length) {
-                statusEl.textContent = 'Browsing by category. Your interests are saved — tap "My Feed" to see only your deals.';
+                els.slimText.textContent = 'Browsing everything — your feed is saved.';
             } else {
-                statusEl.textContent = 'Pick what you care about and this page becomes your feed — only those deals, from every site we collect.';
+                els.slimText.textContent = '';
             }
         }
-
-        function paintChips() {
-            var mine = getInterests();
-            chipsEl.innerHTML = '';
+        if (els.backBtn) els.backBtn.style.display = (mine.length && mode !== 'mine') ? '' : 'none';
+        // expanded status line
+        if (els.status) {
+            if (mode === 'mine' && mine.length) {
+                var c = matchCount();
+                els.status.textContent = 'Your feed: ' + mine.map(labelFor).join(' + ')
+                    + ' — ' + c + ' deal' + (c === 1 ? '' : 's')
+                    + '. Tap "Done" to tuck this picker away.';
+            } else if (mine.length) {
+                els.status.textContent = 'Browsing by category. Your interests are saved — use the bar above to jump back to your feed.';
+            } else {
+                els.status.textContent = 'Pick what you care about and this page becomes your feed — only those deals, from every site we collect.';
+            }
+        }
+        // chips
+        if (els.chips) {
+            els.chips.innerHTML = '';
             INTERESTS.forEach(function (it) {
                 var b = document.createElement('button');
                 b.type = 'button';
@@ -117,37 +158,49 @@
                     if (i === -1) cur.push(it.key); else cur.splice(i, 1);
                     lsSet('ccInterests', JSON.stringify(cur));
                     mode = cur.length ? 'mine' : 'browse';
-                    paintChips();
-                    updateStatus();
+                    notifyChange();
+                    paintAll();
                     if (typeof renderDeals === 'function') renderDeals();
                 });
-                chipsEl.appendChild(b);
+                els.chips.appendChild(b);
             });
         }
+    }
 
-        if (myFeedBtn) {
-            myFeedBtn.addEventListener('click', function () {
-                if (!getInterests().length) {
-                    if (statusEl) statusEl.textContent = 'First pick at least one interest above — then My Feed shows only those deals.';
-                    return;
-                }
-                mode = 'mine';
-                updateStatus();
-                if (typeof renderDeals === 'function') renderDeals();
-            });
-        }
+    document.addEventListener('DOMContentLoaded', function () {
+        els.picker = document.getElementById('interestPicker');
+        els.chips = document.getElementById('interestChips');
+        els.status = document.getElementById('feedStatus');
+        els.slimText = document.getElementById('feedSlimText');
+        els.backBtn = document.getElementById('feedBackBtn');
+        var doneBtn = document.getElementById('feedDoneBtn');
+        var changeBtn = document.getElementById('feedChangeBtn');
+        if (!els.picker) return;
+
+        if (doneBtn) doneBtn.addEventListener('click', function () {
+            expanded = false;
+            paintAll();
+        });
+        if (changeBtn) changeBtn.addEventListener('click', function () {
+            expanded = true;
+            paintAll();
+        });
+        if (els.backBtn) els.backBtn.addEventListener('click', function () {
+            mode = 'mine';
+            paintAll();
+            if (typeof renderDeals === 'function') renderDeals();
+        });
 
         // Any category browsing switches back to "browse" mode; the saved
-        // interests stay put for My Feed.
+        // interests stay put for the slim bar's "Back to my feed".
         document.querySelectorAll('[data-category]').forEach(function (el) {
             el.addEventListener('click', function () {
                 mode = 'browse';
-                updateStatus();
+                paintAll();
             });
         });
 
-        paintChips();
-        updateStatus();
+        paintAll();
         if (mode === 'mine' && typeof renderDeals === 'function') renderDeals();
     });
 })();

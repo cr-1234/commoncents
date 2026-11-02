@@ -176,6 +176,20 @@ function setupEventListeners() {
             document.getElementById('giveawayForm').style.display    = 'block';
             document.getElementById('giveawaySuccess').style.display = 'none';
         }
+        // Signed in? The drawing uses the account email — no typing.
+        const emIn = document.getElementById('giveawayEmail');
+        const note = document.getElementById('giveawayAccountNote');
+        const signedIn = !!(window.CC_AUTH && CC_AUTH.user && CC_AUTH.user());
+        if (emIn && note) {
+            if (signedIn) {
+                emIn.style.display = 'none';
+                note.textContent = "You're signed in as " + CC_AUTH.email() + " — one tap enters you with that email.";
+                note.style.display = 'block';
+            } else {
+                emIn.style.display = '';
+                note.style.display = 'none';
+            }
+        }
         giveawayModal.style.display = 'flex';
     }
 
@@ -189,6 +203,35 @@ function setupEventListeners() {
     if (giveawaySubmitBtn) {
         giveawaySubmitBtn.addEventListener('click', () => {
             const emailInput = document.getElementById('giveawayEmail');
+            // Signed in: one tap — the server enters the account email.
+            if (window.CC_AUTH && CC_AUTH.user && CC_AUTH.user() && window.CC_GW && CC_GW.ready()) {
+                const errEl0 = document.getElementById('giveawayError');
+                if (errEl0) errEl0.style.display = 'none';
+                giveawaySubmitBtn.disabled = true;
+                giveawaySubmitBtn.textContent = 'Entering…';
+                CC_AUTH.idToken()
+                    .then((tok) => CC_GW.enter(CC_AUTH.email(), tok))
+                    .then((res) => {
+                        giveawaySubmitBtn.disabled = false;
+                        giveawaySubmitBtn.textContent = "Enter This Week's Drawing";
+                        if (res === 'entered' || res === 'already') {
+                            updateEntryCount();
+                            showGwSuccess(res === 'already');
+                        } else if (errEl0) {
+                            errEl0.textContent = 'Something went wrong entering you — please try again.';
+                            errEl0.style.display = 'block';
+                        }
+                    })
+                    .catch(() => {
+                        giveawaySubmitBtn.disabled = false;
+                        giveawaySubmitBtn.textContent = "Enter This Week's Drawing";
+                        if (errEl0) {
+                            errEl0.textContent = 'Something went wrong entering you — please try again.';
+                            errEl0.style.display = 'block';
+                        }
+                    });
+                return;
+            }
             const email      = emailInput.value.trim().toLowerCase();
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -363,7 +406,7 @@ function createDealCard(deal) {
             <div class="card-price">
                 $${deal.price}
                 ${deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
-                ${deal.discount ? `<span class="discount-badge">${deal.discount}</span>` : ''}
+                ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
             <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" style="margin-bottom:1rem;">View Deal</a>
             <div class="vote-container" style="border-top:none; padding-top:0;">

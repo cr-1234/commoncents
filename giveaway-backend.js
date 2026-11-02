@@ -21,10 +21,12 @@
 (function () {
     var FN_BASE = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/';
 
-    function postFn(name, body) {
+    function postFn(name, body, idToken) {
+        var headers = { 'Content-Type': 'application/json' };
+        if (idToken) headers['Authorization'] = 'Bearer ' + idToken;
         return fetch(FN_BASE + name, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify(body || {})
         }).then(function (r) {
             if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -88,8 +90,10 @@
         }).catch(function () { /* display state stays as-is */ });
     }
 
-    function enter(email) {
-        return postFn('ccEnterGiveaway', { email: email }).then(function (res) {
+    function enter(email, idToken) {
+        // Signed-in entry: pass the account's ID token — the server uses
+        // the account email and ignores the body's email field.
+        return postFn('ccEnterGiveaway', { email: email }, idToken).then(function (res) {
             if (!res || !res.ok) return 'error';
             lsSet('ccGiveawayEmail', email);
             lsSet('ccGiveawayEnteredWeek', res.week);
