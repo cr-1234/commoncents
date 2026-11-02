@@ -76,10 +76,22 @@
             try { CC_AUTH.noteInterestsChanged(getInterests()); } catch (e) {}
         }
     }
+    // Mirrors app.js isDealExpired: dead-marked or older than 72h.
+    // The tailored feed only ever shows live deals.
+    function isExpired(d) {
+        if (d.dead) return true;
+        if (d.ts) {
+            var ts = Date.parse(d.ts);
+            if (!isNaN(ts) && (Date.now() - ts) > 72 * 3600 * 1000) return true;
+        }
+        return false;
+    }
+
     function matchCount() {
         if (typeof deals === 'undefined') return 0;
         var mine = getInterests();
         return deals.filter(function (d) {
+            if (isExpired(d)) return false;
             var di = dealInterests(d);
             return mine.some(function (k) { return di[k]; });
         }).length;
@@ -90,6 +102,7 @@
         mode: function () { return mode; },
         match: function (deal) {
             if (mode !== 'mine') return true;
+            if (isExpired(deal)) return false;
             var mine = getInterests();
             var d = dealInterests(deal);
             return mine.some(function (k) { return d[k]; });

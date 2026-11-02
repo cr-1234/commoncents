@@ -356,6 +356,20 @@ function setCategory(category) {
 }
 
 // Render Functions
+// A deal is expired when it's been marked dead (its posted price/stock
+// ended) or it's simply old: anything collected over 72 hours ago is
+// treated as expired until a fresh check says otherwise. Expired deals
+// are shown honestly — grayed, price struck, no buy button — never
+// silently passed off as live, and they leave the tailored feed.
+function isDealExpired(deal) {
+    if (deal.dead) return true;
+    if (deal.ts) {
+        var ts = Date.parse(deal.ts);
+        if (!isNaN(ts) && (Date.now() - ts) > 72 * 3600 * 1000) return true;
+    }
+    return false;
+}
+
 function renderDeals() {
     dealGrid.innerHTML = '';
     let filtered = deals.filter(deal => {
@@ -381,6 +395,9 @@ function renderDeals() {
     } else if (sortValue === 'discount') {
         filtered.sort((a, b) => parseInt(b.discount) - parseInt(a.discount));
     }
+    // Expired deals sink below live ones (stable: keeps the chosen sort
+    // order inside each group).
+    filtered.sort((a, b) => (isDealExpired(a) ? 1 : 0) - (isDealExpired(b) ? 1 : 0));
     if (filtered.length === 0) {
         dealGrid.innerHTML = '<div class="no-results">No deals found matching your criteria.</div>';
         return;
@@ -390,25 +407,31 @@ function renderDeals() {
 
 function createDealCard(deal) {
     const article = document.createElement('article');
-    article.className = 'deal-card';
-    
+    const expired = isDealExpired(deal);
+    article.className = 'deal-card' + (expired ? ' deal-expired' : '');
+    const postedDate = deal.ts ? new Date(deal.ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+
     article.innerHTML = `
         <div class="card-image">
             <img src="${deal.image}" alt="${deal.title}" loading="lazy">
-            ${(window.CC_FEED && CC_FEED.isNew(deal)) ? '<span class="new-badge">NEW FOR YOU</span>' : ''}
+            ${expired ? '<span class="expired-badge">EXPIRED</span>' : ((window.CC_FEED && CC_FEED.isNew(deal)) ? '<span class="new-badge">NEW FOR YOU</span>' : '')}
         </div>
         <div class="card-content">
             <div class="card-meta">
                 <span class="card-category">${deal.category.replace('gifts-him','Gifts for Him').replace('gifts-her','Gifts for Her')}</span>
                 <span class="card-source">${getStoreName(deal.url)}</span>
+                ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
             <h3 class="card-title">${deal.title}</h3>
             <div class="card-price">
-                $${deal.price}
-                ${deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
-                ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
+                ${expired ? `<span class="expired-price">$${deal.price}</span>` : `$${deal.price}`}
+                ${!expired && deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
+                ${!expired && deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
-            <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" style="margin-bottom:1rem;">View Deal</a>
+            ${expired
+                ? `<span class="btn btn-primary full-width view-deal-btn expired-btn" style="margin-bottom:1rem;">Deal Expired</span>`
+                : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" style="margin-bottom:1rem;">View Deal</a>`}
+            ${expired && deal.deadNote ? `<p class="dead-note">${deal.deadNote}</p>` : ''}
             <div class="vote-container" style="border-top:none; padding-top:0;">
                 <button class="vote-btn upvote-btn ${deal.votes.up > 0 ? 'active' : ''}" data-id="${deal.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
