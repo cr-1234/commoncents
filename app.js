@@ -151,8 +151,8 @@ function setupEventListeners() {
             const total = 1 + b;
             bd.textContent = (already ? "You're already in for this week. " : '')
                 + 'You have ' + total + (total === 1 ? ' entry' : ' entries')
-                + ' (1 base + ' + b + ' bonus from ' + days + ' visit day' + (days === 1 ? '' : 's') + '). '
-                + 'Every 2 visit days earns +1 more bonus entry, up to 5.';
+                + ': 1 for entering + ' + b + ' extra from your visits (' + days + ' visit day' + (days === 1 ? '' : 's') + ' so far). '
+                + 'Every 2 visit days earns +1 more extra entry, up to 5.';
         }
     }
 
