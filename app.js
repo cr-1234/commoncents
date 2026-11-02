@@ -5,21 +5,12 @@ let searchQuery = '';
 // Paste your Google Sheet published CSV URL below:
 const SPREADSHEET_CSV_URL = '';
 
-// Weekly Tracking Helpers
-function getWeeklyKey(base) {
-    const d = new Date();
-    d.setHours(0,0,0,0);
-    d.setDate(d.getDate() + 4 - (d.getDay()||7));
-    const yearStart = new Date(d.getFullYear(),0,1);
-    const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
-    return base + '_' + d.getFullYear() + '_W' + weekNo;
-}
-function getGiveawayEntries() { return JSON.parse(localStorage.getItem(getWeeklyKey('giveawayEntries')) || '[]'); }
-function setGiveawayEntries(entries) { localStorage.setItem(getWeeklyKey('giveawayEntries'), JSON.stringify(entries)); }
-function getMyEmail() { return localStorage.getItem(getWeeklyKey('giveawayMyEmail')); }
-function setMyEmail(email) { localStorage.setItem(getWeeklyKey('giveawayMyEmail'), email); }
+// Giveaway entries are REAL now: they live in the backend
+// (see giveaway-backend.js — window.CC_GW). Nothing is stored only in
+// this visitor's browser anymore.
 
-// Prize amount scales with entries
+// Prize amount scales with the number of PEOPLE entered (unique
+// entrants). Bonus entries add chances only — they never move the prize.
 function calculatePrize(count) {
     if (count >= 10000) return '$100';
     if (count >= 5000)  return '$75';
@@ -29,19 +20,23 @@ function calculatePrize(count) {
     return '$5';
 }
 
-// Update giveaway entry count and prize display
+// Update giveaway people count and prize display. The count comes from
+// the backend (cc_giveaway_meta for this week) via CC_GW; it is the number
+// of PEOPLE entered — bonus entries never inflate it.
 function updateEntryCount() {
-    const entries = getGiveawayEntries();
+    const count   = (window.CC_GW && typeof CC_GW.count() === 'number') ? CC_GW.count() : 0;
     const countEl = document.getElementById('entryCount');
     const prizeEl = document.getElementById('prizeAmount');
     const tiers   = document.querySelectorAll('.prize-tier');
-    const prize   = calculatePrize(entries.length);
-    if (countEl) countEl.textContent = entries.length;
+    const prize   = calculatePrize(count);
+    if (countEl) countEl.textContent = count;
     if (prizeEl) prizeEl.textContent = prize;
     if (tiers.length) {
         const map = { '$5': 0, '$10': 1, '$25': 2, '$50': 3, '$75': 4, '$100': 5 };
         tiers.forEach((t, i) => t.classList.toggle('active', i === map[prize]));
     }
+    const side = document.getElementById('sidebarPrize');
+    if (side) side.textContent = prize + ' prize · ' + count + ' people entered · grows with entries';
 }
 
 // DOM Elements
@@ -146,14 +141,36 @@ function setupEventListeners() {
     const closeGiveaway     = document.getElementById('closeGiveaway');
     const giveawaySubmitBtn = document.getElementById('giveawaySubmitBtn');
 
+    function showGwSuccess(already) {
+        document.getElementById('giveawayForm').style.display    = 'none';
+        document.getElementById('giveawaySuccess').style.display = 'block';
+        const bd = document.getElementById('gwEntriesBreakdown');
+        if (bd && window.CC_GW) {
+            const b = CC_GW.bonus(), days = CC_GW.visitDays().length;
+            const total = 1 + b;
+            bd.textContent = (already ? "You're already in for this week. " : '')
+                + 'You have ' + total + (total === 1 ? ' entry' : ' entries')
+                + ' (1 base + ' + b + ' bonus from ' + days + ' visit day' + (days === 1 ? '' : 's') + '). '
+                + 'Every 2 visit days earns +1 more bonus entry, up to 5.';
+        }
+    }
+
     function openGiveawayModal(e) {
         if (e) e.preventDefault();
         updateEntryCount();
-        const myEmail = getMyEmail();
-        const entries = getGiveawayEntries();
-        if (myEmail && entries.includes(myEmail)) {
-            document.getElementById('giveawayForm').style.display    = 'none';
-            document.getElementById('giveawaySuccess').style.display = 'block';
+        if (window.CC_GW) {
+            CC_GW.refreshCount();
+            CC_GW.lastWinner((w) => {
+                const el = document.getElementById('lastWinner');
+                if (el && w) {
+                    el.textContent = "Last week's winner: " + w.masked
+                        + (w.prize ? ' won a ' + w.prize + ' Amazon gift card' : '');
+                    el.style.display = 'block';
+                }
+            });
+        }
+        if (window.CC_GW && CC_GW.isEntered()) {
+            showGwSuccess(true);
         } else {
             document.getElementById('giveawayForm').style.display    = 'block';
             document.getElementById('giveawaySuccess').style.display = 'none';
@@ -181,17 +198,30 @@ function setupEventListeners() {
             }
             emailInput.style.borderColor = '';
 
-            // Save unique email
-            const entries = getGiveawayEntries();
-            if (!entries.includes(email)) {
-                entries.push(email);
-                setGiveawayEntries(entries);
-            }
-            setMyEmail(email);
+            const errEl = document.getElementById('giveawayError');
+            if (errEl) errEl.style.display = 'none';
 
-            updateEntryCount();
-            document.getElementById('giveawayForm').style.display    = 'none';
-            document.getElementById('giveawaySuccess').style.display = 'block';
+            if (!window.CC_GW || !CC_GW.ready()) {
+                if (errEl) {
+                    errEl.textContent = "Entries can't be taken right now — please try again later.";
+                    errEl.style.display = 'block';
+                }
+                return;
+            }
+
+            giveawaySubmitBtn.disabled = true;
+            giveawaySubmitBtn.textContent = 'Entering…';
+            CC_GW.enter(email).then((res) => {
+                giveawaySubmitBtn.disabled = false;
+                giveawaySubmitBtn.textContent = "Enter This Week's Drawing";
+                if (res === 'entered' || res === 'already') {
+                    updateEntryCount();
+                    showGwSuccess(res === 'already');
+                } else if (errEl) {
+                    errEl.textContent = 'Something went wrong entering you — please try again.';
+                    errEl.style.display = 'block';
+                }
+            });
 
             
         });
