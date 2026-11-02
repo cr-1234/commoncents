@@ -316,10 +316,12 @@ function setCategory(category) {
 function renderDeals() {
     dealGrid.innerHTML = '';
     let filtered = deals.filter(deal => {
-        const matchCat    = currentCategory === 'all' || deal.category === currentCategory;
+        const inMyFeed    = window.CC_FEED && CC_FEED.mode() === 'mine';
+        const matchCat    = inMyFeed || currentCategory === 'all' || deal.category === currentCategory;
         const matchSearch = deal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             deal.description.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchCat && matchSearch;
+        const matchFeed   = !window.CC_FEED || CC_FEED.match(deal);
+        return matchCat && matchSearch && matchFeed;
     });
 
     const activeSort = document.querySelector('.dropdown-item.active');
@@ -350,6 +352,7 @@ function createDealCard(deal) {
     article.innerHTML = `
         <div class="card-image">
             <img src="${deal.image}" alt="${deal.title}" loading="lazy">
+            ${(window.CC_FEED && CC_FEED.isNew(deal)) ? '<span class="new-badge">NEW FOR YOU</span>' : ''}
         </div>
         <div class="card-content">
             <div class="card-meta">
