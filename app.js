@@ -356,18 +356,14 @@ function setCategory(category) {
 }
 
 // Render Functions
-// A deal is expired when it's been marked dead (its posted price/stock
-// ended) or it's simply old: anything collected over 72 hours ago is
-// treated as expired until a fresh check says otherwise. Expired deals
-// are shown honestly — grayed, price struck, no buy button — never
-// silently passed off as live, and they leave the tailored feed.
+// A deal is expired only when it's been marked dead (its posted
+// price/stock verifiably ended). Deals do NOT expire by age — a good
+// deal stays live until it's actually dead (user's rule, 2026-11-02).
+// Cards show their posted date so visitors can judge freshness.
+// Expired deals render grayed with the price struck and no buy
+// button, and they leave the tailored feed.
 function isDealExpired(deal) {
-    if (deal.dead) return true;
-    if (deal.ts) {
-        var ts = Date.parse(deal.ts);
-        if (!isNaN(ts) && (Date.now() - ts) > 72 * 3600 * 1000) return true;
-    }
-    return false;
+    return deal.dead === true;
 }
 
 function renderDeals() {
@@ -428,6 +424,7 @@ function createDealCard(deal) {
                 ${!expired && deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
                 ${!expired && deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
+            ${!expired && deal.code ? `<div class="deal-code" title="Tap to copy the code">Use code <strong>${deal.code}</strong> at checkout <span class="code-copy-hint">tap to copy</span></div>` : ''}
             ${expired
                 ? `<span class="btn btn-primary full-width view-deal-btn expired-btn" style="margin-bottom:1rem;">Deal Expired</span>`
                 : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" style="margin-bottom:1rem;">View Deal</a>`}
@@ -451,6 +448,14 @@ function createDealCard(deal) {
 
     article.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
     article.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
+    const codeEl = article.querySelector('.deal-code');
+    if (codeEl) codeEl.addEventListener('click', () => {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(deal.code).catch(() => {});
+        const orig = codeEl.innerHTML;
+        codeEl.innerHTML = 'Code copied ✓';
+        codeEl.classList.add('copied');
+        setTimeout(() => { codeEl.innerHTML = orig; codeEl.classList.remove('copied'); }, 1200);
+    });
     return article;
 }
 
@@ -503,6 +508,7 @@ function openModal(deal) {
                     $${deal.price}
                     ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
                 </div>
+                ${deal.code ? `<div class="deal-code" style="margin-bottom:1.5rem;">Use code <strong>${deal.code}</strong> at checkout</div>` : ''}
                 <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width modal-deal-btn" style="margin-bottom:1.5rem;">Get This Deal</a>
                 <div class="vote-container" style="margin-bottom:1.5rem;">
                     <button class="vote-btn upvote-btn ${deal.votes.up > 0 ? 'active' : ''}">

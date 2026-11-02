@@ -76,15 +76,10 @@
             try { CC_AUTH.noteInterestsChanged(getInterests()); } catch (e) {}
         }
     }
-    // Mirrors app.js isDealExpired: dead-marked or older than 72h.
-    // The tailored feed only ever shows live deals.
+    // Mirrors app.js isDealExpired: only deals marked dead are
+    // expired — never age alone. The tailored feed shows live deals.
     function isExpired(d) {
-        if (d.dead) return true;
-        if (d.ts) {
-            var ts = Date.parse(d.ts);
-            if (!isNaN(ts) && (Date.now() - ts) > 72 * 3600 * 1000) return true;
-        }
-        return false;
+        return d.dead === true;
     }
 
     function matchCount() {

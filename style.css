@@ -693,3 +693,13 @@ ul        { list-style: none; }
 .expired-btn { opacity: 0.5; pointer-events: none; }
 .dead-note { font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 0.75rem; }
 .card-date { color: var(--text-secondary); font-size: 0.78rem; margin-left: auto; }
+
+/* ===== Promo code on a deal (posted price needs the code) ===== */
+.deal-code {
+    border: 1.5px dashed #d97706; background: #fffbeb; color: #92400e;
+    border-radius: 8px; padding: 0.5rem 0.6rem; margin-bottom: 1rem;
+    font-size: 0.85rem; text-align: center; cursor: pointer;
+}
+.deal-code strong { letter-spacing: 0.04em; }
+.deal-code .code-copy-hint { display: block; font-size: 0.7rem; opacity: 0.75; margin-top: 0.15rem; }
+.deal-code.copied { background: #ecfdf5; border-color: #059669; color: #065f46; font-weight: 700; }
