@@ -146,7 +146,8 @@ function setupEventListeners() {
         document.getElementById('giveawaySuccess').style.display = 'block';
         const bd = document.getElementById('gwEntriesBreakdown');
         if (bd && window.CC_GW) {
-            const b = CC_GW.bonus(), days = CC_GW.visitDays().length;
+            const b = CC_GW.bonus();
+            const days = (typeof CC_GW.visitCount === 'function') ? CC_GW.visitCount() : CC_GW.visitDays().length;
             const total = 1 + b;
             bd.textContent = (already ? "You're already in for this week. " : '')
                 + 'You have ' + total + (total === 1 ? ' entry' : ' entries')

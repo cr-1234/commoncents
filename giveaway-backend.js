@@ -1,35 +1,30 @@
 // CommonCents giveaway — real backend connection.
 //
-// The giveaway runs in the Gifting Butler Firebase project, in its own
-// collections (cc_giveaway_entries / cc_user_visits / cc_giveaway_meta) with
-// its own Sunday drawing — fully separate from Gifting Butler's giveaway.
-// This web config is public by design (it identifies the Firebase project;
-// all access is controlled by Firestore security rules).
+// The giveaway runs in the Gifting Butler Firebase project (its own
+// cc_giveaway_* collections, its own Sunday drawing) — fully separate
+// from Gifting Butler's giveaway. This page talks to it through three
+// HTTPS endpoints (the same pattern the Gifting Butler room-AI uses):
 //
-// Rules implemented here (mirroring the backend in functions/cc-giveaway.js
-// of the Gifting Butler repo):
-//   - 1 base entry per email per week (doc id {week}__{email}, create-only —
-//     a permission-denied on re-entry means "already entered").
-//   - Visit days are recorded per week; every 2 visit days = +1 bonus entry
-//     at draw time (max +5). Bonuses add chances only, never change the prize.
-//   - The prize ladder counts PEOPLE entered (cc_giveaway_meta count).
+//   ccEnterGiveaway   POST {email}  → enter this week's drawing
+//   ccRecordVisit     POST {email}  → record today's visit (bonus tracking)
+//   ccGiveawayStatus  POST {}       → people count, prize, last winner
+//
+// Rules (mirrored by the backend):
+//   - 1 base entry per email per week.
+//   - Every 2 visit days in the week = +1 bonus entry at draw time
+//     (max +5). Bonuses add chances only — they never change the prize.
+//   - The prize ladder counts PEOPLE entered, never bonus entries.
 (function () {
-    var cfg = {
-        apiKey: "AIzaSyBPvwf-ilWhc5G_jAEaRDwlom0jJY678w4",
-        authDomain: "giftingbutler-74395.firebaseapp.com",
-        projectId: "giftingbutler-74395",
-        storageBucket: "giftingbutler-74395.firebasestorage.app",
-        messagingSenderId: "37308175610",
-        appId: "1:37308175610:web:547281f014be448b292543"
-    };
+    var FN = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/';
 
-    var db = null;
-    try {
-        if (window.firebase && firebase.initializeApp) {
-            firebase.initializeApp(cfg);
-            db = firebase.firestore();
-        }
-    } catch (e) { db = null; }
+    function post(name, body) {
+        return fetch(FN + name, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body || {})
+        }).then(function (r) { return r.json(); })
+          .catch(function () { return null; });
+    }
 
     // Same week formula as the backend's ccWeekKey (prefix "ccgw").
     function weekKey(d) {
@@ -46,24 +41,32 @@
     function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
     function getEmail() { return lsGet('ccGiveawayEmail') || ''; }
+
+    // Local mirror of this week's visit days (display + offline fallback).
+    // The server keeps the copy that actually counts at draw time.
     function visitDays() {
         try { return JSON.parse(lsGet('ccVisitDays_' + weekKey()) || '[]'); }
         catch (e) { return []; }
     }
-    function bonus() { return Math.min(5, Math.floor(visitDays().length / 2)); }
+    function visitCount() {
+        var server = parseInt(lsGet('ccVisitDaysCount_' + weekKey()) || '', 10);
+        var local = visitDays().length;
+        return isNaN(server) ? local : Math.max(server, local);
+    }
+    function bonus() { return Math.min(5, Math.floor(visitCount() / 2)); }
 
-    var state = { count: null };
+    var state = { count: null, lastWinner: undefined };
     var cached = lsGet('ccGiveawayCount');
     if (cached !== null) state.count = parseInt(cached, 10) || 0;
 
-    function refreshCount() {
-        if (!db) return;
-        db.collection('cc_giveaway_meta').doc(weekKey()).get().then(function (doc) {
-            var n = (doc.exists && doc.data().count) || 0;
-            state.count = n;
-            lsSet('ccGiveawayCount', String(n));
+    function refreshStatus() {
+        return post('ccGiveawayStatus', {}).then(function (data) {
+            if (!data || !data.ok) return;
+            state.count = data.count || 0;
+            state.lastWinner = data.lastWinner || null;
+            lsSet('ccGiveawayCount', String(state.count));
             if (typeof window.updateEntryCount === 'function') window.updateEntryCount();
-        }).catch(function () { /* keep the last known count */ });
+        });
     }
 
     function recordVisit() {
@@ -75,51 +78,34 @@
             days.push(t);
             lsSet('ccVisitDays_' + weekKey(), JSON.stringify(days));
         }
-        if (!db) return;
-        var wk = weekKey();
-        db.collection('cc_user_visits').doc(wk + '__' + em).set(
-            { email: em, week: wk, days: firebase.firestore.FieldValue.arrayUnion(t) },
-            { merge: true }
-        ).catch(function () { /* local mirror already kept for display */ });
+        post('ccRecordVisit', { email: em }).then(function (data) {
+            if (data && data.ok && typeof data.visitDays === 'number') {
+                lsSet('ccVisitDaysCount_' + weekKey(), String(data.visitDays));
+            }
+        });
     }
 
     function enter(email) {
-        if (!db) return Promise.resolve('unavailable');
-        var wk = weekKey();
-        function finish(result) {
-            lsSet('ccGiveawayEmail', email);
-            lsSet('ccGiveawayEnteredWeek', wk);
-            recordVisit();
-            refreshCount();
-            return result;
-        }
-        return db.collection('cc_giveaway_entries').doc(wk + '__' + email).set({
-            email: email,
-            week: wk,
-            source: 'commoncents',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(function () {
-            return finish('entered');
-        }).catch(function (err) {
-            // Entries are create-only by rule: if the doc already exists the
-            // write is denied — that means this email is already in.
-            if (err && err.code === 'permission-denied') return finish('already');
+        return post('ccEnterGiveaway', { email: email }).then(function (data) {
+            if (!data) return 'error';
+            if (data.ok && (data.result === 'entered' || data.result === 'already')) {
+                lsSet('ccGiveawayEmail', email);
+                lsSet('ccGiveawayEnteredWeek', weekKey());
+                recordVisit();
+                refreshStatus();
+                return data.result;
+            }
             return 'error';
         });
     }
 
     function lastWinner(cb) {
-        if (!db) { cb(null); return; }
-        var lastWeek = weekKey(new Date(Date.now() - 7 * 86400000));
-        db.collection('cc_giveaway_meta').doc(lastWeek).get().then(function (doc) {
-            if (doc.exists && doc.data().winnerMasked) {
-                cb({ masked: doc.data().winnerMasked, prize: doc.data().prize || '' });
-            } else cb(null);
-        }).catch(function () { cb(null); });
+        if (state.lastWinner !== undefined) { cb(state.lastWinner); return; }
+        refreshStatus().then(function () { cb(state.lastWinner || null); });
     }
 
     window.CC_GW = {
-        ready: function () { return !!db; },
+        ready: function () { return typeof fetch === 'function'; },
         weekKey: weekKey,
         getEmail: getEmail,
         isEntered: function () {
@@ -127,15 +113,16 @@
         },
         count: function () { return state.count; },
         visitDays: visitDays,
+        visitCount: visitCount,
         bonus: bonus,
         enter: enter,
         recordVisit: recordVisit,
-        refreshCount: refreshCount,
+        refreshCount: refreshStatus,
         lastWinner: lastWinner
     };
 
     // Every page load: count today's visit for known entrants (bonus
     // progress) and refresh the public people-counter.
     if (getEmail()) recordVisit();
-    refreshCount();
+    refreshStatus();
 })();
