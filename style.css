@@ -589,12 +589,13 @@ body.dark-mode .giveaway-submit-btn { color: #000; }
 .amazon-browse-btn {
     display: inline-block; padding: 0.7rem 1.5rem;
     background: linear-gradient(135deg, var(--highlight), var(--highlight-hover));
-    color: #000; font-weight: 700; font-size: 0.9rem;
+    color: #fff; font-weight: 700; font-size: 0.9rem;
     border-radius: var(--border-radius); text-decoration: none;
-    box-shadow: 0 3px 14px rgba(203,162,88,0.35);
+    box-shadow: 0 3px 14px rgba(91,45,142,0.32);
     transition: all 0.2s; margin-bottom: 0.65rem;
 }
-.amazon-browse-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(203,162,88,0.5); }
+.amazon-browse-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(91,45,142,0.45); }
+body.dark-mode .amazon-browse-btn { color: #000; }
 .success-note { font-size: 0.75rem; color: var(--text-secondary); }
 
 /* ── Footer ─────────────────────────────────────────────────── */
@@ -719,7 +720,7 @@ body.dark-mode .giveaway-submit-btn { color: #000; }
     border: 1.5px solid var(--highlight); border-radius: 999px;
     padding: 0.32rem 0.95rem; font-weight: 700; font-size: 0.8rem; cursor: pointer;
 }
-.feed-slim-btn:hover { background: var(--highlight); color: #1a1a1a; }
+.feed-slim-btn:hover { background: var(--highlight); color: #fff; }
 .interest-picker.slim .interest-picker-head,
 .interest-picker.slim .interest-chips,
 .interest-picker.slim .feed-status { display: none; }
