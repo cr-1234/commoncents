@@ -445,11 +445,14 @@ body.dark-mode .view-deal-btn { color: #000; }
 .vote-btn {
     background: none; border: none; color: var(--text-secondary);
     cursor: pointer; display: flex; align-items: center; gap: 0.25rem;
-    font-size: 0.9rem; transition: color 0.2s; padding: 0.25rem;
+    font-size: 0.9rem; transition: all 0.2s; padding: 0.25rem 0.55rem;
+    border-radius: 999px;
 }
 .vote-btn:hover { color: var(--text-primary); }
-.vote-btn.active.upvote-btn   { color: var(--highlight); }
-.vote-btn.active.downvote-btn { color: #ef4444; }
+.vote-btn.active.upvote-btn   { color: var(--highlight); background: rgba(91,45,142,0.12); }
+.vote-btn.active.downvote-btn { color: #dc2626; background: rgba(220,38,38,0.10); }
+@keyframes votePop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
+.vote-btn.pop { animation: votePop 0.35s ease; }
 
 /* ── Buttons ────────────────────────────────────────────────── */
 .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: var(--border-radius); font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; text-align: center; }

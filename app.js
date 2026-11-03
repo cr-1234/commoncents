@@ -1,5 +1,13 @@
 // State
 let currentCategory = 'all';
+
+// This visitor's own votes (deal id -> 'up' | 'down'), remembered on this
+// device. The active button state must reflect MY vote, not the shared
+// totals — otherwise a first click on a deal that already has votes
+// removes one instead of adding mine.
+let myVotes = {};
+try { myVotes = JSON.parse(localStorage.getItem('ccMyVotes') || '{}'); } catch (e) { myVotes = {}; }
+function saveMyVotes() { try { localStorage.setItem('ccMyVotes', JSON.stringify(myVotes)); } catch (e) {} }
 let searchQuery = '';
 
 // Paste your Google Sheet published CSV URL below:
@@ -429,11 +437,11 @@ function createDealCard(deal) {
                 : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" style="margin-bottom:1rem;">View Deal</a>`}
             ${expired && deal.deadNote ? `<p class="dead-note">${deal.deadNote}</p>` : ''}
             <div class="vote-container" style="border-top:none; padding-top:0;">
-                <button class="vote-btn upvote-btn ${deal.votes.up > 0 ? 'active' : ''}" data-id="${deal.id}">
+                <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}" data-id="${deal.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
                     <span>${deal.votes.up}</span>
                 </button>
-                <button class="vote-btn downvote-btn ${deal.votes.down > 0 ? 'active' : ''}" data-id="${deal.id}">
+                <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}" data-id="${deal.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
                     <span>${deal.votes.down}</span>
                 </button>
@@ -459,19 +467,24 @@ function handleVote(e, deal, type) {
     const countSpan    = btn.querySelector('span');
     const otherCount   = otherBtn.querySelector('span');
 
-    // If already active, toggle off
-    if (btn.classList.contains('active')) {
-        btn.classList.remove('active');
+    // Toggle MY vote (tracked per visitor, not by the shared totals)
+    const mine = myVotes[deal.id];
+    if (mine === type) {
         deal.votes[type]--;
+        delete myVotes[deal.id];
+        btn.classList.remove('active');
     } else {
-        if (otherBtn.classList.contains('active')) {
-            otherBtn.classList.remove('active');
+        if (mine === otherType) {
             deal.votes[otherType]--;
+            otherBtn.classList.remove('active');
             otherCount.textContent = deal.votes[otherType];
         }
-        btn.classList.add('active');
         deal.votes[type]++;
+        myVotes[deal.id] = type;
+        btn.classList.add('active');
+        btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
     }
+    saveMyVotes();
     countSpan.textContent = deal.votes[type];
 }
 
@@ -526,18 +539,18 @@ function openModal(deal) {
                 ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
                 <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width modal-deal-btn" style="margin-bottom:1.5rem;">Get This Deal</a>
                 <div class="vote-container" style="margin-bottom:1.5rem;">
-                    <button class="vote-btn upvote-btn ${deal.votes.up > 0 ? 'active' : ''}">
+                    <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
                         <span>${deal.votes.up}</span>
                     </button>
-                    <button class="vote-btn downvote-btn ${deal.votes.down > 0 ? 'active' : ''}">
+                    <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
                         <span>${deal.votes.down}</span>
                     </button>
                 </div>
                 <div style="border-top:1px solid var(--border-color); padding-top:1.5rem;">
                     <h3 style="margin-bottom:1rem;">Comments</h3>
-                    <div style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${commentsHTML}</div>
+                    <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${commentsHTML}</div>
                     <div style="background:var(--bg-body); padding:1rem; border-radius:8px;">
                         ${commentFormHTML}
                     </div>
@@ -568,8 +581,11 @@ function openModal(deal) {
             const liveUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
             if (!liveUser) return; // the form only renders for members; stay safe
             const liveName = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser.displayName || 'Member';
-            deal.comments.unshift({ user: escHtml(liveName).slice(0, 40), text: escHtml(textVal), time: 'Just now' });
+            // Chronological order: the first comment stays on top, new ones go last.
+            deal.comments.push({ user: escHtml(liveName).slice(0, 40), text: escHtml(textVal), time: 'Just now' });
             openModal(deal);
+            const cl = document.getElementById('commentsList');
+            if (cl) cl.scrollTop = cl.scrollHeight;
         });
     }
 
