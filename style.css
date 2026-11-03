@@ -3,17 +3,19 @@
 /* ── CSS Variables ─────────────────────────────────────────── */
 :root {
     /* Light theme — the site's default face. Base matched to Gifting Butler (2026-11-03):
-       #F7F7F7 background, white cards, #111 ink; CommonCents keeps its own gold (#C49A28). */
+       FULL Gifting Butler scheme (user's call, 2026-11-03): #F7F7F7 background, white cards,
+       #111 ink, plum #5B2D8E as the primary accent; gold survives only as GB's secondary
+       accent on the coupon elements (#FDF3D8 / #C49A28 / #8A6A10). */
     --bg-body:      #F7F7F7;
     --bg-card:      #ffffff;
     --bg-header:    rgba(255, 255, 255, 0.85);
     --text-primary: #111111;
     --text-secondary:#595959;
-    --highlight:    #C49A28;
-    --highlight-hover:#8A6A10;
+    --highlight:    #5B2D8E;
+    --highlight-hover:#4D2F86;
     --silver:       #64748b;
     --border-color: rgba(0,0,0,0.09);
-    --shadow-md:    0 12px 40px rgba(0,0,0,0.10);
+    --shadow-md:    0 12px 40px rgba(40,20,70,0.14);
     --font-main:    'Inter', sans-serif;
     --border-radius: 12px; /* unified border radius */
     --font-display: 'Poppins', sans-serif;
@@ -23,12 +25,12 @@
     --glass-border: rgba(0,0,0,0.07);
     --glass-shine:  rgba(255,255,255,0.6);
     --glass-blur:   blur(20px);
-    --gold-gradient:linear-gradient(135deg, #E3C565 0%, #C49A28 50%, #8A6A10 100%);
+    --gold-gradient:linear-gradient(135deg, #7C3AED 0%, #5B2D8E 50%, #3B1D63 100%);
     --glass-inner-border: inset 0 0 0 1px rgba(0,0,0,0.03);
     
     /* Logo Colors */
     --silver-logo:  #6b7280;
-    --gold-logo:    #C49A28;
+    --gold-logo:    #5B2D8E;
 
     color-scheme: light;
 }
@@ -92,6 +94,13 @@ ul        { list-style: none; }
         inset 0 -1px 0 rgba(0,0,0,0.1),
         var(--glass-inner-border);
     overflow: hidden;
+}
+body:not(.dark-mode) .glass {
+    box-shadow:
+        0 8px 32px rgba(40,20,70,0.08),
+        inset 0 1.5px 0 var(--glass-shine),
+        inset 0 -1px 0 rgba(0,0,0,0.03),
+        var(--glass-inner-border);
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
@@ -506,7 +515,7 @@ body:not(.dark-mode) .dropdown-item:hover {
     background: var(--gold-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 20px rgba(203,162,88,0.3);
+    text-shadow: 0 4px 20px rgba(91,45,142,0.25);
     line-height: 1; margin-bottom: 1rem; letter-spacing: -0.03em;
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
@@ -652,13 +661,13 @@ body:not(.dark-mode) .dropdown-item:hover {
 }
 .interest-chip:hover { border-color: var(--highlight); color: var(--text-primary); }
 .interest-chip.active {
-    background: var(--gold-gradient); color: #1a1a1a;
+    background: var(--gold-gradient); color: #ffffff;
     border-color: transparent; font-weight: 700;
 }
 .feed-status { color: var(--text-secondary); font-size: 0.83rem; margin: 0.65rem 0 0.2rem; }
 .new-badge {
     position: absolute; top: 10px; left: 10px; z-index: 2;
-    background: var(--gold-gradient); color: #1a1a1a;
+    background: var(--gold-gradient); color: #ffffff;
     font-size: 11px; font-weight: 800; letter-spacing: 0.05em;
     padding: 0.28rem 0.65rem; border-radius: 999px;
 }
@@ -722,14 +731,14 @@ body:not(.dark-mode) .dropdown-item:hover {
 /* Card face: just a small tag; the code itself lives in the detail modal. */
 .deal-code-tag {
     display: inline-flex; align-items: center; gap: 0.35rem;
-    font-size: 0.75rem; font-weight: 600; color: #92400e;
-    background: #fffbeb; border: 1px solid #f59e0b; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 600; color: #8A6A10;
+    background: #FDF3D8; border: 1px solid #C49A28; border-radius: 999px;
     padding: 0.2rem 0.6rem; margin-bottom: 1rem;
 }
 /* Modal: coupon-clip box. Tap copies; the box visibly flips to a clipped state. */
 .deal-code {
     display: flex; align-items: center; justify-content: center; gap: 0.6rem;
-    border: 1.5px dashed #d97706; background: #fffbeb; color: #92400e;
+    border: 1.5px dashed #C49A28; background: #FDF3D8; color: #8A6A10;
     border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 0.5rem;
     font-size: 0.95rem; text-align: center; cursor: pointer; user-select: none;
 }
