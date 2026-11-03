@@ -745,6 +745,19 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 
 /* ===== Promo code on a deal (posted price needs the code) ===== */
 /* Card face: just a small tag; the code itself lives in the detail modal. */
+.deal-note {
+    background: #EDE5F8; border: 1px solid rgba(91,45,142,0.25);
+    border-left: 4px solid var(--highlight); border-radius: 8px;
+    padding: 0.7rem 0.9rem; font-size: 0.92rem; line-height: 1.5;
+    color: var(--text-primary); margin-bottom: 1rem; text-align: left;
+}
+.deal-note strong { color: var(--highlight); }
+.deal-note-tag {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: 0.75rem; font-weight: 600; color: var(--highlight);
+    background: rgba(91,45,142,0.08); border: 1px solid rgba(91,45,142,0.3); border-radius: 999px;
+    padding: 0.22rem 0.7rem; margin-bottom: 0.8rem;
+}
 .deal-code-tag {
     display: inline-flex; align-items: center; gap: 0.35rem;
     font-size: 0.75rem; font-weight: 600; color: #8A6A10;
