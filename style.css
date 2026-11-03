@@ -2,17 +2,18 @@
 
 /* ── CSS Variables ─────────────────────────────────────────── */
 :root {
-    /* Light theme — the site's default face (flipped from dark 2026-11-03). */
-    --bg-body:      #f7f5f2;
+    /* Light theme — the site's default face. Base matched to Gifting Butler (2026-11-03):
+       #F7F7F7 background, white cards, #111 ink; CommonCents keeps its own gold (#C49A28). */
+    --bg-body:      #F7F7F7;
     --bg-card:      #ffffff;
     --bg-header:    rgba(255, 255, 255, 0.85);
-    --text-primary: #1b1b1f;
-    --text-secondary:#5f5f6b;
-    --highlight:    #b8860b;
-    --highlight-hover:#96690a;
+    --text-primary: #111111;
+    --text-secondary:#595959;
+    --highlight:    #C49A28;
+    --highlight-hover:#8A6A10;
     --silver:       #64748b;
     --border-color: rgba(0,0,0,0.09);
-    --shadow-md:    0 12px 40px rgba(0,0,0,0.12);
+    --shadow-md:    0 12px 40px rgba(0,0,0,0.10);
     --font-main:    'Inter', sans-serif;
     --border-radius: 12px; /* unified border radius */
     --font-display: 'Poppins', sans-serif;
@@ -22,12 +23,12 @@
     --glass-border: rgba(0,0,0,0.07);
     --glass-shine:  rgba(255,255,255,0.6);
     --glass-blur:   blur(20px);
-    --gold-gradient:linear-gradient(135deg, #E3C565 0%, #C49A27 50%, #9A720F 100%);
+    --gold-gradient:linear-gradient(135deg, #E3C565 0%, #C49A28 50%, #8A6A10 100%);
     --glass-inner-border: inset 0 0 0 1px rgba(0,0,0,0.03);
     
     /* Logo Colors */
     --silver-logo:  #6b7280;
-    --gold-logo:    #b8860b;
+    --gold-logo:    #C49A28;
 
     color-scheme: light;
 }
