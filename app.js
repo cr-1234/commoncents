@@ -417,6 +417,7 @@ function createDealCard(deal) {
                 ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
             <h3 class="card-title">${deal.title}</h3>
+            ${deal.description ? `<p class="card-desc">${deal.description}</p>` : ''}
             <div class="card-price">
                 ${expired ? `<span class="expired-price">$${deal.price}</span>` : `$${deal.price}`}
                 ${!expired && deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
@@ -487,6 +488,15 @@ function openModal(deal) {
             <p style="color:var(--text-secondary); font-size:0.95rem; white-space:pre-wrap;">${c.text}</p>
         </div>`).join('');
 
+    // Comment identity: a signed-in user comments under their account display
+    // name (never their email). Guests get an optional display-name field —
+    // no email is ever asked for or shown.
+    const ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
+    const ccDisplayName = ccUser ? (ccUser.displayName || 'Member') : null;
+    const commentIdentityHTML = ccUser
+        ? `<p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${ccDisplayName}</strong></p>`
+        : `<input type="text" id="commentName" maxlength="30" placeholder="Display name (optional)" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary);">`;
+
     modalBody.innerHTML = `
         <div class="modal-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
             <div><img src="${deal.image}" alt="${deal.title}" style="width:100%; border-radius:8px;"></div>
@@ -514,9 +524,10 @@ function openModal(deal) {
                     <h3 style="margin-bottom:1rem;">Comments</h3>
                     <div style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${commentsHTML}</div>
                     <div style="background:var(--bg-body); padding:1rem; border-radius:8px;">
-                        <input type="email" id="commentEmail" placeholder="Your email (required)" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary);">
+                        ${commentIdentityHTML}
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
                         <button id="postCommentBtn" class="btn btn-primary full-width" style="font-size:0.9rem; padding:0.5rem;">Post Comment</button>
+                        <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.4rem;">Your email address is never shown publicly.</p>
                     </div>
                 </div>
             </div>
@@ -535,13 +546,21 @@ function openModal(deal) {
     }
 
     document.getElementById('postCommentBtn').addEventListener('click', () => {
-        const emailVal = document.getElementById('commentEmail').value.trim();
-        const textVal  = document.getElementById('commentText').value.trim();
-        if (!emailVal || !textVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-            alert('⚠️ Please enter a valid email and comment.');
+        const textVal = document.getElementById('commentText').value.trim();
+        if (!textVal) {
+            alert('⚠️ Please write a comment first.');
             return;
         }
-        deal.comments.unshift({ user: emailVal.split('@')[0], text: textVal, time: 'Just now' });
+        const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const liveUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
+        let name;
+        if (liveUser) {
+            name = liveUser.displayName || 'Member';
+        } else {
+            const nameEl = document.getElementById('commentName');
+            name = (nameEl && nameEl.value.trim()) || 'Guest';
+        }
+        deal.comments.unshift({ user: esc(name).slice(0, 40), text: esc(textVal), time: 'Just now' });
         openModal(deal);
     });
 }

@@ -418,6 +418,11 @@ body:not(.dark-mode) .dropdown-item:hover {
     color: var(--text-secondary); background: var(--glass-bg); padding: 0.2rem 0.5rem; border-radius: var(--border-radius);
 }
 .card-source { font-size: 0.75rem; color: var(--highlight); font-weight: 600; }
+.card-desc {
+    color: var(--text-secondary); font-size: 0.88rem; line-height: 1.45;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; margin: 0.3rem 0 0.8rem;
+}
 .card-title {
     font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
