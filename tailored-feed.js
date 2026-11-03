@@ -31,9 +31,7 @@
         { key: 'food',     label: 'Groceries & Food',   cats: ['groceries'], kw: ['protein', 'snack', 'coffee', 'chocolate', 'cereal', 'nuts', 'grocery'] },
         { key: 'baby',     label: 'Baby & Kids',        cats: [],            kw: ['baby', 'toddler', 'kids', 'children', 'diaper', 'stroller', 'lego', 'toy', 'infant', 'nursery', 'crayola'] },
         { key: 'beauty',   label: 'Health & Beauty',    cats: [],            kw: ['skincare', 'makeup', 'shampoo', 'beauty', 'serum', 'lotion', 'toothbrush', 'vitamin', 'melatonin', 'supplement'] },
-        { key: 'clothing', label: 'Clothing & Shoes',   cats: [],            kw: ['shoes', 'sneakers', 'jacket', 'boots', 'hoodie', 'jeans', 'nike', 'adidas', 'sweater'] },
-        { key: 'him',      label: 'Gifts for Him',      cats: ['gifts-him'], kw: ["men's", 'mens '] },
-        { key: 'her',      label: 'Gifts for Her',      cats: ['gifts-her'], kw: ["women's", 'womens '] }
+        { key: 'clothing', label: 'Clothing & Shoes',   cats: [],            kw: ['shoes', 'sneakers', 'jacket', 'boots', 'hoodie', 'jeans', 'nike', 'adidas', 'sweater'] }
     ];
     // Collector category (verbatim) -> interest key.
     var FC2KEY = { 'Tech': 'tech', 'Tools': 'tools', 'Household': 'home', 'Groceries': 'food' };
@@ -44,6 +42,15 @@
         try { return JSON.parse(lsGet('ccInterests') || '[]'); }
         catch (e) { return []; }
     }
+    // Drop saved picks whose section no longer exists (Gifts for Him/Her
+    // were removed 2026-11-03) so stale saved feeds clean themselves up.
+    (function sanitizePicks() {
+        var cur = getInterests();
+        var clean = cur.filter(function (k) {
+            return INTERESTS.some(function (i) { return i.key === k; });
+        });
+        if (clean.length !== cur.length) lsSet('ccInterests', JSON.stringify(clean));
+    })();
     function labelFor(key) {
         for (var i = 0; i < INTERESTS.length; i++) if (INTERESTS[i].key === key) return INTERESTS[i].label;
         return key;
@@ -80,6 +87,14 @@
     // expired — never age alone. The tailored feed shows live deals.
     function isExpired(d) {
         return d.dead === true;
+    }
+
+    function countFor(key) {
+        if (typeof deals === 'undefined') return 0;
+        return deals.filter(function (d) {
+            if (isExpired(d)) return false;
+            return dealInterests(d)[key] === true;
+        }).length;
     }
 
     function matchCount() {
@@ -156,9 +171,13 @@
         if (els.chips) {
             els.chips.innerHTML = '';
             INTERESTS.forEach(function (it) {
+                var picked = mine.indexOf(it.key) !== -1;
+                // A section with no deals right now stays out of the picker;
+                // it appears on its own the day a matching deal lands.
+                if (!picked && countFor(it.key) === 0) return;
                 var b = document.createElement('button');
                 b.type = 'button';
-                b.className = 'interest-chip' + (mine.indexOf(it.key) !== -1 ? ' active' : '');
+                b.className = 'interest-chip' + (picked ? ' active' : '');
                 b.textContent = it.label;
                 b.addEventListener('click', function () {
                     var cur = getInterests();
