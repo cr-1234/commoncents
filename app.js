@@ -488,14 +488,29 @@ function openModal(deal) {
             <p style="color:var(--text-secondary); font-size:0.95rem; white-space:pre-wrap;">${c.text}</p>
         </div>`).join('');
 
-    // Comment identity: a signed-in user comments under their account display
-    // name (never their email). Guests get an optional display-name field —
-    // no email is ever asked for or shown.
+    // Comments are members-only (no anonymous free-for-all). A signed-in user
+    // comments under the username saved on their account — falling back to
+    // their account display name, then "Member". Their email is never shown.
+    // Signed-out visitors see a sign-in prompt instead of a form.
+    const escHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
-    const ccDisplayName = ccUser ? (ccUser.displayName || 'Member') : null;
-    const commentIdentityHTML = ccUser
-        ? `<p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${ccDisplayName}</strong></p>`
-        : `<input type="text" id="commentName" maxlength="30" placeholder="Display name (optional)" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary);">`;
+    const ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
+    const ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || 'Member') : null;
+    const commentFormHTML = ccUser ? `
+                        <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong> <button type="button" id="commentNameEdit" style="background:none; border:none; color:var(--highlight); cursor:pointer; font-size:0.82rem; font-weight:600; padding:0; margin-left:0.35rem;">${ccProfileName ? 'Change name' : 'Set a comment name'}</button></p>
+                        <div id="commentNameEditor" style="display:none; margin-bottom:0.6rem;">
+                            <input type="text" id="commentNameInput" maxlength="24" placeholder="Pick a name for your comments" value="${escHtml(ccProfileName)}" style="width:100%; padding:0.5rem; margin-bottom:0.4rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary);">
+                            <button type="button" id="commentNameSave" class="btn btn-primary" style="font-size:0.85rem; padding:0.4rem 1rem;">Save name</button>
+                            <p id="commentNameMsg" style="display:none; font-size:0.8rem; color:#ef4444; margin-top:0.35rem;"></p>
+                        </div>
+                        <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
+                        <button id="postCommentBtn" class="btn btn-primary full-width" style="font-size:0.9rem; padding:0.5rem;">Post Comment</button>
+                        <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.4rem;">Comments show your comment name — never your email address.</p>`
+        : `
+                        <div style="text-align:center; padding:0.4rem 0;">
+                            <p style="color:var(--text-secondary); margin-bottom:0.75rem;">Comments are for members — sign in to join the conversation.</p>
+                            <button type="button" id="commentSignInBtn" class="btn btn-primary full-width" style="font-size:0.9rem; padding:0.5rem;">Sign in to comment</button>
+                        </div>`;
 
     modalBody.innerHTML = `
         <div class="modal-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
@@ -524,10 +539,7 @@ function openModal(deal) {
                     <h3 style="margin-bottom:1rem;">Comments</h3>
                     <div style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${commentsHTML}</div>
                     <div style="background:var(--bg-body); padding:1rem; border-radius:8px;">
-                        ${commentIdentityHTML}
-                        <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
-                        <button id="postCommentBtn" class="btn btn-primary full-width" style="font-size:0.9rem; padding:0.5rem;">Post Comment</button>
-                        <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.4rem;">Your email address is never shown publicly.</p>
+                        ${commentFormHTML}
                     </div>
                 </div>
             </div>
@@ -545,24 +557,56 @@ function openModal(deal) {
         modalCode.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyDealCode(modalCode, deal.code); } });
     }
 
-    document.getElementById('postCommentBtn').addEventListener('click', () => {
-        const textVal = document.getElementById('commentText').value.trim();
-        if (!textVal) {
-            alert('⚠️ Please write a comment first.');
-            return;
-        }
-        const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const liveUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
-        let name;
-        if (liveUser) {
-            name = liveUser.displayName || 'Member';
-        } else {
-            const nameEl = document.getElementById('commentName');
-            name = (nameEl && nameEl.value.trim()) || 'Guest';
-        }
-        deal.comments.unshift({ user: esc(name).slice(0, 40), text: esc(textVal), time: 'Just now' });
-        openModal(deal);
-    });
+    const postBtn = document.getElementById('postCommentBtn');
+    if (postBtn) {
+        postBtn.addEventListener('click', () => {
+            const textVal = document.getElementById('commentText').value.trim();
+            if (!textVal) {
+                alert('⚠️ Please write a comment first.');
+                return;
+            }
+            const liveUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
+            if (!liveUser) return; // the form only renders for members; stay safe
+            const liveName = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser.displayName || 'Member';
+            deal.comments.unshift({ user: escHtml(liveName).slice(0, 40), text: escHtml(textVal), time: 'Just now' });
+            openModal(deal);
+        });
+    }
+
+    const signInPromptBtn = document.getElementById('commentSignInBtn');
+    if (signInPromptBtn) {
+        signInPromptBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            const b = document.getElementById('signInBtn');
+            if (b) b.click();
+        });
+    }
+
+    const nameEditBtn = document.getElementById('commentNameEdit');
+    if (nameEditBtn) {
+        nameEditBtn.addEventListener('click', () => {
+            const ed = document.getElementById('commentNameEditor');
+            if (ed) ed.style.display = ed.style.display === 'none' ? '' : 'none';
+        });
+    }
+
+    const nameSaveBtn = document.getElementById('commentNameSave');
+    if (nameSaveBtn) {
+        nameSaveBtn.addEventListener('click', () => {
+            const inp = document.getElementById('commentNameInput');
+            const msg = document.getElementById('commentNameMsg');
+            const v = (inp && inp.value || '').trim();
+            if (!/^[A-Za-z0-9_.\- ]{3,24}$/.test(v)) {
+                if (msg) { msg.textContent = 'Use 3–24 characters: letters, numbers, spaces, dots, dashes or underscores.'; msg.style.display = ''; }
+                return;
+            }
+            nameSaveBtn.disabled = true;
+            CC_AUTH.setUsername(v).then(() => { openModal(deal); }).catch(() => {
+                nameSaveBtn.disabled = false;
+                if (msg) { msg.textContent = 'Could not save that name — try again.'; msg.style.display = ''; }
+            });
+        });
+    }
 }
 
 

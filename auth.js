@@ -21,6 +21,7 @@
 
     var auth = null;
     var currentUser = null;
+    var profileUsername = '';
     var saveTimer = null;
     try {
         if (window.firebase) {
@@ -62,6 +63,7 @@
             return postFn('ccGetProfile', {}, token);
         }).then(function (res) {
             if (!res || res.error) return;
+            profileUsername = typeof res.username === 'string' ? res.username : '';
             var acct = Array.isArray(res.interests) ? res.interests : [];
             var local = CC_FEED.getInterests();
             if (acct.length) {
@@ -181,12 +183,23 @@
             return currentUser ? currentUser.getIdToken() : Promise.reject(new Error('not signed in'));
         },
         noteInterestsChanged: noteInterestsChanged,
+        username: function () { return profileUsername; },
+        setUsername: function (name) {
+            if (!currentUser) return Promise.reject(new Error('not signed in'));
+            return currentUser.getIdToken().then(function (token) {
+                return postFn('ccSaveUsername', { username: name }, token);
+            }).then(function (res) {
+                if (res && res.username) profileUsername = res.username;
+                return res;
+            });
+        },
         signOut: function () { if (auth) auth.signOut(); }
     };
 
     if (auth) {
         auth.onAuthStateChanged(function (user) {
             currentUser = user || null;
+            if (!currentUser) profileUsername = '';
             paintHeader();
             if (currentUser) {
                 // The giveaway treats the account email as "your email"
