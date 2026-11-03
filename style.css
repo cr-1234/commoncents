@@ -312,17 +312,18 @@ body:not(.dark-mode) .glass {
 }
 .giveaway-sidebar-btn {
     background: linear-gradient(135deg, var(--highlight) 0%, var(--highlight-hover) 100%);
-    color: #000; font-weight: 700; font-size: 0.85rem;
+    color: #fff; font-weight: 700; font-size: 0.85rem;
     border: none; border-radius: var(--border-radius); padding: 0.65rem 1rem;
     cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em;
-    box-shadow: 0 2px 12px rgba(203,162,88,0.3);
+    box-shadow: 0 2px 12px rgba(91,45,142,0.28);
 }
-.giveaway-sidebar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(203,162,88,0.45); }
+.giveaway-sidebar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(91,45,142,0.4); }
+body.dark-mode .giveaway-sidebar-btn { color: #000; }
 
 /* ── Giveaway Nav Link ──────────────────────────────────────── */
 .giveaway-nav-link {
     background: linear-gradient(135deg, var(--highlight), var(--highlight-hover));
-    color: #000 !important; font-weight: 700 !important; font-size: 0.82rem;
+    color: #fff !important; font-weight: 700 !important; font-size: 0.82rem;
     padding: 0.3rem 0.8rem !important; border-radius: 20px;
 
     letter-spacing: 0.03em;
