@@ -65,9 +65,9 @@ function initApp() {
     setupEventListeners();
     updateEntryCount();
 
-    // Restore saved theme (default is dark — only apply light if explicitly saved)
-    if (localStorage.getItem('theme') === 'light') {
-        document.body.classList.add('light-mode');
+    // Restore saved theme (the site is light by default — dark only if explicitly saved)
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
     }
 
     // Load dynamic deals from Google Sheets if configured
@@ -96,9 +96,9 @@ function setupEventListeners() {
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
-            const isLight = document.body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
     }
 

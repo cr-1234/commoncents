@@ -2,6 +2,38 @@
 
 /* ── CSS Variables ─────────────────────────────────────────── */
 :root {
+    /* Light theme — the site's default face (flipped from dark 2026-11-03). */
+    --bg-body:      #f7f5f2;
+    --bg-card:      #ffffff;
+    --bg-header:    rgba(255, 255, 255, 0.85);
+    --text-primary: #1b1b1f;
+    --text-secondary:#5f5f6b;
+    --highlight:    #b8860b;
+    --highlight-hover:#96690a;
+    --silver:       #64748b;
+    --border-color: rgba(0,0,0,0.09);
+    --shadow-md:    0 12px 40px rgba(0,0,0,0.12);
+    --font-main:    'Inter', sans-serif;
+    --border-radius: 12px; /* unified border radius */
+    --font-display: 'Poppins', sans-serif;
+
+    /* Apple-Style Glassmorphism & Metallic Gold tokens */
+    --glass-bg:     rgba(255,255,255,0.6);
+    --glass-border: rgba(0,0,0,0.07);
+    --glass-shine:  rgba(255,255,255,0.6);
+    --glass-blur:   blur(20px);
+    --gold-gradient:linear-gradient(135deg, #E3C565 0%, #C49A27 50%, #9A720F 100%);
+    --glass-inner-border: inset 0 0 0 1px rgba(0,0,0,0.03);
+    
+    /* Logo Colors */
+    --silver-logo:  #6b7280;
+    --gold-logo:    #b8860b;
+
+    color-scheme: light;
+}
+
+/* Dark theme — kept for anyone who saved it; no longer the default. */
+body.dark-mode {
     --bg-body:      #0A0A0A;
     --bg-card:      #121212;
     --bg-header:    rgba(10, 10, 10, 0.75);
@@ -12,22 +44,13 @@
     --silver:       #cbd5e1;
     --border-color: rgba(255,255,255,0.08);
     --shadow-md:    0 12px 40px rgba(0,0,0,0.65);
-    --font-main:    'Inter', sans-serif;
-    --border-radius: 12px; /* unified border radius */
-    --font-display: 'Poppins', sans-serif;
-
-    /* Apple-Style Glassmorphism & Metallic Gold tokens */
     --glass-bg:     rgba(20,20,20,0.55);
     --glass-border: rgba(255,255,255,0.1);
     --glass-shine:  rgba(255,255,255,0.15);
-    --glass-blur:   blur(20px);
     --gold-gradient:linear-gradient(135deg, #F6E8A8 0%, #D4AF37 50%, #B37F15 100%);
     --glass-inner-border: inset 0 0 0 1px rgba(255,255,255,0.05);
-    
-    /* Logo Colors */
     --silver-logo:  #b0b0b0;
     --gold-logo:    #D4AF37;
-    
     color-scheme: dark;
 }
 
@@ -36,10 +59,10 @@
 /* ── Theme Toggle Icons via CSS (no JS display juggling) ─────── */
 /* Dark mode  → show sun (click to go light)  */
 /* Light mode → show moon (click to go dark)  */
-.theme-btn .sun-icon  { display: inline; }
-.theme-btn .moon-icon { display: none;   }
-.light-mode .theme-btn .sun-icon  { display: none;   }
-.light-mode .theme-btn .moon-icon { display: inline; }
+.theme-btn .sun-icon  { display: none;   }
+.theme-btn .moon-icon { display: inline; }
+body.dark-mode .theme-btn .sun-icon  { display: inline; }
+body.dark-mode .theme-btn .moon-icon { display: none;   }
 
 /* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -338,7 +361,7 @@ ul        { list-style: none; }
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
 }
-.light-mode .dropdown-item:hover {
+body:not(.dark-mode) .dropdown-item:hover {
     background: rgba(15, 23, 42, 0.04);
     box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.05), inset 0 0 0 1px rgba(15, 23, 42, 0.02);
 }
@@ -622,7 +645,7 @@ ul        { list-style: none; }
 .my-feed-btn:hover { background: var(--highlight); color: #1a1a1a; }
 .interest-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .interest-chip {
-    background: #1b1b1b; color: var(--text-secondary);
+    background: var(--bg-card); color: var(--text-secondary);
     border: 1px solid var(--border-color); border-radius: 999px;
     padding: 0.42rem 0.95rem; font-size: 0.85rem; cursor: pointer;
 }
