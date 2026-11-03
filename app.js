@@ -297,8 +297,6 @@ function openSubmitDealModal() {
                             <option value="tools">Tools</option>
                             <option value="household">Household</option>
                             <option value="groceries">Groceries</option>
-                            <option value="gifts-him">Gifts for Him</option>
-                            <option value="gifts-her">Gifts for Her</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
@@ -414,7 +412,7 @@ function createDealCard(deal) {
         </div>
         <div class="card-content">
             <div class="card-meta">
-                <span class="card-category">${deal.category.replace('gifts-him','Gifts for Him').replace('gifts-her','Gifts for Her')}</span>
+                <span class="card-category">${deal.category}</span>
                 <span class="card-source">${getStoreName(deal.url)}</span>
                 ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
@@ -493,7 +491,7 @@ function openModal(deal) {
         <div class="modal-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
             <div><img src="${deal.image}" alt="${deal.title}" style="width:100%; border-radius:8px;"></div>
             <div>
-                <div class="card-category">${deal.category.replace('gifts-him','Gifts for Him').replace('gifts-her','Gifts for Her')}</div>
+                <div class="card-category">${deal.category}</div>
                 <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
                 <p style="color:var(--text-secondary); margin-bottom:1.5rem; line-height:1.7;">${deal.description}</p>
                 <div class="card-price" style="font-size:2rem; margin-bottom:1.5rem;">
