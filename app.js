@@ -420,8 +420,8 @@ function createDealCard(deal) {
         </div>
         <div class="card-content">
             <div class="card-meta">
-                <span class="card-category">${deal.category}</span>
                 <span class="card-source">${getStoreName(deal.url)}</span>
+                <span class="card-category">${deal.category}</span>
                 ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
             <h3 class="card-title">${deal.title}</h3>
