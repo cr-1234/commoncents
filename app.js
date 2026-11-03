@@ -424,7 +424,7 @@ function createDealCard(deal) {
                 ${!expired && deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
                 ${!expired && deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
-            ${!expired && deal.code ? `<div class="deal-code" title="Tap to copy the code">Use code <strong>${deal.code}</strong> at checkout <span class="code-copy-hint">tap to copy</span></div>` : ''}
+            ${!expired && deal.code ? `<div class="deal-code-tag">✂ Promo code — tap deal to get it</div>` : ''}
             ${expired
                 ? `<span class="btn btn-primary full-width view-deal-btn expired-btn" style="margin-bottom:1rem;">Deal Expired</span>`
                 : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" style="margin-bottom:1rem;">View Deal</a>`}
@@ -448,14 +448,6 @@ function createDealCard(deal) {
 
     article.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
     article.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
-    const codeEl = article.querySelector('.deal-code');
-    if (codeEl) codeEl.addEventListener('click', () => {
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(deal.code).catch(() => {});
-        const orig = codeEl.innerHTML;
-        codeEl.innerHTML = 'Code copied ✓';
-        codeEl.classList.add('copied');
-        setTimeout(() => { codeEl.innerHTML = orig; codeEl.classList.remove('copied'); }, 1200);
-    });
     return article;
 }
 
@@ -508,7 +500,7 @@ function openModal(deal) {
                     $${deal.price}
                     ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
                 </div>
-                ${deal.code ? `<div class="deal-code" style="margin-bottom:1.5rem;">Use code <strong>${deal.code}</strong> at checkout</div>` : ''}
+                ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
                 <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width modal-deal-btn" style="margin-bottom:1.5rem;">Get This Deal</a>
                 <div class="vote-container" style="margin-bottom:1.5rem;">
                     <button class="vote-btn upvote-btn ${deal.votes.up > 0 ? 'active' : ''}">
@@ -538,6 +530,12 @@ function openModal(deal) {
     modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
     modalBody.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
 
+    const modalCode = modalBody.querySelector('.deal-code');
+    if (modalCode) {
+        modalCode.addEventListener('click', () => copyDealCode(modalCode, deal.code));
+        modalCode.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyDealCode(modalCode, deal.code); } });
+    }
+
     document.getElementById('postCommentBtn').addEventListener('click', () => {
         const emailVal = document.getElementById('commentEmail').value.trim();
         const textVal  = document.getElementById('commentText').value.trim();
@@ -563,6 +561,28 @@ function getStoreName(url) {
 }
 
 const AMAZON_TAG = 'commoncents0050-20';
+function copyDealCode(el, code) {
+    const done = () => {
+        if (el.dataset.copying) return;
+        el.dataset.copying = '1';
+        const orig = el.innerHTML;
+        el.innerHTML = '<span class="code-clip-icon">✓</span><span class="code-main"><strong>Code copied!</strong></span><span class="code-action">PASTE AT CHECKOUT</span>';
+        el.classList.add('copied');
+        setTimeout(() => { el.innerHTML = orig; el.classList.remove('copied'); delete el.dataset.copying; }, 2600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(done).catch(done);
+    } else {
+        try {
+            const ta = document.createElement('textarea');
+            ta.value = code; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+        } catch (e) {}
+        done();
+    }
+}
+
 function getAffiliateUrl(url) {
     if (!url) return '#';
     try {

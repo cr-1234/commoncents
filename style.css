@@ -695,11 +695,25 @@ ul        { list-style: none; }
 .card-date { color: var(--text-secondary); font-size: 0.78rem; margin-left: auto; }
 
 /* ===== Promo code on a deal (posted price needs the code) ===== */
-.deal-code {
-    border: 1.5px dashed #d97706; background: #fffbeb; color: #92400e;
-    border-radius: 8px; padding: 0.5rem 0.6rem; margin-bottom: 1rem;
-    font-size: 0.85rem; text-align: center; cursor: pointer;
+/* Card face: just a small tag; the code itself lives in the detail modal. */
+.deal-code-tag {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: 0.75rem; font-weight: 600; color: #92400e;
+    background: #fffbeb; border: 1px solid #f59e0b; border-radius: 999px;
+    padding: 0.2rem 0.6rem; margin-bottom: 1rem;
 }
-.deal-code strong { letter-spacing: 0.04em; }
-.deal-code .code-copy-hint { display: block; font-size: 0.7rem; opacity: 0.75; margin-top: 0.15rem; }
-.deal-code.copied { background: #ecfdf5; border-color: #059669; color: #065f46; font-weight: 700; }
+/* Modal: coupon-clip box. Tap copies; the box visibly flips to a clipped state. */
+.deal-code {
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    border: 1.5px dashed #d97706; background: #fffbeb; color: #92400e;
+    border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 0.5rem;
+    font-size: 0.95rem; text-align: center; cursor: pointer; user-select: none;
+}
+.deal-code .code-clip-icon { font-size: 1.05rem; line-height: 1; }
+.deal-code .code-main strong { letter-spacing: 0.05em; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.deal-code .code-action {
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em;
+    border: 1px solid currentColor; border-radius: 999px; padding: 0.18rem 0.5rem; white-space: nowrap;
+}
+.deal-code.copied { background: #ecfdf5; border: 1.5px solid #059669; color: #065f46; }
+.code-helper { font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 1.5rem; }
