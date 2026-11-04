@@ -8,6 +8,11 @@ let currentCategory = 'all';
 let myVotes = {};
 try { myVotes = JSON.parse(localStorage.getItem('ccMyVotes') || '{}'); } catch (e) { myVotes = {}; }
 function saveMyVotes() { try { localStorage.setItem('ccMyVotes', JSON.stringify(myVotes)); } catch (e) {} }
+// Displayed count = the deal's stored tally + my own vote if I cast it.
+// The stored tallies reset on every page load but myVotes persists, so the
+// counts must be DERIVED, never mutated — mutating them let a returning
+// visitor's switch subtract a vote that wasn't in the count (totals hit -1).
+function voteCount(deal, type) { return (deal.votes[type] || 0) + (myVotes[deal.id] === type ? 1 : 0); }
 let searchQuery = '';
 
 // Paste your Google Sheet published CSV URL below:
@@ -440,11 +445,11 @@ function createDealCard(deal) {
             <div class="vote-container" style="border-top:none; padding-top:0;">
                 <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}" data-id="${deal.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                    <span>${deal.votes.up}</span>
+                    <span>${voteCount(deal, 'up')}</span>
                 </button>
                 <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}" data-id="${deal.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-                    <span>${deal.votes.down}</span>
+                    <span>${voteCount(deal, 'down')}</span>
                 </button>
             </div>
         </div>`;
@@ -468,25 +473,22 @@ function handleVote(e, deal, type) {
     const countSpan    = btn.querySelector('span');
     const otherCount   = otherBtn.querySelector('span');
 
-    // Toggle MY vote (tracked per visitor, not by the shared totals)
+    // Flip MY vote only — the stored tallies are never mutated; what's shown
+    // is always derived via voteCount(), so totals can never go negative.
     const mine = myVotes[deal.id];
     if (mine === type) {
-        deal.votes[type]--;
         delete myVotes[deal.id];
-        btn.classList.remove('active');
     } else {
-        if (mine === otherType) {
-            deal.votes[otherType]--;
-            otherBtn.classList.remove('active');
-            otherCount.textContent = deal.votes[otherType];
-        }
-        deal.votes[type]++;
         myVotes[deal.id] = type;
-        btn.classList.add('active');
         btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
     }
     saveMyVotes();
-    countSpan.textContent = deal.votes[type];
+    const upBtn = container.querySelector('.upvote-btn');
+    const downBtn = container.querySelector('.downvote-btn');
+    upBtn.classList.toggle('active', myVotes[deal.id] === 'up');
+    downBtn.classList.toggle('active', myVotes[deal.id] === 'down');
+    upBtn.querySelector('span').textContent = voteCount(deal, 'up');
+    downBtn.querySelector('span').textContent = voteCount(deal, 'down');
 }
 
 
@@ -543,11 +545,11 @@ function openModal(deal) {
                 <div class="vote-container" style="margin-bottom:1.5rem;">
                     <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                        <span>${deal.votes.up}</span>
+                        <span>${voteCount(deal, 'up')}</span>
                     </button>
                     <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-                        <span>${deal.votes.down}</span>
+                        <span>${voteCount(deal, 'down')}</span>
                     </button>
                 </div>
             </div>
