@@ -427,7 +427,6 @@ function createDealCard(deal) {
             <div class="card-meta">
                 <span class="card-source">${getStoreName(deal.url)}</span>
                 <span class="card-category">${deal.category}</span>
-                ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
             <h3 class="card-title">${deal.title}</h3>
             ${deal.description ? `<p class="card-desc">${deal.description}</p>` : ''}
@@ -435,6 +434,7 @@ function createDealCard(deal) {
                 ${expired ? `<span class="expired-price">$${deal.price}</span>` : `$${deal.price}`}
                 ${!expired && deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
                 ${!expired && deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
+                ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
             ${!expired && deal.code ? `<div class="deal-code-tag">✂ Promo code — tap deal to get it</div>` : ''}
             ${!expired && deal.dealNote ? `<div class="deal-note-tag">✂ Coupon to clip on Amazon — tap deal for details</div>` : ''}
@@ -554,7 +554,7 @@ function openModal(deal) {
                 </div>
             </div>
         </div>
-        <div style="border-top:1px solid var(--border-color); padding-top:1.5rem; margin-top:1.5rem;">
+        <div style="border-top:1px solid var(--border-color); padding-top:1.5rem; margin-top:1.5rem; max-width:620px; margin-left:auto; margin-right:auto; width:100%;">
                     <h3 style="margin-bottom:1rem;">Comments</h3>
                     <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${commentsHTML}</div>
                     <div style="background:var(--bg-body); padding:1rem; border-radius:8px;">
