@@ -528,9 +528,9 @@ function openModal(deal) {
 
     modalBody.innerHTML = `
         <div class="modal-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
-            <div><img src="${deal.image}" alt="${deal.title}" style="width:100%; border-radius:8px;"></div>
+            <div class="modal-media"><img src="${deal.image}" alt="${deal.title}"></div>
             <div>
-                <div class="card-category">${deal.category}</div>
+                <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${deal.category}</div>
                 <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
                 <p style="color:var(--text-secondary); margin-bottom:1.5rem; line-height:1.7;">${deal.description}</p>
                 <div class="card-price" style="font-size:2rem; margin-bottom:1.5rem;">
@@ -550,14 +550,14 @@ function openModal(deal) {
                         <span>${deal.votes.down}</span>
                     </button>
                 </div>
-                <div style="border-top:1px solid var(--border-color); padding-top:1.5rem;">
+            </div>
+        </div>
+        <div style="border-top:1px solid var(--border-color); padding-top:1.5rem; margin-top:1.5rem;">
                     <h3 style="margin-bottom:1rem;">Comments</h3>
                     <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${commentsHTML}</div>
                     <div style="background:var(--bg-body); padding:1rem; border-radius:8px;">
                         ${commentFormHTML}
                     </div>
-                </div>
-            </div>
         </div>`;
 
     if (window.innerWidth < 768) modalBody.querySelector('.modal-grid').style.gridTemplateColumns = '1fr';
