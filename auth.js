@@ -103,12 +103,19 @@
             inBtn.style.display = 'none';
             outBtn.style.display = '';
             emailEl.style.display = '';
-            emailEl.textContent = currentUser.email || '';
+            // No raw email in the header (the user disliked it) — a round
+            // initial avatar instead, like Google/Amazon; the full email
+            // is on hover.
+            emailEl.textContent = (currentUser.email || '?').charAt(0).toUpperCase();
+            emailEl.title = currentUser.email || '';
+            emailEl.classList.add('as-avatar');
         } else {
             inBtn.style.display = '';
             outBtn.style.display = 'none';
             emailEl.style.display = 'none';
             emailEl.textContent = '';
+            emailEl.title = '';
+            emailEl.classList.remove('as-avatar');
         }
     }
 

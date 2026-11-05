@@ -99,10 +99,18 @@
                 </ul>
             </div>
             <div class="sidebar-widget giveaway-sidebar-widget">
-                <div class="giveaway-sidebar-badge">WEEKLY DRAWING</div>
+                <div class="giveaway-sidebar-badge">WEEKLY GIVEAWAY</div>
                 <h3 class="giveaway-sidebar-title">Win an Amazon<br>Gift Card</h3>
                 <p class="giveaway-sidebar-prize" id="sidebarPrize">Prize starts at $5 · grows with entries</p>
-                <button class="btn giveaway-sidebar-btn full-width" id="openGiveawaySidebar">Enter the Drawing</button>
+                <button class="btn giveaway-sidebar-btn full-width" id="openGiveawaySidebar">Enter the Giveaway</button>
+            </div>
+            <div class="sidebar-widget feed-widget">
+                <h3>Your Feed</h3>
+                <p class="feed-widget-text" id="feedWidgetText"></p>
+                <div class="feed-widget-actions">
+                    <button type="button" class="feed-slim-btn" id="feedWidgetBack" style="display:none;">Back to my feed</button>
+                    <button type="button" class="feed-slim-btn" id="feedWidgetChange">Build your feed</button>
+                </div>
             </div>
         </aside>
 
@@ -119,7 +127,7 @@
                         <div class="dropdown-item" data-value="popular">Most Popular</div>
                         <div class="dropdown-item" data-value="price-low">Price: Low to High</div>
                         <div class="dropdown-item" data-value="price-high">Price: High to Low</div>
-                        <div class="dropdown-item" data-value="discount">Biggest Discount</div>
+                        <div class="dropdown-item" data-value="discount">Biggest % Off</div>
                     </div>
                 </div>
             </div>
@@ -130,13 +138,6 @@
                 </div>
                 <div class="interest-chips" id="interestChips"></div>
                 <p class="feed-status" id="feedStatus"></p>
-                <div class="feed-slim" id="feedSlim">
-                    <span class="feed-slim-text" id="feedSlimText"></span>
-                    <span class="feed-slim-actions">
-                        <button type="button" class="feed-slim-btn" id="feedBackBtn" style="display:none;">Back to my feed</button>
-                        <button type="button" class="feed-slim-btn" id="feedChangeBtn">Change</button>
-                    </span>
-                </div>
             </div>
             <div class="deal-grid" id="dealGrid"></div>
         </main>
@@ -156,11 +157,11 @@
             <span class="close-modal" id="closeGiveaway">&times;</span>
 
             <div class="giveaway-header-bar">
-                <span class="giveaway-badge-tag">WEEKLY DRAWING</span>
+                <span class="giveaway-badge-tag">WEEKLY GIVEAWAY</span>
             </div>
 
             <div class="giveaway-body">
-                <h2 class="giveaway-title">The CommonCents<br>Gift Card Giveaway</h2>
+                <h2 class="giveaway-title">Gift Card Giveaway</h2>
                 <p class="giveaway-subtitle">One winner drawn every Sunday. Enter each week for a new chance to win!</p>
                 <p class="giveaway-legal" id="lastWinner" style="display:none;"></p>
 
@@ -171,27 +172,30 @@
                         Prize grows as more people enter &mdash; <strong id="entryCount">0</strong> people entered
                     </div>
                     <div class="prize-scale-bar">
-                        <span class="prize-tier active">$5</span>
-                        <span class="prize-tier">$10</span>
-                        <span class="prize-tier">$25</span>
-                        <span class="prize-tier">$50</span>
-                        <span class="prize-tier">$75</span>
-                        <span class="prize-tier">$100</span>
+                        <span class="prize-tier active">$5<span class="tier-need">starts here</span></span>
+                        <span class="prize-tier">$10<span class="tier-need">100+ people</span></span>
+                        <span class="prize-tier">$25<span class="tier-need">250+ people</span></span>
+                        <span class="prize-tier">$50<span class="tier-need">1,000+ people</span></span>
+                        <span class="prize-tier">$75<span class="tier-need">5,000+ people</span></span>
+                        <span class="prize-tier">$100<span class="tier-need">10,000+ people</span></span>
                     </div>
+                    <div class="prize-progress"><div class="prize-progress-fill" id="prizeProgressFill"></div></div>
+                    <p class="prize-next" id="prizeNext"></p>
                 </div>
 
                 <div id="giveawayForm" class="giveaway-form-block">
                     <input type="email" id="giveawayEmail" placeholder="your@email.com" class="giveaway-input">
                     <p class="giveaway-account-note" id="giveawayAccountNote" style="display:none;"></p>
-                    <button id="giveawaySubmitBtn" class="giveaway-submit-btn">Enter This Week's Drawing</button>
-                    <p class="giveaway-legal">One entry per person per week. Come back on different days — every 2 visit days earns +1 bonus entry (up to 5 extra chances). Bonuses add chances, never change the prize. No purchase necessary. Drawing every Sunday at noon ET.</p>
+                    <button id="giveawaySubmitBtn" class="giveaway-submit-btn">Enter This Week's Giveaway</button>
+                    <p class="giveaway-legal">One entry per person per week. Come back on different days — every 2 visit days earns +1 bonus entry (up to 5 extra chances). Bonuses add chances, never change the prize. No purchase necessary. Winner drawn every Sunday at noon ET.</p>
                     <p class="giveaway-legal" id="giveawayError" style="display:none;color:#ef4444;"></p>
                 </div>
 
                 <div id="giveawaySuccess" class="giveaway-success-block" style="display:none;">
                     <div class="success-checkmark">✓</div>
-                    <h3 class="success-title">You're in the drawing!</h3>
+                    <h3 class="success-title">You're in the giveaway!</h3>
                     <p class="success-subtitle">We'll email you if you win. Good luck!</p>
+                    <div class="entry-circles" id="gwEntryCircles"></div>
                     <p class="success-note" id="gwEntriesBreakdown"></p>
                 </div>
             </div>
@@ -223,7 +227,7 @@
         <div class="modal-content auth-modal-content">
             <span class="close-modal" id="authClose">&times;</span>
             <h2 class="auth-title" id="authTitle">Sign in</h2>
-            <p class="auth-sub">Your feed picks save to your account, and entering the weekly drawing is one tap — no typing your email.</p>
+            <p class="auth-sub">Your feed picks save to your account, and entering the weekly giveaway is one tap — no typing your email.</p>
             <button type="button" class="auth-google-btn" id="authGoogleBtn"><img class="g-logo" src="google-g.svg" alt="" aria-hidden="true">Continue with Google</button>
             <div class="auth-divider"><span>or</span></div>
             <form id="authForm">

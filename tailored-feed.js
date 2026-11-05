@@ -8,10 +8,10 @@
 // their account instead (see auth.js). Changeable anytime.
 //
 // Layout: while you're picking, the full chip picker shows. Once you
-// have picks and tap Done, the picker collapses to a slim one-line bar
-// ("Your feed: Tech + Baby & Kids — 10 deals · Change") so it stays out
-// of the way; "Change" brings the chips back. Browsing a category keeps
-// the slim bar, with a "Back to my feed" button.
+// have picks and tap Done, the picker hides completely — the top of the
+// page stays clean. The feed's status lives in the sidebar's "Your
+// Feed" widget instead (picks + deal count, a Change button that
+// reopens the picker, and a "Back to my feed" button while browsing).
 //
 // Also the on-site half of deal alerts: deals collected since your last
 // visit get a "NEW FOR YOU" badge. (Email alerts are a later add-on.)
@@ -141,18 +141,19 @@
         if (!els.picker) return;
         var mine = getInterests();
         els.picker.classList.toggle('slim', !expanded && mine.length > 0);
-        // slim bar text + back button visibility
-        if (els.slimText) {
+        // Sidebar "Your Feed" widget text + buttons
+        if (els.widgetText) {
             if (mode === 'mine' && mine.length) {
                 var n = matchCount();
-                els.slimText.textContent = 'Your feed: ' + mine.map(labelFor).join(' + ')
-                    + ' — ' + n + ' deal' + (n === 1 ? '' : 's');
+                els.widgetText.textContent = mine.map(labelFor).join(' + ')
+                    + ' — ' + n + ' deal' + (n === 1 ? '' : 's') + ' for you';
             } else if (mine.length) {
-                els.slimText.textContent = 'Browsing everything — your feed is saved.';
+                els.widgetText.textContent = 'Browsing everything — your picks are saved.';
             } else {
-                els.slimText.textContent = '';
+                els.widgetText.textContent = 'Pick the categories you care about and your homepage shows only those deals.';
             }
         }
+        if (els.widgetChange) els.widgetChange.textContent = mine.length ? 'Change' : 'Build your feed';
         if (els.backBtn) els.backBtn.style.display = (mine.length && mode !== 'mine') ? '' : 'none';
         // expanded status line
         if (els.status) {
@@ -162,7 +163,7 @@
                     + ' — ' + c + ' deal' + (c === 1 ? '' : 's')
                     + '. Tap "Done" to tuck this picker away.';
             } else if (mine.length) {
-                els.status.textContent = 'Browsing by category. Your interests are saved — use the bar above to jump back to your feed.';
+                els.status.textContent = 'Browsing by category. Your interests are saved — use "Back to my feed" in the sidebar to jump back.';
             } else {
                 els.status.textContent = 'Pick what you care about and this page becomes your feed — only those deals, from every site we collect.';
             }
@@ -198,19 +199,20 @@
         els.picker = document.getElementById('interestPicker');
         els.chips = document.getElementById('interestChips');
         els.status = document.getElementById('feedStatus');
-        els.slimText = document.getElementById('feedSlimText');
-        els.backBtn = document.getElementById('feedBackBtn');
+        els.widgetText = document.getElementById('feedWidgetText');
+        els.widgetChange = document.getElementById('feedWidgetChange');
+        els.backBtn = document.getElementById('feedWidgetBack');
         var doneBtn = document.getElementById('feedDoneBtn');
-        var changeBtn = document.getElementById('feedChangeBtn');
         if (!els.picker) return;
 
         if (doneBtn) doneBtn.addEventListener('click', function () {
             expanded = false;
             paintAll();
         });
-        if (changeBtn) changeBtn.addEventListener('click', function () {
+        if (els.widgetChange) els.widgetChange.addEventListener('click', function () {
             expanded = true;
             paintAll();
+            els.picker.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
         if (els.backBtn) els.backBtn.addEventListener('click', function () {
             mode = 'mine';

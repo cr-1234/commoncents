@@ -353,16 +353,16 @@ body.dark-mode .giveaway-sidebar-btn { color: #000; }
     background: var(--glass-bg); backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border); box-shadow: inset 0 1px 0 var(--glass-shine), var(--glass-inner-border), 0 8px 32px rgba(0,0,0,0.5);
-    border-radius: var(--border-radius) !important;
-    overflow: hidden; z-index: 100;
+    border-radius: 22px !important;
+    overflow: hidden; z-index: 100; padding: 6px;
     display: none;
     flex-direction: column;
 }
 .dropdown-items.show { display: flex; }
 .dropdown-item {
-    padding: 0.75rem 1rem; cursor: pointer; color: var(--text-primary);
+    padding: 0.7rem 1rem; cursor: pointer; color: var(--text-primary);
     transition: all 0.25s ease; font-size: 0.95rem;
-    border-left: 2px solid transparent;
+    border-radius: 14px;
 }
 .dropdown-item:hover {
     background: rgba(255, 255, 255, 0.06);
@@ -432,7 +432,7 @@ body:not(.dark-mode) .dropdown-item:hover {
 }
 .view-deal-btn {
     background: linear-gradient(135deg, var(--highlight) 0%, var(--highlight-hover) 100%);
-    color: #fff; border: none; padding: 0.6rem 1rem; border-radius: var(--border-radius);
+    color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 999px;
     font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
     box-shadow: 0 2px 10px rgba(91,45,142,0.25);
 }
@@ -453,7 +453,7 @@ body.dark-mode .view-deal-btn { color: #000; }
 .vote-btn.pop { animation: votePop 0.35s ease; }
 
 /* ── Buttons ────────────────────────────────────────────────── */
-.btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: var(--border-radius); font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; text-align: center; }
+.btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 999px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; text-align: center; }
 .btn-primary { background: linear-gradient(135deg, var(--highlight), var(--highlight-hover)); color: #fff; }
 body.dark-mode .btn-primary { color: #000; }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(91,45,142,0.35); }
@@ -509,53 +509,74 @@ body.dark-mode .btn-primary { color: #000; }
 
 /* Prize block */
 .giveaway-prize-block {
-    background: linear-gradient(135deg, rgba(91,45,142,0.05) 0%, rgba(91,45,142,0.02) 100%);
-    border: 1px solid rgba(91,45,142,0.14);
+    background: linear-gradient(135deg, #7C3AED 0%, #5B2D8E 55%, #3B1D63 100%);
+    border: none;
     border-radius: var(--border-radius); padding: 1.25rem; margin-bottom: 1.5rem;
-    box-shadow: inset 0 1px 0 rgba(91,45,142,0.10);
+    box-shadow: 0 10px 28px rgba(59,29,99,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
 }
 .prize-label {
     font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--text-secondary); margin-bottom: 0.35rem;
+    color: rgba(255,255,255,0.75); margin-bottom: 0.35rem;
 }
 .prize-amount {
-    font-size: 3.2rem; font-weight: 800; color: var(--highlight);
-    background: var(--gold-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 20px rgba(91,45,142,0.25);
+    font-size: 3.2rem; font-weight: 800; color: #8A6A10;
     line-height: 1; margin-bottom: 1rem; letter-spacing: -0.03em;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
+    background: linear-gradient(180deg, #F7DC7E 0%, #C49A28 100%);
+    border: 1px solid rgba(255,255,255,0.35);
     border-radius: var(--border-radius);
     padding: 0.5rem 1.5rem;
     display: inline-block;
-    box-shadow: inset 0 1px 0 var(--glass-shine), var(--glass-inner-border), 0 8px 24px rgba(40,20,70,0.12);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.55);
 }
-.prize-scale-note { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.85rem; }
-.prize-scale-note strong { color: var(--text-primary); }
+.prize-scale-note { font-size: 0.8rem; color: rgba(255,255,255,0.85); margin-bottom: 0.85rem; }
+.prize-scale-note strong { color: #fff; }
 .prize-scale-bar {
     display: flex; justify-content: space-between; gap: 4px;
 }
 .prize-tier {
-    flex: 1; font-size: 0.65rem; font-weight: 700; padding: 0.25rem 0;
+    flex: 1; font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0 0.35rem;
     border-radius: var(--border-radius); text-align: center;
-    background: var(--bg-body);
-    color: var(--text-secondary); border: 1px solid var(--border-color);
-    transition: all 0.2s;
+    background: rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.18);
+    transition: all 0.2s; line-height: 1.25;
+}
+.prize-tier .tier-need {
+    display: block; font-size: 0.52rem; font-weight: 600;
+    letter-spacing: 0.02em; opacity: 0.75; margin-top: 0.1rem;
 }
 .prize-tier.active {
-    background: rgba(91,45,142,0.12);
-    color: var(--highlight); border-color: rgba(91,45,142,0.3);
+    background: #FDF3D8;
+    color: #8A6A10; border-color: #C49A28;
+}
+.prize-progress {
+    height: 8px; border-radius: 999px; margin-top: 0.85rem;
+    background: rgba(255,255,255,0.18); overflow: hidden;
+}
+.prize-progress-fill {
+    height: 100%; width: 0%; border-radius: 999px;
+    background: linear-gradient(90deg, #E7C65A, #C49A28);
+    transition: width 0.5s ease;
+}
+.prize-next { font-size: 0.78rem; color: #F3D27A; margin-top: 0.55rem; min-height: 1em; }
+.entry-circles { display: flex; justify-content: center; gap: 0.45rem; margin: 0.9rem 0 0.5rem; flex-wrap: wrap; }
+.ec-dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 800; color: #fff;
+    background: linear-gradient(135deg, #7C3AED, #5B2D8E);
+    box-shadow: 0 4px 12px rgba(91,45,142,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.ec-dot.base { background: linear-gradient(180deg, #E7C65A, #C49A28); color: #5c430a; }
+.ec-dot.empty {
+    background: transparent; color: rgba(91,45,142,0.4);
+    border: 2px dashed rgba(91,45,142,0.35); box-shadow: none;
 }
 
 /* Form */
 .giveaway-form-block { text-align: left; }
 .giveaway-input {
-    width: 100%; padding: 0.85rem 1rem;
-    border-radius: var(--border-radius);
+    width: 100%; padding: 0.85rem 1.25rem;
+    border-radius: 999px;
     background: var(--glass-bg); backdrop-filter: var(--glass-blur);
     color: var(--text-primary); font-size: 0.95rem; margin-bottom: 0.75rem;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -565,7 +586,7 @@ body.dark-mode .btn-primary { color: #000; }
     width: 100%; padding: 0.9rem;
     background: linear-gradient(135deg, var(--highlight) 0%, var(--highlight-hover) 100%);
     color: #fff; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.02em;
-    border: none;    border-radius: var(--border-radius);
+    border: none;    border-radius: 999px;
     transition: all 0.2s; box-shadow: 0 4px 18px rgba(91,45,142,0.3);
 }
 .giveaway-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(91,45,142,0.4); }
@@ -684,6 +705,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 
 /* ── Accounts: header sign-in + auth modal ──────────────────────── */
 .auth-area { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+.auth-email.as-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #7C3AED, #5B2D8E);
+    color: #fff; font-weight: 800; font-size: 0.9rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(91,45,142,0.35);
+}
 .auth-email { color: var(--text-secondary); font-size: 0.85rem; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .auth-btn {
     background: transparent; color: var(--highlight);
@@ -696,7 +724,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .auth-title { font-family: var(--font-display); margin-bottom: 0.4rem; }
 .auth-sub { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.1rem; line-height: 1.45; }
 .auth-google-btn {
-    width: 100%; background: #fff; color: #1f1f1f; border: 1px solid #dadce0; border-radius: var(--border-radius);
+    width: 100%; background: #fff; color: #1f1f1f; border: 1px solid #dadce0; border-radius: 999px;
     padding: 0.7rem 1rem; font-weight: 600; font-size: 0.95rem; cursor: pointer; margin-bottom: 0.9rem;
     display: flex; align-items: center; justify-content: center; gap: 0.6rem;
     box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
@@ -722,11 +750,11 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     padding: 0.32rem 0.95rem; font-weight: 700; font-size: 0.8rem; cursor: pointer;
 }
 .feed-slim-btn:hover { background: var(--highlight); color: #fff; }
-.interest-picker.slim .interest-picker-head,
-.interest-picker.slim .interest-chips,
-.interest-picker.slim .feed-status { display: none; }
-.interest-picker.slim { padding-bottom: 1rem; }
-.interest-picker.slim .feed-slim { display: flex; }
+/* With picks saved, the picker hides completely — the sidebar's
+   "Your Feed" widget carries the status and the Change button. */
+.interest-picker.slim { display: none; }
+.feed-widget-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 0.7rem; }
+.feed-widget-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
 /* ===== Expired deals: shown honestly, never passed off as live ===== */
 .deal-card.deal-expired .card-image img { filter: grayscale(1); opacity: 0.5; }

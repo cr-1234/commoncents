@@ -50,6 +50,18 @@ function updateEntryCount() {
     }
     const side = document.getElementById('sidebarPrize');
     if (side) side.textContent = prize + ' prize · ' + count + ' people entered · grows with entries';
+    // Progress toward the next prize tier + a plain-words "how many more" line.
+    const fill = document.getElementById('prizeProgressFill');
+    const next = document.getElementById('prizeNext');
+    const LADDER = [[0, '$5'], [100, '$10'], [250, '$25'], [1000, '$50'], [5000, '$75'], [10000, '$100']];
+    let cur = LADDER[0], nxt = null;
+    for (let i = 0; i < LADDER.length; i++) {
+        if (count >= LADDER[i][0]) { cur = LADDER[i]; nxt = LADDER[i + 1] || null; }
+    }
+    if (fill) fill.style.width = nxt ? Math.min(100, Math.round(((count - cur[0]) / (nxt[0] - cur[0])) * 100)) + '%' : '100%';
+    if (next) next.textContent = nxt
+        ? (nxt[0] - count) + ' more ' + (nxt[0] - count === 1 ? 'person' : 'people') + ' and the prize jumps to ' + nxt[1] + '!'
+        : 'Top prize reached — good luck on Sunday!';
 }
 
 // DOM Elements
@@ -166,6 +178,20 @@ function setupEventListeners() {
                 + 'You have ' + total + (total === 1 ? ' entry' : ' entries')
                 + ': 1 for entering + ' + b + ' extra from your visits (' + days + ' visit day' + (days === 1 ? '' : 's') + ' so far). '
                 + 'Every 2 visit days earns +1 more extra entry, up to 5.';
+            // Entry circles: one gold circle for the entry itself, plum
+            // circles for earned visit bonuses, dashed outlines for the
+            // bonus spots still open (max 5).
+            const circ = document.getElementById('gwEntryCircles');
+            if (circ) {
+                circ.innerHTML = '';
+                for (let i = 0; i < 6; i++) {
+                    const s = document.createElement('span');
+                    if (i === 0) { s.className = 'ec-dot base'; s.textContent = '1'; }
+                    else if (i <= b) { s.className = 'ec-dot'; s.textContent = String(i + 1); }
+                    else { s.className = 'ec-dot empty'; s.textContent = '+'; }
+                    circ.appendChild(s);
+                }
+            }
         }
     }
 
@@ -226,7 +252,7 @@ function setupEventListeners() {
                     .then((tok) => CC_GW.enter(CC_AUTH.email(), tok))
                     .then((res) => {
                         giveawaySubmitBtn.disabled = false;
-                        giveawaySubmitBtn.textContent = "Enter This Week's Drawing";
+                        giveawaySubmitBtn.textContent = "Enter This Week's Giveaway";
                         if (res === 'entered' || res === 'already') {
                             updateEntryCount();
                             showGwSuccess(res === 'already');
@@ -237,7 +263,7 @@ function setupEventListeners() {
                     })
                     .catch(() => {
                         giveawaySubmitBtn.disabled = false;
-                        giveawaySubmitBtn.textContent = "Enter This Week's Drawing";
+                        giveawaySubmitBtn.textContent = "Enter This Week's Giveaway";
                         if (errEl0) {
                             errEl0.textContent = 'Something went wrong entering you — please try again.';
                             errEl0.style.display = 'block';
@@ -270,7 +296,7 @@ function setupEventListeners() {
             giveawaySubmitBtn.textContent = 'Entering…';
             CC_GW.enter(email).then((res) => {
                 giveawaySubmitBtn.disabled = false;
-                giveawaySubmitBtn.textContent = "Enter This Week's Drawing";
+                giveawaySubmitBtn.textContent = "Enter This Week's Giveaway";
                 if (res === 'entered' || res === 'already') {
                     updateEntryCount();
                     showGwSuccess(res === 'already');
