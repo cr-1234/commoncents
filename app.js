@@ -546,49 +546,47 @@ function openModal(deal) {
                             <p id="commentNameMsg" style="display:none; font-size:0.8rem; color:#ef4444; margin-top:0.35rem;"></p>
                         </div>
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
-                        <button id="postCommentBtn" class="btn btn-primary full-width" style="font-size:0.9rem; padding:0.5rem;">Post Comment</button>
+                        <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>
                         <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.4rem;">Comments show your comment name — never your email address.</p>`
         : `
                         <div style="text-align:center; padding:0.4rem 0;">
                             <p style="color:var(--text-secondary); margin-bottom:0.75rem;">Comments are for members — sign in to join the conversation.</p>
-                            <button type="button" id="commentSignInBtn" class="btn btn-primary full-width" style="font-size:0.9rem; padding:0.5rem;">Sign in to comment</button>
+                            <button type="button" id="commentSignInBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Sign in to comment</button>
                         </div>`;
 
     modalBody.innerHTML = `
-        <div class="modal-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
-            <div class="modal-media"><img src="${deal.image}" alt="${deal.title}"></div>
-            <div>
-                <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${deal.category}</div>
-                <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
-                <p style="color:var(--text-secondary); margin-bottom:1.5rem; line-height:1.7;">${deal.description}</p>
-                <div class="card-price" style="font-size:2rem; margin-bottom:1.5rem;">
-                    $${deal.price}
-                    ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
-                </div>
-                ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
-                ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
-                <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width modal-deal-btn" style="margin-bottom:1.5rem;">Get This Deal</a>
-                <div class="vote-container" style="margin-bottom:1.5rem;">
-                    <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                        <span>${voteCount(deal, 'up')}</span>
-                    </button>
-                    <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-                        <span>${voteCount(deal, 'down')}</span>
-                    </button>
-                </div>
+        <div class="modal-media-banner"><img src="${deal.image}" alt="${deal.title}"></div>
+        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${getStoreName(deal.url)} &middot; ${deal.category}</div>
+        <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
+        <div class="modal-buy-row">
+            <div class="card-price" style="font-size:2rem;">
+                $${deal.price}
+                ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
+                ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
+            <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn">Get This Deal</a>
         </div>
-        <div style="border-top:1px solid var(--border-color); padding-top:1.5rem; margin-top:1.5rem; max-width:620px; margin-left:auto; margin-right:auto; width:100%;">
-                    <h3 style="margin-bottom:1rem;">Comments</h3>
+        ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
+        ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
+        <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
+        <div class="vote-container" style="margin-bottom:0.25rem;">
+            <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                <span>${voteCount(deal, 'up')}</span>
+            </button>
+            <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+                <span>${voteCount(deal, 'down')}</span>
+            </button>
+        </div>
+        <div class="comments-section">
+                    <h3 style="font-size:1.05rem; margin-bottom:0.75rem;">Comments</h3>
                     <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${commentsHTML}</div>
-                    <div style="background:var(--bg-body); padding:1rem; border-radius:8px;">
+                    <div>
                         ${commentFormHTML}
                     </div>
         </div>`;
 
-    if (window.innerWidth < 768) modalBody.querySelector('.modal-grid').style.gridTemplateColumns = '1fr';
     modal.style.display = 'flex';
 
     modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));

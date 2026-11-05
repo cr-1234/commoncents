@@ -6,7 +6,7 @@
        FULL Gifting Butler scheme (user's call, 2026-11-03): #F7F7F7 background, white cards,
        #111 ink, plum #5B2D8E as the primary accent; gold survives only as GB's secondary
        accent on the coupon elements (#FDF3D8 / #C49A28 / #8A6A10). */
-    --bg-body:      #F7F7F7;
+    --bg-body:      #F4F1F9;
     --bg-card:      #ffffff;
     --bg-header:    rgba(255, 255, 255, 0.85);
     --text-primary: #111111;
@@ -14,7 +14,7 @@
     --highlight:    #5B2D8E;
     --highlight-hover:#4D2F86;
     --silver:       #64748b;
-    --border-color: rgba(0,0,0,0.09);
+    --border-color: rgba(91,45,142,0.13);
     --shadow-md:    0 12px 40px rgba(40,20,70,0.14);
     --font-main:    'Inter', sans-serif;
     --border-radius: 12px; /* unified border radius */
@@ -264,7 +264,10 @@ body:not(.dark-mode) .glass {
     gap: 2rem; align-items: start; padding-top: 2rem; padding-bottom: 2rem;
 }
 .sidebar { position: sticky; top: 6rem; }
-.sidebar-widget { margin-bottom: 2rem; }
+.sidebar-widget {
+    margin-bottom: 2rem; background: #F9F6FD;
+    border: 1px solid rgba(91,45,142,0.09); border-radius: 16px; padding: 1.1rem 1.1rem 1.2rem;
+}
 .sidebar-widget > h3 {
     font-size: 1rem; margin-bottom: 0.85rem; color: var(--text-primary);
     border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; display: block;
@@ -471,7 +474,7 @@ body.dark-mode .btn-primary { color: #000; }
     margin: 5% auto; padding: 2rem;
     border: 1px solid var(--glass-border);
     box-shadow: inset 0 1px 0 var(--glass-shine), 0 30px 60px rgba(0,0,0,0.5);
-    width: 90%; max-width: 800px; border-radius: var(--border-radius); position: relative;
+    width: 90%; max-width: 700px; border-radius: var(--border-radius); position: relative;
 }
 .close-modal {
     position: absolute; right: 1.25rem; top: 0.9rem; font-size: 2rem;
@@ -771,20 +774,16 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 
 /* ===== Promo code on a deal (posted price needs the code) ===== */
 /* Card face: just a small tag; the code itself lives in the detail modal. */
-#modalBody .card-price { justify-content: center; }
-.modal-deal-btn { display: block; max-width: 340px; margin-left: auto; margin-right: auto; }
-.modal-media {
-    background: var(--bg-body); border: 1px solid var(--border-color);
-    border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    padding: 1rem; align-self: start;
+.modal-buy-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.modal-buy-row .card-price { margin-bottom: 0; flex-wrap: nowrap; }
+.modal-deal-btn { margin-left: auto; }
+.comments-section { border-top: 1px solid var(--border-color); margin-top: 1.25rem; padding-top: 1.1rem; }
+.modal-media-banner {
+    background: #EDE5F8; border-radius: 14px; height: 280px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.25rem; overflow: hidden;
 }
-.modal-media img { width: 100%; max-height: 340px; object-fit: contain; border-radius: 6px; }
-.deal-note {
-    background: #EDE5F8; border: 1px solid rgba(91,45,142,0.25);
-    border-left: 4px solid var(--highlight); border-radius: 8px;
-    padding: 0.7rem 0.9rem; font-size: 0.92rem; line-height: 1.5;
-    color: var(--text-primary); margin-bottom: 1rem; text-align: left;
-}
+.modal-media-banner img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 1rem; }
 .deal-note strong { color: var(--highlight); }
 .deal-note-tag {
     display: inline-flex; align-items: center; gap: 0.35rem;
