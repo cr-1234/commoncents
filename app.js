@@ -521,13 +521,23 @@ function handleVote(e, deal, type) {
 
 function openModal(deal) {
     if (!deal.comments) deal.comments = [];
-    const commentsHTML = deal.comments.map(c => `
+    const cmtPencil = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>';
+    const cmtTrash = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>';
+    const commentsHTML = deal.comments.map((c, idx) => `
         <div style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);">
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
                 <strong style="color:var(--text-primary);">${c.user}</strong>
-                <span style="color:var(--text-secondary); font-size:0.85rem;">${c.time}</span>
+                <span style="display:inline-flex; align-items:center;">
+                    <span style="color:var(--text-secondary); font-size:0.85rem;">${c.time}</span>
+                    ${c.own ? `<span class="cmt-actions"><button type="button" class="cmt-act-btn" data-cact="edit" data-idx="${idx}" title="Edit comment" aria-label="Edit comment">${cmtPencil}</button><button type="button" class="cmt-act-btn del" data-cact="del" data-idx="${idx}" title="Delete comment" aria-label="Delete comment">${cmtTrash}</button></span>` : ''}
+                </span>
             </div>
-            <p style="color:var(--text-secondary); font-size:0.95rem; white-space:pre-wrap;">${c.text}</p>
+            ${deal._editingIdx === idx ? `
+                <textarea id="commentEditText" rows="2" style="width:100%; padding:0.5rem; margin-bottom:0.4rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;">${c.text}</textarea>
+                <div style="display:flex; gap:0.4rem;">
+                    <button type="button" class="btn btn-primary" data-cact="save" data-idx="${idx}" style="font-size:0.8rem; padding:0.3rem 1rem;">Save</button>
+                    <button type="button" class="btn" data-cact="cancel" data-idx="${idx}" style="font-size:0.8rem; padding:0.3rem 1rem;">Cancel</button>
+                </div>` : `<p style="color:var(--text-secondary); font-size:0.95rem; white-space:pre-wrap;">${c.text}</p>`}
         </div>`).join('');
 
     // Comments are members-only (no anonymous free-for-all). A signed-in user
@@ -543,8 +553,7 @@ function openModal(deal) {
                         <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong></p>
                         ${ccProfileName ? '' : '<p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.5rem;">Tip: you can set your own comment name — tap your profile circle at the top right of the page.</p>'}
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
-                        <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>
-                        <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.4rem;">Comments show your comment name — never your email address.</p>`
+                        <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>`
         : `
                         <div style="text-align:center; padding:0.4rem 0;">
                             <p style="color:var(--text-secondary); margin-bottom:0.75rem;">Comments are for members — sign in to join the conversation.</p>
@@ -605,9 +614,10 @@ function openModal(deal) {
             }
             const liveUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
             if (!liveUser) return; // the form only renders for members; stay safe
-            const liveName = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser.displayName || 'Member';
+            const liveName = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser.displayName || (typeof CC_AUTH.fallbackName === 'function' ? CC_AUTH.fallbackName() : '') || 'Member';
             // Chronological order: the first comment stays on top, new ones go last.
-            deal.comments.push({ user: escHtml(liveName).slice(0, 40), text: escHtml(textVal), time: 'Just now' });
+            // own:true gives the poster pencil/trash controls on their comment.
+            deal.comments.push({ user: escHtml(liveName).slice(0, 40), text: escHtml(textVal), time: 'Just now', own: true });
             openModal(deal);
             const cl = document.getElementById('commentsList');
             if (cl) cl.scrollTop = cl.scrollHeight;
@@ -622,6 +632,37 @@ function openModal(deal) {
             if (b) b.click();
         });
     }
+
+    // Own-comment actions: pencil edits in place, trash deletes. Comments
+    // live in this page session only, so "own" means posted here, now.
+    modalBody.querySelectorAll('[data-cact]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const act = btn.getAttribute('data-cact');
+            const idx = parseInt(btn.getAttribute('data-idx'), 10);
+            const cl0 = document.getElementById('commentsList');
+            const st = cl0 ? cl0.scrollTop : 0;
+            if (act === 'edit') {
+                deal._editingIdx = idx;
+                openModal(deal);
+            } else if (act === 'cancel') {
+                delete deal._editingIdx;
+                openModal(deal);
+            } else if (act === 'del') {
+                deal.comments.splice(idx, 1);
+                delete deal._editingIdx;
+                openModal(deal);
+            } else if (act === 'save') {
+                const ta = document.getElementById('commentEditText');
+                const v = ta ? ta.value.trim() : '';
+                if (!v || !deal.comments[idx]) return;
+                deal.comments[idx].text = escHtml(v);
+                delete deal._editingIdx;
+                openModal(deal);
+            }
+            const cl1 = document.getElementById('commentsList');
+            if (cl1) cl1.scrollTop = st;
+        });
+    });
 
 }
 

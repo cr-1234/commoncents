@@ -321,11 +321,11 @@ body:not(.dark-mode) .glass {
 
 /* ── Giveaway Sidebar Widget ────────────────────────────────── */
 .giveaway-sidebar-widget {
-    background: linear-gradient(135deg, rgba(203,162,88,0.08) 0%, rgba(184,150,46,0.04) 100%);
-    border: 1px solid rgba(203,162,88,0.2);
+    background: #F9F6FD;
+    border: 1px solid rgba(91,45,142,0.09);
     border-radius: var(--border-radius);
     padding: 1.25rem;
-    box-shadow: inset 0 1px 0 rgba(203,162,88,0.15);
+    box-shadow: none;
 }
 .giveaway-sidebar-badge {
     font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
@@ -548,9 +548,9 @@ body.dark-mode .btn-primary { color: #000; }
     color: rgba(255,255,255,0.75); margin-bottom: 0.35rem;
 }
 .prize-amount {
-    font-size: 3.2rem; font-weight: 800; color: #8A6A10;
+    font-size: 3.2rem; font-weight: 800; color: #5B2D8E;
     line-height: 1; margin-bottom: 1rem; letter-spacing: -0.03em;
-    background: linear-gradient(180deg, #F7DC7E 0%, #C49A28 100%);
+    background: #FFFFFF;
     border: 1px solid rgba(255,255,255,0.35);
     border-radius: var(--border-radius);
     padding: 0.5rem 1.5rem;
@@ -574,8 +574,8 @@ body.dark-mode .btn-primary { color: #000; }
     letter-spacing: 0.02em; opacity: 0.75; margin-top: 0.1rem;
 }
 .prize-tier.active {
-    background: #FDF3D8;
-    color: #8A6A10; border-color: #C49A28;
+    background: #FFFFFF;
+    color: #5B2D8E; border-color: #FFFFFF;
 }
 .prize-progress {
     height: 8px; border-radius: 999px; margin-top: 0.85rem;
@@ -583,10 +583,10 @@ body.dark-mode .btn-primary { color: #000; }
 }
 .prize-progress-fill {
     height: 100%; width: 0%; border-radius: 999px;
-    background: linear-gradient(90deg, #E7C65A, #C49A28);
+    background: #FFFFFF;
     transition: width 0.5s ease;
 }
-.prize-next { font-size: 0.78rem; color: #F3D27A; margin-top: 0.55rem; min-height: 1em; }
+.prize-next { font-size: 0.78rem; color: rgba(255,255,255,0.88); margin-top: 0.55rem; min-height: 1em; }
 .entry-circles { display: flex; justify-content: center; gap: 0.45rem; margin: 0.9rem 0 0.5rem; flex-wrap: wrap; }
 .ec-dot {
     width: 36px; height: 36px; border-radius: 50%;
@@ -595,7 +595,7 @@ body.dark-mode .btn-primary { color: #000; }
     background: linear-gradient(135deg, #7C3AED, #5B2D8E);
     box-shadow: 0 4px 12px rgba(91,45,142,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
 }
-.ec-dot.base { background: linear-gradient(180deg, #E7C65A, #C49A28); color: #5c430a; }
+.ec-dot.base { background: #FFFFFF; color: #5B2D8E; box-shadow: inset 0 0 0 2px #5B2D8E, 0 4px 12px rgba(91,45,142,0.18); }
 .ec-dot.empty {
     background: transparent; color: rgba(91,45,142,0.4);
     border: 2px dashed rgba(91,45,142,0.35); box-shadow: none;
@@ -629,8 +629,8 @@ body.dark-mode .giveaway-submit-btn { color: #000; }
 .giveaway-success-block { text-align: center; padding: 0.5rem 0; }
 .success-checkmark {
     width: 56px; height: 56px; border-radius: var(--border-radius);
-    background: linear-gradient(135deg, rgba(203,162,88,0.2), rgba(203,162,88,0.08));
-    border: 2px solid rgba(203,162,88,0.4);
+    background: linear-gradient(135deg, rgba(91,45,142,0.14), rgba(91,45,142,0.06));
+    border: 2px solid rgba(91,45,142,0.35);
     display: flex; align-items: center; justify-content: center;
     font-size: 1.6rem; color: var(--highlight);
     margin: 0 auto 1rem; font-weight: 700;
@@ -856,3 +856,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 }
 .deal-code.copied { background: #ecfdf5; border: 1.5px solid #059669; color: #065f46; }
 .code-helper { font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 1.5rem; }
+
+/* Own-comment actions (pencil / trash on comments you posted) */
+.cmt-actions { display: inline-flex; gap: 0.1rem; margin-left: 0.35rem; }
+.cmt-act-btn {
+    background: none; border: none; cursor: pointer; color: var(--text-secondary);
+    padding: 0.28rem; border-radius: 6px; display: inline-flex; align-items: center;
+    transition: color 0.15s, background 0.15s;
+}
+.cmt-act-btn:hover { color: var(--highlight); background: rgba(91,45,142,0.08); }
+.cmt-act-btn.del:hover { color: #dc2626; background: rgba(220,38,38,0.08); }
