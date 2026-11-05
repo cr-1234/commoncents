@@ -103,12 +103,26 @@
             inBtn.style.display = 'none';
             outBtn.style.display = '';
             emailEl.style.display = '';
-            // No raw email in the header (the user disliked it) — a round
-            // initial avatar instead, like Google/Amazon; the full email
-            // is on hover.
-            emailEl.textContent = (currentUser.email || '?').charAt(0).toUpperCase();
+            // No raw email in the header (the user disliked it). If the
+            // account has a picture (Google sign-ins do), show it in the
+            // circle; otherwise the email's first letter — the pattern
+            // most sites use. Full email stays on hover.
             emailEl.title = currentUser.email || '';
             emailEl.classList.add('as-avatar');
+            if (currentUser.photoURL) {
+                emailEl.innerHTML = '';
+                var avImg = document.createElement('img');
+                avImg.src = currentUser.photoURL;
+                avImg.alt = '';
+                avImg.referrerPolicy = 'no-referrer';
+                avImg.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;';
+                avImg.onerror = function () {
+                    emailEl.textContent = (currentUser.email || '?').charAt(0).toUpperCase();
+                };
+                emailEl.appendChild(avImg);
+            } else {
+                emailEl.textContent = (currentUser.email || '?').charAt(0).toUpperCase();
+            }
         } else {
             inBtn.style.display = '';
             outBtn.style.display = 'none';
