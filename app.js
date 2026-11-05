@@ -539,12 +539,8 @@ function openModal(deal) {
     const ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
     const ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || 'Member') : null;
     const commentFormHTML = ccUser ? `
-                        <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong> <button type="button" id="commentNameEdit" style="background:none; border:none; color:var(--highlight); cursor:pointer; font-size:0.82rem; font-weight:600; padding:0; margin-left:0.35rem;">${ccProfileName ? 'Change name' : 'Set a comment name'}</button></p>
-                        <div id="commentNameEditor" style="display:none; margin-bottom:0.6rem;">
-                            <input type="text" id="commentNameInput" maxlength="24" placeholder="Pick a name for your comments" value="${escHtml(ccProfileName)}" style="width:100%; padding:0.5rem; margin-bottom:0.4rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary);">
-                            <button type="button" id="commentNameSave" class="btn btn-primary" style="font-size:0.85rem; padding:0.4rem 1rem;">Save name</button>
-                            <p id="commentNameMsg" style="display:none; font-size:0.8rem; color:#ef4444; margin-top:0.35rem;"></p>
-                        </div>
+                        <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong></p>
+                        ${ccProfileName ? '' : '<p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.5rem;">Tip: you can set a comment name from your picture menu at the top of the page.</p>'}
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
                         <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>
                         <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.4rem;">Comments show your comment name — never your email address.</p>`
@@ -626,31 +622,6 @@ function openModal(deal) {
         });
     }
 
-    const nameEditBtn = document.getElementById('commentNameEdit');
-    if (nameEditBtn) {
-        nameEditBtn.addEventListener('click', () => {
-            const ed = document.getElementById('commentNameEditor');
-            if (ed) ed.style.display = ed.style.display === 'none' ? '' : 'none';
-        });
-    }
-
-    const nameSaveBtn = document.getElementById('commentNameSave');
-    if (nameSaveBtn) {
-        nameSaveBtn.addEventListener('click', () => {
-            const inp = document.getElementById('commentNameInput');
-            const msg = document.getElementById('commentNameMsg');
-            const v = (inp && inp.value || '').trim();
-            if (!/^[A-Za-z0-9_.\- ]{3,24}$/.test(v)) {
-                if (msg) { msg.textContent = 'Use 3–24 characters: letters, numbers, spaces, dots, dashes or underscores.'; msg.style.display = ''; }
-                return;
-            }
-            nameSaveBtn.disabled = true;
-            CC_AUTH.setUsername(v).then(() => { openModal(deal); }).catch(() => {
-                nameSaveBtn.disabled = false;
-                if (msg) { msg.textContent = 'Could not save that name — try again.'; msg.style.display = ''; }
-            });
-        });
-    }
 }
 
 

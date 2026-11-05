@@ -731,7 +731,23 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 }
 
 /* ── Accounts: header sign-in + auth modal ──────────────────────── */
-.auth-area { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; margin-left: auto; }
+.auth-area { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; margin-left: auto; position: relative; }
+.auth-menu {
+    position: absolute; top: calc(100% + 8px); right: 0; width: 264px; z-index: 130;
+    background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(40,20,70,0.18); padding: 1rem; text-align: left;
+}
+.auth-menu-email { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.7rem; word-break: break-all; }
+.auth-menu-label { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.35rem; }
+.auth-menu input {
+    width: 100%; box-sizing: border-box; padding: 0.55rem 0.9rem; border-radius: 999px;
+    border: 1px solid var(--border-color); background: var(--bg-card);
+    color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.55rem;
+}
+.auth-menu input:focus { outline: none; border-color: var(--highlight); box-shadow: 0 0 0 3px rgba(91,45,142,0.15); }
+.auth-menu-save { width: 100%; padding: 0.55rem; font-size: 0.88rem; }
+.auth-menu-msg { font-size: 0.8rem; margin-top: 0.5rem; }
+.auth-menu-note { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.6rem; line-height: 1.45; }
 .auth-email.as-avatar {
     width: 32px; height: 32px; border-radius: 50%;
     background: linear-gradient(135deg, #7C3AED, #5B2D8E);
@@ -740,6 +756,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     box-shadow: 0 3px 10px rgba(91,45,142,0.35);
     overflow: hidden;
 }
+.auth-email.as-avatar { cursor: pointer; }
 .auth-email { color: var(--text-secondary); font-size: 0.85rem; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .auth-btn {
     background: transparent; color: var(--highlight);

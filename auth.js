@@ -130,6 +130,8 @@
             emailEl.textContent = '';
             emailEl.title = '';
             emailEl.classList.remove('as-avatar');
+            var menuEl0 = document.getElementById('authMenu');
+            if (menuEl0) menuEl0.style.display = 'none';
         }
     }
 
@@ -147,6 +149,55 @@
         var errEl = document.getElementById('authError');
         var googleBtn = document.getElementById('authGoogleBtn');
         if (!modal || !inBtn || !form) return;
+
+        // ── Avatar menu: the comment-name setting lives here (moved out of
+        // the comment form at the user's direction — the form was carrying
+        // too much machinery). Clicking the avatar opens it.
+        var menu = document.getElementById('authMenu');
+        var avatarEl = document.getElementById('authEmail');
+        var menuEmail = document.getElementById('authMenuEmail');
+        var nameInput = document.getElementById('authMenuNameInput');
+        var nameSave = document.getElementById('authMenuNameSave');
+        var nameMsg = document.getElementById('authMenuNameMsg');
+        function closeMenu() { if (menu) menu.style.display = 'none'; }
+        function openMenu() {
+            if (!menu || !currentUser) return;
+            if (menuEmail) menuEmail.textContent = currentUser.email || '';
+            if (nameInput) nameInput.value = profileUsername || '';
+            if (nameMsg) nameMsg.style.display = 'none';
+            menu.style.display = '';
+        }
+        if (avatarEl) avatarEl.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (!currentUser) return;
+            if (menu && menu.style.display !== 'none') closeMenu(); else openMenu();
+        });
+        document.addEventListener('click', function (e) {
+            if (menu && menu.style.display !== 'none' && !e.target.closest('.auth-area')) closeMenu();
+        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+        if (nameSave) nameSave.addEventListener('click', function () {
+            var v = (nameInput && nameInput.value || '').trim();
+            function show(txt, ok) {
+                if (!nameMsg) return;
+                nameMsg.textContent = txt;
+                nameMsg.style.display = '';
+                nameMsg.style.color = ok ? '#15803d' : '#ef4444';
+            }
+            if (!/^[A-Za-z0-9_.\- ]{3,24}$/.test(v)) {
+                show('Use 3–24 characters: letters, numbers, spaces, dots, dashes or underscores.', false);
+                return;
+            }
+            nameSave.disabled = true;
+            window.CC_AUTH.setUsername(v).then(function () {
+                nameSave.disabled = false;
+                show('Saved — your comments will show this name.', true);
+                setTimeout(closeMenu, 1100);
+            }).catch(function () {
+                nameSave.disabled = false;
+                show('Could not save that name — try again.', false);
+            });
+        });
         var mode = 'signin'; // or 'signup'
 
         function setMode(m) {
