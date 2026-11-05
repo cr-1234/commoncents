@@ -751,3 +751,29 @@ function parseCSVLine(line) {
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
+
+// ── Ad-blocker fallback ──────────────────────────────────────────────────
+// If the sponsor rail isn't actually visible (an ad blocker hid it, or its
+// picture failed to load), drop the rail column so the deals take the space
+// back and the page looks normal instead of squeezed next to a dead gap.
+(function () {
+    var main = document.querySelector('.main-content');
+    var rail = document.querySelector('.ad-rail');
+    if (!main) return;
+    function railBroken() {
+        if (!rail || !document.body.contains(rail)) return true;
+        if (rail.offsetHeight === 0) return true;
+        var img = rail.querySelector('img');
+        if (img) {
+            if (img.complete && img.naturalWidth === 0) return true;
+            if (img.offsetHeight === 0) return true;
+        }
+        return false;
+    }
+    function check() { if (railBroken()) main.classList.add('no-ads'); }
+    var img = rail && rail.querySelector('img');
+    if (img) { img.addEventListener('error', check); if (img.complete) check(); }
+    window.addEventListener('load', check);
+    setTimeout(check, 1500);
+    setTimeout(check, 4000);
+})();

@@ -263,6 +263,8 @@ body:not(.dark-mode) .glass {
     display: grid; grid-template-columns: 250px 1fr 290px;
     gap: 1.75rem; align-items: start; padding-top: 2rem; padding-bottom: 2rem;
 }
+/* Ad-blocker fallback (JS adds .no-ads when the sponsor rail is not actually visible): the deals take the rail's space back so the layout looks normal. */
+.main-content.no-ads { grid-template-columns: 250px 1fr; }
 /* Right rail: one sponsored slot (the CR Design ad from the emails).
    Sticky like the sidebar; steps aside on narrower screens. */
 .ad-rail { position: sticky; top: 6rem; }
