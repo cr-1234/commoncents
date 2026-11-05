@@ -460,10 +460,10 @@ function createDealCard(deal) {
                 ${expired ? `<span class="expired-price">$${deal.price}</span>` : `$${deal.price}`}
                 ${!expired && deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
                 ${!expired && deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
+                ${!expired && deal.code ? `<span class="deal-code-tag">✂ Promo code</span>` : ''}
+                ${!expired && deal.dealNote ? `<span class="deal-note-tag">✂ Clip coupon</span>` : ''}
                 ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
-            ${!expired && deal.code ? `<div class="deal-code-tag">✂ Promo code — tap deal to get it</div>` : ''}
-            ${!expired && deal.dealNote ? `<div class="deal-note-tag">✂ Coupon to clip on Amazon — tap deal for details</div>` : ''}
             ${expired
                 ? `<span class="btn btn-primary full-width view-deal-btn expired-btn" style="margin-bottom:1rem;">Deal Expired</span>`
                 : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" style="margin-bottom:1rem;">View Deal</a>`}
