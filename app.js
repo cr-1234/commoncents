@@ -537,10 +537,11 @@ function openModal(deal) {
     const escHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
     const ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
-    const ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || 'Member') : null;
+    const ccGenName = (window.CC_AUTH && CC_AUTH.fallbackName) ? CC_AUTH.fallbackName() : '';
+    const ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || ccGenName || 'Member') : null;
     const commentFormHTML = ccUser ? `
                         <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong></p>
-                        ${ccProfileName ? '' : '<p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.5rem;">Tip: you can set a comment name from your picture menu at the top of the page.</p>'}
+                        ${ccProfileName ? '' : '<p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.5rem;">Tip: you can set your own comment name — tap your profile circle at the top right of the page.</p>'}
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
                         <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>
                         <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.4rem;">Comments show your comment name — never your email address.</p>`

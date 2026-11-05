@@ -165,6 +165,17 @@
             if (menuEmail) menuEmail.textContent = currentUser.email || '';
             if (nameInput) nameInput.value = profileUsername || '';
             if (nameMsg) nameMsg.style.display = 'none';
+            var cur = document.getElementById('authMenuCurrent');
+            if (cur) {
+                var gen = (!profileUsername && window.CC_AUTH.fallbackName) ? window.CC_AUTH.fallbackName() : '';
+                var shown = profileUsername || (currentUser && currentUser.displayName) || gen;
+                if (!profileUsername && shown) {
+                    cur.textContent = 'Right now your comments show as ' + shown + '.';
+                    cur.style.display = '';
+                } else {
+                    cur.style.display = 'none';
+                }
+            }
             menu.style.display = '';
         }
         if (avatarEl) avatarEl.addEventListener('click', function (e) {
@@ -256,6 +267,18 @@
         },
         noteInterestsChanged: noteInterestsChanged,
         username: function () { return profileUsername; },
+        // Deterministic friendly default name from the account id — so a
+        // member who never picks a comment name still shows as SOMEONE
+        // distinct (never a generic "Member"), and the same account gets
+        // the same name on every device without anything being saved.
+        fallbackName: function () {
+            if (!currentUser || !currentUser.uid) return '';
+            var ADJ = ['Savvy', 'Smart', 'Happy', 'Thrifty', 'Keen', 'Clever', 'Bright', 'Sunny'];
+            var NOUN = ['Shopper', 'Saver', 'Hunter', 'Finder', 'Scout', 'Collector', 'Browser', 'DealFan'];
+            var h = 0, uid = String(currentUser.uid);
+            for (var i = 0; i < uid.length; i++) h = ((h * 31) + uid.charCodeAt(i)) >>> 0;
+            return ADJ[h % ADJ.length] + NOUN[(h >> 4) % NOUN.length] + (100 + (h % 900));
+        },
         setUsername: function (name) {
             if (!currentUser) return Promise.reject(new Error('not signed in'));
             return currentUser.getIdToken().then(function (token) {
