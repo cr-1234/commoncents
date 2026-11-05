@@ -277,7 +277,7 @@
             var NOUN = ['Saver', 'Scout', 'Seeker', 'Hunter', 'Finder', 'Buyer'];
             var h = 0, uid = String(currentUser.uid);
             for (var i = 0; i < uid.length; i++) h = ((h * 31) + uid.charCodeAt(i)) >>> 0;
-            return ADJ[h % ADJ.length] + NOUN[(h >> 4) % NOUN.length] + (10 + (h % 90));
+            return ADJ[h % ADJ.length] + NOUN[(h >>> 4) % NOUN.length] + (10 + (h % 90));
         },
         setUsername: function (name) {
             if (!currentUser) return Promise.reject(new Error('not signed in'));
