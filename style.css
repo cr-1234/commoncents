@@ -73,7 +73,7 @@ body      { font-family: var(--font-main); background-color: var(--bg-body); col
 h1, h2, h3, h4, h5, h6 { font-family: var(--font-display, var(--font-main)); }
 a         { text-decoration: none; color: inherit; transition: color 0.2s; }
 ul        { list-style: none; }
-.container{ max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.container{ max-width: 1440px; margin: 0 auto; padding: 0 20px; }
 
 /* ── Custom Scrollbar ───────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
@@ -260,8 +260,26 @@ body:not(.dark-mode) .glass {
 
 /* ── Layout ─────────────────────────────────────────────────── */
 .main-content {
-    display: grid; grid-template-columns: 260px 1fr;
-    gap: 2rem; align-items: start; padding-top: 2rem; padding-bottom: 2rem;
+    display: grid; grid-template-columns: 250px 1fr 290px;
+    gap: 1.75rem; align-items: start; padding-top: 2rem; padding-bottom: 2rem;
+}
+/* Right rail: one sponsored slot (the CR Design ad from the emails).
+   Sticky like the sidebar; steps aside on narrower screens. */
+.ad-rail { position: sticky; top: 6rem; }
+.ad-rail-label {
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem;
+}
+.ad-rail img {
+    width: 100%; height: auto; display: block; border-radius: 14px;
+    border: 1px solid var(--border-color); box-shadow: 0 8px 22px rgba(40,20,70,0.10);
+}
+.ad-rail-contact { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.65rem; }
+.ad-rail-contact a { color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; }
+.ad-rail-contact a:hover { color: var(--highlight); }
+@media (max-width: 1150px) {
+    .main-content { grid-template-columns: 250px 1fr; }
+    .ad-rail { display: none; }
 }
 .sidebar {
     position: sticky; top: 6rem;
