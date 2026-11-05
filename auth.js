@@ -176,16 +176,6 @@
                     cur.style.display = 'none';
                 }
             }
-            var gwRow = document.getElementById('authMenuGiveaway');
-            if (gwRow) {
-                var gw = window.CC_GW;
-                if (gw && gw.isEntered && gw.isEntered()) {
-                    var n = 1 + (gw.bonus ? gw.bonus() : 0);
-                    gwRow.textContent = 'Giveaway: you\u2019re in this week \u00B7 ' + n + (n === 1 ? ' entry' : ' entries');
-                } else {
-                    gwRow.textContent = 'Giveaway: not entered yet \u2014 enter';
-                }
-            }
             menu.style.display = '';
         }
         if (avatarEl) avatarEl.addEventListener('click', function (e) {
@@ -218,18 +208,6 @@
                 nameSave.disabled = false;
                 show('Could not save that name — try again.', false);
             });
-        });
-        var feedRow = document.getElementById('authMenuFeed');
-        if (feedRow) feedRow.addEventListener('click', function () {
-            closeMenu();
-            var b = document.getElementById('feedWidgetChange');
-            if (b) b.click();
-        });
-        var gwRowBtn = document.getElementById('authMenuGiveaway');
-        if (gwRowBtn) gwRowBtn.addEventListener('click', function () {
-            closeMenu();
-            var g = document.getElementById('openGiveaway');
-            if (g) g.click();
         });
         var mode = 'signin'; // or 'signup'
 
