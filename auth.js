@@ -273,11 +273,11 @@
         // the same name on every device without anything being saved.
         fallbackName: function () {
             if (!currentUser || !currentUser.uid) return '';
-            var ADJ = ['Savvy', 'Smart', 'Happy', 'Thrifty', 'Keen', 'Clever', 'Bright', 'Sunny'];
-            var NOUN = ['Shopper', 'Saver', 'Hunter', 'Finder', 'Scout', 'Collector', 'Browser', 'DealFan'];
+            var ADJ = ['Ace', 'Pro', 'Keen', 'Wise', 'Bold', 'Swift', 'Smart', 'Prime'];
+            var NOUN = ['Saver', 'Scout', 'Seeker', 'Hunter', 'Finder', 'Buyer'];
             var h = 0, uid = String(currentUser.uid);
             for (var i = 0; i < uid.length; i++) h = ((h * 31) + uid.charCodeAt(i)) >>> 0;
-            return ADJ[h % ADJ.length] + NOUN[(h >> 4) % NOUN.length] + (100 + (h % 900));
+            return ADJ[h % ADJ.length] + NOUN[(h >> 4) % NOUN.length] + (10 + (h % 90));
         },
         setUsername: function (name) {
             if (!currentUser) return Promise.reject(new Error('not signed in'));

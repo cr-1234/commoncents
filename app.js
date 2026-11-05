@@ -521,8 +521,10 @@ function handleVote(e, deal, type) {
 
 function openModal(deal) {
     if (!deal.comments) deal.comments = [];
-    const cmtPencil = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>';
-    const cmtTrash = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>';
+    // Standard solid icons (the Material shapes every site uses) — the thin
+    // outline versions read as scratchy at small sizes (user's complaint).
+    const cmtPencil = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
+    const cmtTrash = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
     const commentsHTML = deal.comments.map((c, idx) => `
         <div style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
@@ -549,9 +551,9 @@ function openModal(deal) {
     const ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
     const ccGenName = (window.CC_AUTH && CC_AUTH.fallbackName) ? CC_AUTH.fallbackName() : '';
     const ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || ccGenName || 'Member') : null;
+    const cmtInfo = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
     const commentFormHTML = ccUser ? `
-                        <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong></p>
-                        ${ccProfileName ? '' : '<p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.5rem;">Tip: you can set your own comment name — tap your profile circle at the top right of the page.</p>'}
+                        <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong> <button type="button" id="commentNameInfo" class="cmt-info-btn" aria-label="About your comment name">${cmtInfo}<span class="cmt-tip" role="tooltip">You can ${ccProfileName ? 'change' : 'set'} your comment name — tap your profile circle at the top right of the page.</span></button></p>
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
                         <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>`
         : `
@@ -602,6 +604,12 @@ function openModal(deal) {
     if (modalCode) {
         modalCode.addEventListener('click', () => copyDealCode(modalCode, deal.code));
         modalCode.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyDealCode(modalCode, deal.code); } });
+    }
+
+    const nameInfoBtn = document.getElementById('commentNameInfo');
+    if (nameInfoBtn) {
+        // Hover shows the tooltip on desktop (CSS); a tap toggles it for touch.
+        nameInfoBtn.addEventListener('click', () => nameInfoBtn.classList.toggle('tip-show'));
     }
 
     const postBtn = document.getElementById('postCommentBtn');

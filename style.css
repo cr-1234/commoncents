@@ -550,7 +550,7 @@ body.dark-mode .btn-primary { color: #000; }
 .prize-amount {
     font-size: 3.2rem; font-weight: 800; color: #5B2D8E;
     line-height: 1; margin-bottom: 1rem; letter-spacing: -0.03em;
-    background: #FFFFFF;
+    background: #EDE5F8;
     border: 1px solid rgba(255,255,255,0.35);
     border-radius: var(--border-radius);
     padding: 0.5rem 1.5rem;
@@ -574,8 +574,8 @@ body.dark-mode .btn-primary { color: #000; }
     letter-spacing: 0.02em; opacity: 0.75; margin-top: 0.1rem;
 }
 .prize-tier.active {
-    background: #FFFFFF;
-    color: #5B2D8E; border-color: #FFFFFF;
+    background: #EDE5F8;
+    color: #5B2D8E; border-color: #EDE5F8;
 }
 .prize-progress {
     height: 8px; border-radius: 999px; margin-top: 0.85rem;
@@ -583,7 +583,7 @@ body.dark-mode .btn-primary { color: #000; }
 }
 .prize-progress-fill {
     height: 100%; width: 0%; border-radius: 999px;
-    background: #FFFFFF;
+    background: #C9A8F0;
     transition: width 0.5s ease;
 }
 .prize-next { font-size: 0.78rem; color: rgba(255,255,255,0.88); margin-top: 0.55rem; min-height: 1em; }
@@ -595,7 +595,7 @@ body.dark-mode .btn-primary { color: #000; }
     background: linear-gradient(135deg, #7C3AED, #5B2D8E);
     box-shadow: 0 4px 12px rgba(91,45,142,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
 }
-.ec-dot.base { background: #FFFFFF; color: #5B2D8E; box-shadow: inset 0 0 0 2px #5B2D8E, 0 4px 12px rgba(91,45,142,0.18); }
+.ec-dot.base { background: linear-gradient(135deg, #7C3AED, #5B2D8E); color: #fff; box-shadow: 0 4px 12px rgba(91,45,142,0.35), inset 0 1px 0 rgba(255,255,255,0.3); }
 .ec-dot.empty {
     background: transparent; color: rgba(91,45,142,0.4);
     border: 2px dashed rgba(91,45,142,0.35); box-shadow: none;
@@ -866,3 +866,25 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 }
 .cmt-act-btn:hover { color: var(--highlight); background: rgba(91,45,142,0.08); }
 .cmt-act-btn.del:hover { color: #dc2626; background: rgba(220,38,38,0.08); }
+
+/* Info (i) button beside "Commenting as ___" — reveals how to change the name */
+.cmt-info-btn {
+    background: none; border: none; cursor: pointer; color: var(--text-secondary);
+    padding: 0.15rem; border-radius: 50%; display: inline-flex; align-items: center;
+    vertical-align: -0.2em; transition: color 0.15s, background 0.15s;
+    position: relative;
+}
+.cmt-info-btn:hover { color: var(--highlight); background: rgba(91,45,142,0.08); }
+.cmt-tip {
+    position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%) translateY(2px);
+    width: max-content; max-width: 240px; white-space: normal; text-align: left;
+    background: #2A1A45; color: #fff; font-size: 0.75rem; font-weight: 400;
+    line-height: 1.45; padding: 0.5rem 0.7rem; border-radius: 10px;
+    box-shadow: 0 8px 22px rgba(30,15,55,0.35);
+    opacity: 0; pointer-events: none; transition: opacity 0.15s, transform 0.15s;
+    z-index: 60;
+}
+.cmt-info-btn:hover .cmt-tip, .cmt-info-btn:focus-visible .cmt-tip, .cmt-info-btn.tip-show .cmt-tip {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+}
