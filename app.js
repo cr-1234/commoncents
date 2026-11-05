@@ -521,6 +521,9 @@ function handleVote(e, deal, type) {
 
 function openModal(deal) {
     if (!deal.comments) deal.comments = [];
+    window._ccOpenDealId = deal.id;
+    const skipLoadOnce = !!deal._skipLoadOnce;
+    delete deal._skipLoadOnce;
     // Standard solid icons (the Material shapes every site uses) — the thin
     // outline versions read as scratchy at small sizes (user's complaint).
     const cmtPencil = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
@@ -547,6 +550,23 @@ function openModal(deal) {
     // their account display name, then "Member". Their email is never shown.
     // Signed-out visitors see a sign-in prompt instead of a form.
     const escHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const fmtCommentTime = (ts) => {
+        if (!ts) return '';
+        const d = new Date(ts);
+        if (isNaN(d)) return '';
+        const now = new Date();
+        if (d.toDateString() === now.toDateString()) {
+            const mins = Math.max(0, Math.round((now - d) / 60000));
+            if (mins < 2) return 'Just now';
+            if (mins < 60) return mins + 'm ago';
+            return Math.round(mins / 60) + 'h ago';
+        }
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+    const showCommentError = (msg) => {
+        const e = document.getElementById('commentError');
+        if (e) { e.textContent = msg; e.style.display = ''; }
+    };
     const ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
     const ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
     const ccGenName = (window.CC_AUTH && CC_AUTH.fallbackName) ? CC_AUTH.fallbackName() : '';
@@ -555,7 +575,8 @@ function openModal(deal) {
     const commentFormHTML = ccUser ? `
                         <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong> <button type="button" id="commentNameInfo" class="cmt-info-btn" aria-label="About your comment name">${cmtInfo}<span class="cmt-tip" role="tooltip">You can ${ccProfileName ? 'change' : 'set'} your comment name — tap your profile circle at the top right of the page.</span></button></p>
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
-                        <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>`
+                        <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>
+                        <p id="commentError" style="display:none; font-size:0.82rem; color:#dc2626; margin-top:0.45rem;"></p>`
         : `
                         <div style="text-align:center; padding:0.4rem 0;">
                             <p style="color:var(--text-secondary); margin-bottom:0.75rem;">Comments are for members — sign in to join the conversation.</p>
@@ -622,10 +643,28 @@ function openModal(deal) {
             }
             const liveUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
             if (!liveUser) return; // the form only renders for members; stay safe
+            if (window.CC_COMMENTS) {
+                // Stored comments: the server saves the comment (and derives
+                // the display name) — it appears once it's actually saved.
+                postBtn.disabled = true;
+                CC_COMMENTS.post(deal.id, textVal).then(c => {
+                    if (!c) throw new Error('empty');
+                    deal.comments.push({ id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: 'Just now', own: true });
+                    deal._skipLoadOnce = true;
+                    openModal(deal);
+                    const cl = document.getElementById('commentsList');
+                    if (cl) cl.scrollTop = cl.scrollHeight;
+                }).catch(() => {
+                    postBtn.disabled = false;
+                    showCommentError('Could not save your comment — check your connection and try again.');
+                });
+                return;
+            }
             const liveName = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser.displayName || (typeof CC_AUTH.fallbackName === 'function' ? CC_AUTH.fallbackName() : '') || 'Member';
             // Chronological order: the first comment stays on top, new ones go last.
             // own:true gives the poster pencil/trash controls on their comment.
             deal.comments.push({ user: escHtml(liveName).slice(0, 40), text: escHtml(textVal), time: 'Just now', own: true });
+            deal._skipLoadOnce = true;
             openModal(deal);
             const cl = document.getElementById('commentsList');
             if (cl) cl.scrollTop = cl.scrollHeight;
@@ -651,20 +690,45 @@ function openModal(deal) {
             const st = cl0 ? cl0.scrollTop : 0;
             if (act === 'edit') {
                 deal._editingIdx = idx;
+                deal._skipLoadOnce = true;
                 openModal(deal);
             } else if (act === 'cancel') {
                 delete deal._editingIdx;
+                deal._skipLoadOnce = true;
                 openModal(deal);
             } else if (act === 'del') {
+                const c = deal.comments[idx];
+                if (c && c.id && window.CC_COMMENTS) {
+                    CC_COMMENTS.remove(c.id).then(() => {
+                        const i2 = deal.comments.indexOf(c);
+                        if (i2 !== -1) deal.comments.splice(i2, 1);
+                        delete deal._editingIdx;
+                        deal._skipLoadOnce = true;
+                        openModal(deal);
+                    }).catch(() => showCommentError('Could not delete that comment — try again.'));
+                    return;
+                }
                 deal.comments.splice(idx, 1);
                 delete deal._editingIdx;
+                deal._skipLoadOnce = true;
                 openModal(deal);
             } else if (act === 'save') {
                 const ta = document.getElementById('commentEditText');
                 const v = ta ? ta.value.trim() : '';
                 if (!v || !deal.comments[idx]) return;
-                deal.comments[idx].text = escHtml(v);
+                const c = deal.comments[idx];
+                if (c.id && window.CC_COMMENTS) {
+                    CC_COMMENTS.edit(c.id, v).then(saved => {
+                        c.text = escHtml(saved && saved.text ? saved.text : v);
+                        delete deal._editingIdx;
+                        deal._skipLoadOnce = true;
+                        openModal(deal);
+                    }).catch(() => showCommentError('Could not save that edit — try again.'));
+                    return;
+                }
+                c.text = escHtml(v);
                 delete deal._editingIdx;
+                deal._skipLoadOnce = true;
                 openModal(deal);
             }
             const cl1 = document.getElementById('commentsList');
@@ -672,6 +736,19 @@ function openModal(deal) {
         });
     });
 
+    // Stored comments: fetch the saved thread for this deal and swap it in
+    // (the server is the source of truth once it answers). Skipped on the
+    // re-renders that post / edit / delete trigger themselves.
+    if (!skipLoadOnce && window.CC_COMMENTS) {
+        const myDealId = deal.id;
+        CC_COMMENTS.load(myDealId).then(list => {
+            if (!Array.isArray(list)) return;
+            if (window._ccOpenDealId !== myDealId || modal.style.display === 'none') return;
+            deal.comments = list.map(c => ({ id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts), own: !!c.mine }));
+            deal._skipLoadOnce = true;
+            openModal(deal);
+        }).catch(() => { /* backend unreachable: keep whatever is shown */ });
+    }
 }
 
 
