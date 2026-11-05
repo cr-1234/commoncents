@@ -707,7 +707,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 }
 
 /* ── Accounts: header sign-in + auth modal ──────────────────────── */
-.auth-area { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+.auth-area { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; margin-left: auto; }
 .auth-email.as-avatar {
     width: 32px; height: 32px; border-radius: 50%;
     background: linear-gradient(135deg, #7C3AED, #5B2D8E);
