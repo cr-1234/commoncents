@@ -419,6 +419,20 @@ body:not(.dark-mode) .dropdown-item:hover {
 .deal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 @media (max-width: 1250px) { .deal-grid { grid-template-columns: repeat(2, 1fr); } }
 
+/* ── Pagination ─────────────────────────────────────────────── */
+.pagination { display: flex; justify-content: center; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-top: 1.75rem; }
+.page-btn {
+    background: var(--bg-card); color: var(--highlight);
+    border: 1.5px solid var(--highlight); border-radius: 999px;
+    padding: 0.45rem 0.95rem; font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+}
+.page-btn:not(.page-nav) { min-width: 2.5rem; }
+.page-btn:hover:not(:disabled) { background: var(--highlight); color: #fff; }
+.page-btn.active { background: linear-gradient(135deg, var(--highlight), var(--highlight-hover)); color: #fff; border-color: transparent; }
+body.dark-mode .page-btn.active { color: #000; }
+.page-btn:disabled { opacity: 0.4; cursor: default; }
+
 /* ── Deal Card ──────────────────────────────────────────────── */
 .deal-card {
     background-color: var(--bg-card);

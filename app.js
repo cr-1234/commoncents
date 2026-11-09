@@ -15,6 +15,16 @@ function saveMyVotes() { try { localStorage.setItem('ccMyVotes', JSON.stringify(
 function voteCount(deal, type) { return (deal.votes[type] || 0) + (myVotes[deal.id] === type ? 1 : 0); }
 let searchQuery = '';
 
+// Pagination: 12 deals per page (3 across x 4 rows), applied AFTER
+// filtering + sorting, in every view (all deals, category, search,
+// My Feed). The page resets to 1 whenever the filter inputs change —
+// renderDeals detects that via a filter key, so every path that funnels
+// into renderDeals (nav, sidebar, search box, sort menu, feed picker,
+// "Back to my feed") is covered without each caller having to remember.
+const DEALS_PER_PAGE = 12;
+let currentPage = 1;
+let lastFilterKey = null;
+
 // Paste your Google Sheet published CSV URL below:
 const SPREADSHEET_CSV_URL = '';
 
@@ -431,11 +441,73 @@ function renderDeals() {
     // Expired deals sink below live ones (stable: keeps the chosen sort
     // order inside each group).
     filtered.sort((a, b) => (isDealExpired(a) ? 1 : 0) - (isDealExpired(b) ? 1 : 0));
+
+    // Pagination: if the filter inputs changed since the last render,
+    // go back to page 1; then render only this page's slice.
+    const feedKey = window.CC_FEED
+        ? CC_FEED.mode() + ':' + (typeof CC_FEED.getInterests === 'function' ? CC_FEED.getInterests().join(',') : '')
+        : 'nofeed';
+    const filterKey = [currentCategory, searchQuery, sortValue, feedKey].join('|');
+    if (filterKey !== lastFilterKey) { currentPage = 1; lastFilterKey = filterKey; }
+    const totalPages = Math.ceil(filtered.length / DEALS_PER_PAGE);
+    if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+
     if (filtered.length === 0) {
         dealGrid.innerHTML = '<div class="no-results">No deals found matching your criteria.</div>';
+        renderPagination(0);
         return;
     }
-    filtered.forEach(deal => dealGrid.appendChild(createDealCard(deal)));
+    const pageStart = (currentPage - 1) * DEALS_PER_PAGE;
+    filtered.slice(pageStart, pageStart + DEALS_PER_PAGE)
+        .forEach(deal => dealGrid.appendChild(createDealCard(deal)));
+    renderPagination(totalPages);
+}
+
+// Pagination controls live in a container app.js creates itself, right
+// under the deals grid (no index.html edit needed). Hidden entirely
+// when the filtered list fits on one page.
+function getPaginationEl() {
+    let el = document.getElementById('pagination');
+    if (!el) {
+        el = document.createElement('nav');
+        el.id = 'pagination';
+        el.className = 'pagination';
+        el.setAttribute('aria-label', 'Deal pages');
+        dealGrid.parentNode.insertBefore(el, dealGrid.nextSibling);
+    }
+    return el;
+}
+
+function renderPagination(totalPages) {
+    const el = getPaginationEl();
+    if (!totalPages || totalPages <= 1) {
+        el.innerHTML = '';
+        el.style.display = 'none';
+        return;
+    }
+    el.style.display = '';
+    el.innerHTML = '';
+    const makeBtn = (label, page, opts) => {
+        opts = opts || {};
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'page-btn' + (opts.nav ? ' page-nav' : '') + (opts.active ? ' active' : '');
+        b.textContent = label;
+        if (opts.disabled) b.disabled = true;
+        if (opts.active) b.setAttribute('aria-current', 'page');
+        b.addEventListener('click', () => {
+            if (page === currentPage || page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderDeals();
+            try { dealGrid.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+        });
+        el.appendChild(b);
+    };
+    makeBtn('← Prev', currentPage - 1, { nav: true, disabled: currentPage <= 1 });
+    for (let p = 1; p <= totalPages; p++) {
+        makeBtn(String(p), p, { active: p === currentPage });
+    }
+    makeBtn('Next →', currentPage + 1, { nav: true, disabled: currentPage >= totalPages });
 }
 
 function createDealCard(deal) {
