@@ -919,7 +919,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 
 /* Logo mark (his uploaded tag art), avatar-menu rows, house ad */
 .logo-mark-img { height: 46px; width: auto; display: block; }
-.auth-menu-links { margin-top: 0.8rem; border-top: 1px solid rgba(91,45,142,0.14); padding-top: 0.55rem; display: flex; flex-direction: column; gap: 0.45rem; }
+/* No divider above the link rows: the old border-top + 0.8rem margin +
+   0.55rem padding dated from when a permanently-open editor block sat
+   above this wrapper; with the editor collapsed into a pill row it left
+   a stray line and a double-size gap between the Comment name pill and
+   the My feed picks pill. Top spacing now equals the row gap (0.45rem)
+   so all three pills stack evenly, spacing only, no line. */
+.auth-menu-links { margin-top: 0.45rem; display: flex; flex-direction: column; gap: 0.45rem; }
 /* Both menu rows are the same pill button (user ruling, 2026-11-09):
    full-width, light-plum fill, plum text, 999px radius — a matched
    pair that clearly reads as clickable. */
