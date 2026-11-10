@@ -83,5 +83,27 @@
     "shelvedAt": "2026-11-10",
     "shelvedReason": "Unavailable on Amazon — no price and no buy box",
     "lastSeenPrice": null
+  },
+  {
+    "id": 1053,
+    "title": "BEDELITE 2-Inch Memory Foam Mattress Topper For $27.49 Shipped From Amazon",
+    "category": "household",
+    "fc": "Household",
+    "price": 27.49,
+    "originalPrice": 49.99,
+    "discount": 45,
+    "image": "https://m.media-amazon.com/images/I/81fjKLOkgSL._AC_SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B0H7XCMSJ3?tag=commoncents0050-20",
+    "description": "Two inches of shredded memory foam in a breathable bamboo-blend cover, with a deep-pocket skirt that fits mattresses up to 24 inches thick. Use the code below and it's $27.49 shipped — nearly half off its $49.99 list price.",
+    "code": "F14H0XL9",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-10T18:31:25Z",
+    "source": "hip2save",
+    "shelvedAt": "2026-11-10",
+    "shelvedReason": "Promo-code savings path gone — no coupon on the page and live base price $49.99 is at the $49.99 list price (posted deal price was $27.49 with code F14H0XL9).",
+    "lastSeenPrice": 49.99
   }
 ]
