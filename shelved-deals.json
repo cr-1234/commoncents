@@ -62,5 +62,26 @@
     "shelvedAt": "2026-11-10",
     "shelvedReason": "Unavailable on Amazon — no live price and no buy box.",
     "lastSeenPrice": null
+  },
+  {
+    "id": 1031,
+    "title": "BePuzzled Disney Buzz Lightyear Original 3D Crystal Puzzle For $9.74 From Amazon",
+    "category": "kids",
+    "fc": "Kids",
+    "price": 9.74,
+    "originalPrice": 21,
+    "discount": 54,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/02090430/product-B07QVWHRLD.jpg",
+    "url": "https://www.amazon.com/dp/B07QVWHRLD?tag=commoncents0050-20",
+    "description": "A 3D crystal puzzle of Buzz Lightyear that builds into a display-worthy figure. A fun afternoon project for Toy Story fans — and at over half off, an easy gift.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-03T04:34:05Z",
+    "source": "dansdeals",
+    "shelvedAt": "2026-11-10",
+    "shelvedReason": "Unavailable on Amazon — no price and no buy box",
+    "lastSeenPrice": null
   }
 ]
