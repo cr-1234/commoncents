@@ -170,10 +170,16 @@
             });
             lsSet('ccInterests', JSON.stringify(valid));
             mode = valid.length ? 'mine' : 'browse';
-            // An account sync is not a view choice: a saved view on this
-            // device still wins over the picks-derived mode.
-            var sv = loadSavedView();
-            if (sv) mode = (sv.mode === 'mine' && valid.length) ? 'mine' : 'browse';
+            if (fromAccount) {
+                // An account sync is not a view choice: a saved view on
+                // this device still wins over the picks-derived mode.
+                var sv = loadSavedView();
+                if (sv) mode = (sv.mode === 'mine' && valid.length) ? 'mine' : 'browse';
+            } else {
+                // An explicit local apply of picks IS entering (or
+                // leaving) My Feed — it becomes the saved view.
+                saveView();
+            }
             // Applying picks (e.g. an account sync) must never pop the
             // picker open for someone who has picks or already dismissed
             // the invite.
