@@ -940,6 +940,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    the span empty — it must not leave an empty white chip behind. */
 #authMenuGiveawayCount { background: #fff; color: #5B2D8E; font-weight: 700; font-size: 0.75rem; border-radius: 999px; padding: 0.1rem 0.55rem; }
 #authMenuGiveawayCount:empty { display: none; }
+/* "Change" gets its own little button (user, 2026-11-09: "a small circle
+   around it") — a white pill chip with a plum-tinted outline on the two
+   Change rows. Purely visual affordance: the whole pill row is still
+   the button and clicks exactly as before. Scoped to its own class so
+   the giveaway count badge above is NOT styled like it. */
+.auth-menu-change-chip { background: #fff; border: 1px solid rgba(91,45,142,0.35); color: #5B2D8E; border-radius: 999px; padding: 0.12rem 0.6rem; font-weight: 600; font-size: 0.75rem; }
+.auth-menu-link:hover .auth-menu-change-chip { background: #EDE5F8; border-color: rgba(91,45,142,0.55); }
 /* The house ad is a picture now (the image carries its own panel,
    text and pill), so the wrapper only spaces it and the image itself
    takes the old panel's radius/border. */
