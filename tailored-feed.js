@@ -29,12 +29,13 @@
         { key: 'tools',    label: 'Tools & DIY',        cats: ['tools'],     kw: ['drill', 'dewalt', 'craftsman', 'milwaukee', 'makita', 'ryobi', 'saw', 'wrench', 'socket', 'diy'] },
         { key: 'home',     label: 'Home & Kitchen',     cats: ['household'], kw: ['vacuum', 'kitchen', 'mixer', 'blanket', 'lamp', 'chair', 'mattress', 'air fryer', 'cookware', 'towel', 'storage', 'kitchenaid', 'dyson', 'tumbler', 'mug'] },
         { key: 'food',     label: 'Groceries & Food',   cats: ['groceries'], kw: ['protein', 'snack', 'coffee', 'chocolate', 'cereal', 'nuts', 'grocery'] },
-        { key: 'baby',     label: 'Baby & Kids',        cats: [],            kw: ['baby', 'toddler', 'kids', 'children', 'diaper', 'stroller', 'lego', 'toy', 'infant', 'nursery', 'crayola'] },
-        { key: 'beauty',   label: 'Health & Beauty',    cats: [],            kw: ['skincare', 'makeup', 'shampoo', 'beauty', 'serum', 'lotion', 'toothbrush', 'vitamin', 'melatonin', 'supplement'] },
-        { key: 'clothing', label: 'Clothing & Shoes',   cats: [],            kw: ['shoes', 'sneakers', 'jacket', 'boots', 'hoodie', 'jeans', 'nike', 'adidas', 'sweater'] }
+        { key: 'baby',     label: 'Baby & Kids',        cats: ['kids'],      kw: ['baby', 'toddler', 'kids', 'children', 'diaper', 'stroller', 'lego', 'toy', 'infant', 'nursery', 'crayola'] },
+        { key: 'beauty',   label: 'Health & Beauty',    cats: ['beauty'],    kw: ['skincare', 'makeup', 'shampoo', 'beauty', 'serum', 'lotion', 'toothbrush', 'vitamin', 'melatonin', 'supplement'] },
+        { key: 'clothing', label: 'Clothing & Shoes',   cats: ['clothing'],  kw: ['shoes', 'sneakers', 'jacket', 'boots', 'hoodie', 'jeans', 'nike', 'adidas', 'sweater'] },
+        { key: 'pets',     label: 'Pets',               cats: ['pets'],      kw: ['dog', 'cat', 'pet', 'litter', 'puppy', 'kitten', 'aquarium'] }
     ];
     // Collector category (verbatim) -> interest key.
-    var FC2KEY = { 'Tech': 'tech', 'Tools': 'tools', 'Household': 'home', 'Groceries': 'food' };
+    var FC2KEY = { 'Tech': 'tech', 'Tools': 'tools', 'Household': 'home', 'Groceries': 'food', 'Kids': 'baby', 'Beauty': 'beauty', 'Clothing': 'clothing', 'Pets': 'pets' };
 
     function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }

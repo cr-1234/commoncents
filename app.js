@@ -346,6 +346,10 @@ function openSubmitDealModal() {
                             <option value="tools">Tools</option>
                             <option value="household">Household</option>
                             <option value="groceries">Groceries</option>
+                            <option value="kids">Kids</option>
+                            <option value="beauty">Beauty</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="pets">Pets</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
