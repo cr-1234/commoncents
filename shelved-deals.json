@@ -40,5 +40,27 @@
     "shelvedAt": "2026-11-08",
     "shelvedReason": "Live price $89.99 vs posted $69.99 — 82% of its $109.99 list, no longer a real discount.",
     "lastSeenPrice": 89.99
+  },
+  {
+    "id": 1047,
+    "title": "Under Armour Girls’ Hooded Parka Puffer Jacket For $45.58 Shipped From Amazon",
+    "category": "clothing",
+    "fc": "Clothing",
+    "price": 45.58,
+    "originalPrice": 75.97,
+    "discount": 40,
+    "image": "https://m.media-amazon.com/images/I/71pzjEMwIOL._AC_SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B0FKHX4DPH?tag=commoncents0050-20",
+    "description": "Under Armour’s hooded puffer for girls — warm, water-resistant, and built for cold winter days. A name-brand winter coat at 40% off list.",
+    "dealNote": "Clip the $30.39 coupon on the Amazon product page to get this price — without the coupon, it’s $75.97.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-10T12:25:00Z",
+    "source": "dansdeals",
+    "shelvedAt": "2026-11-10",
+    "shelvedReason": "Unavailable on Amazon — no live price and no buy box.",
+    "lastSeenPrice": null
   }
 ]
