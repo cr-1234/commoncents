@@ -7,11 +7,17 @@
 // (no account needed); signed-in visitors get the same picks saved to
 // their account instead (see auth.js). Changeable anytime.
 //
-// Layout: while you're picking, the full chip picker shows. Once you
-// have picks and tap Done, the picker hides completely — the top of the
-// page stays clean. The feed's status lives in the sidebar's "Your
-// Feed" widget instead (picks + deal count, a Change button that
-// reopens the picker, and a "Back to my feed" button while browsing).
+// Layout: the chip picker invites ONCE — it starts open only for a
+// first-time visitor (no saved picks, never dismissed). Pressing Done
+// records the dismissal (localStorage ccPickerDone); from then on —
+// and whenever picks exist — the picker stays tucked away on every
+// load, and category clicks never reopen it. The feed's status lives
+// in the sidebar's "Your Feed" widget instead (picks + deal count, a
+// Change button that reopens the picker, and a "Back to my feed"
+// button while browsing). Every interest renders a chip in the picker
+// at all times — including sections with no deals right now — because
+// the picker is where a visitor makes a standing choice, deals or
+// no deals.
 //
 // Also the on-site half of deal alerts: deals collected since your last
 // visit get a "NEW FOR YOU" badge. (Email alerts are a later add-on.)
@@ -75,7 +81,11 @@
     }
 
     var mode = getInterests().length ? 'mine' : 'browse';
-    var expanded = getInterests().length === 0; // picker starts open only for new visitors
+    // The picker invites once: it starts open only when the visitor has
+    // no saved picks AND has never pressed Done (ccPickerDone). After
+    // that it stays tucked away — only the explicit Change buttons
+    // (sidebar widget / avatar menu) ever reopen it.
+    var expanded = getInterests().length === 0 && lsGet('ccPickerDone') !== '1';
     var prevVisit = parseInt(lsGet('ccLastVisit') || '0', 10) || 0;
     lsSet('ccLastVisit', String(Date.now()));
 
@@ -130,7 +140,10 @@
             });
             lsSet('ccInterests', JSON.stringify(valid));
             mode = valid.length ? 'mine' : 'browse';
-            expanded = valid.length === 0;
+            // Applying picks (e.g. an account sync) must never pop the
+            // picker open for someone who has picks or already dismissed
+            // the invite.
+            expanded = valid.length === 0 && lsGet('ccPickerDone') !== '1';
             if (!fromAccount) notifyChange();
             paintAll();
             if (typeof renderDeals === 'function') renderDeals();
@@ -141,7 +154,7 @@
     function paintAll() {
         if (!els.picker) return;
         var mine = getInterests();
-        els.picker.classList.toggle('slim', !expanded && mine.length > 0);
+        els.picker.classList.toggle('slim', !expanded);
         // Sidebar "Your Feed" widget text + buttons
         if (els.widgetText) {
             if (mode === 'mine' && mine.length) {
@@ -174,9 +187,9 @@
             els.chips.innerHTML = '';
             INTERESTS.forEach(function (it) {
                 var picked = mine.indexOf(it.key) !== -1;
-                // A section with no deals right now stays out of the picker;
-                // it appears on its own the day a matching deal lands.
-                if (!picked && countFor(it.key) === 0) return;
+                // Every interest always gets a chip — even with zero
+                // deals right now. The picker is a standing choice, not
+                // a snapshot of today's stock (user ruling, 2026-11-09).
                 var b = document.createElement('button');
                 b.type = 'button';
                 b.className = 'interest-chip' + (picked ? ' active' : '');
@@ -234,6 +247,9 @@
 
         if (doneBtn) doneBtn.addEventListener('click', function () {
             expanded = false;
+            // Done is forever: remember the dismissal so the picker
+            // never auto-opens again on later loads.
+            lsSet('ccPickerDone', '1');
             paintAll();
         });
         if (els.widgetChange) els.widgetChange.addEventListener('click', function () {
@@ -248,7 +264,10 @@
         });
 
         // Any category browsing switches back to "browse" mode; the saved
-        // interests stay put for the slim bar's "Back to my feed".
+        // interests stay put for the slim bar's "Back to my feed". This
+        // deliberately never touches `expanded`: category clicks (All
+        // Deals included) must never reopen a tucked picker — the
+        // Change buttons are the only way back in.
         document.querySelectorAll('[data-category]').forEach(function (el) {
             el.addEventListener('click', function () {
                 mode = 'browse';
