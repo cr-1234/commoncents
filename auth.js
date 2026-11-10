@@ -103,39 +103,26 @@
             inBtn.style.display = 'none';
             outBtn.style.display = '';
             emailEl.style.display = '';
-            // The signed-in control is a pill button (every control on
-            // this site is pill-shaped): a small round thumb — the
-            // account picture for Google sign-ins, else the email's
-            // first letter on a translucent circle — plus a chevron,
-            // so it reads as a dropdown you can click. No raw email in
-            // the header (the user disliked it); the menu it opens
-            // shows a masked address.
-            emailEl.title = 'Account menu';
-            emailEl.setAttribute('role', 'button');
-            emailEl.setAttribute('aria-label', 'Account menu');
-            emailEl.setAttribute('aria-haspopup', 'true');
+            // No raw email in the header (the user disliked it). If the
+            // account has a picture (Google sign-ins do), show it in the
+            // circle; otherwise the email's first letter — the pattern
+            // most sites use. Full email stays on hover.
+            emailEl.title = currentUser.email || '';
             emailEl.classList.add('as-avatar');
-            emailEl.innerHTML = '';
-            var thumb = document.createElement('span');
-            thumb.className = 'auth-avatar-thumb';
             if (currentUser.photoURL) {
+                emailEl.innerHTML = '';
                 var avImg = document.createElement('img');
                 avImg.src = currentUser.photoURL;
                 avImg.alt = '';
                 avImg.referrerPolicy = 'no-referrer';
+                avImg.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;';
                 avImg.onerror = function () {
-                    thumb.textContent = (currentUser.email || '?').charAt(0).toUpperCase();
+                    emailEl.textContent = (currentUser.email || '?').charAt(0).toUpperCase();
                 };
-                thumb.appendChild(avImg);
+                emailEl.appendChild(avImg);
             } else {
-                thumb.textContent = (currentUser.email || '?').charAt(0).toUpperCase();
+                emailEl.textContent = (currentUser.email || '?').charAt(0).toUpperCase();
             }
-            emailEl.appendChild(thumb);
-            var chev = document.createElement('span');
-            chev.className = 'auth-avatar-chevron';
-            chev.setAttribute('aria-hidden', 'true');
-            chev.textContent = '\u25BE';
-            emailEl.appendChild(chev);
         } else {
             inBtn.style.display = '';
             outBtn.style.display = 'none';
@@ -143,9 +130,6 @@
             emailEl.textContent = '';
             emailEl.title = '';
             emailEl.classList.remove('as-avatar');
-            emailEl.removeAttribute('role');
-            emailEl.removeAttribute('aria-label');
-            emailEl.removeAttribute('aria-haspopup');
             var menuEl0 = document.getElementById('authMenu');
             if (menuEl0) menuEl0.style.display = 'none';
         }
