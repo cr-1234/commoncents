@@ -160,9 +160,21 @@
         var nameSave = document.getElementById('authMenuNameSave');
         var nameMsg = document.getElementById('authMenuNameMsg');
         function closeMenu() { if (menu) menu.style.display = 'none'; }
+        // The menu shows a masked email only: first 3 characters of the
+        // local part + "•••" + "@" + full domain (first character + "•••"
+        // when the local part is 3 chars or fewer). The full address is
+        // never rendered in the menu.
+        function maskEmail(email) {
+            var s = String(email || '');
+            var at = s.indexOf('@');
+            if (at < 0) return s ? s.charAt(0) + '\u2022\u2022\u2022' : '';
+            var local = s.slice(0, at);
+            var head = local.length > 3 ? local.slice(0, 3) : local.charAt(0);
+            return head + '\u2022\u2022\u2022' + s.slice(at);
+        }
         function openMenu() {
             if (!menu || !currentUser) return;
-            if (menuEmail) menuEmail.textContent = currentUser.email || '';
+            if (menuEmail) menuEmail.textContent = maskEmail(currentUser.email || '');
             if (nameInput) nameInput.value = profileUsername || '';
             if (nameMsg) nameMsg.style.display = 'none';
             var cur = document.getElementById('authMenuCurrent');
@@ -178,12 +190,16 @@
             }
             var gwRow = document.getElementById('authMenuGiveaway');
             if (gwRow) {
+                var gwLabel = document.getElementById('authMenuGiveawayLabel');
+                var gwCount = document.getElementById('authMenuGiveawayCount');
                 var gw = window.CC_GW;
                 if (gw && gw.isEntered && gw.isEntered()) {
                     var n = 1 + (gw.bonus ? gw.bonus() : 0);
-                    gwRow.textContent = 'Giveaway: you\u2019re in this week \u00B7 ' + n + (n === 1 ? ' entry' : ' entries');
+                    if (gwLabel) gwLabel.textContent = 'Giveaway: you\u2019re in this week';
+                    if (gwCount) gwCount.textContent = n + (n === 1 ? ' entry' : ' entries');
                 } else {
-                    gwRow.textContent = 'Giveaway: not entered yet \u2014 enter';
+                    if (gwLabel) gwLabel.textContent = 'Giveaway: not entered yet \u2014 enter';
+                    if (gwCount) gwCount.textContent = '';
                 }
             }
             menu.style.display = '';
