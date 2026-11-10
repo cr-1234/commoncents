@@ -715,6 +715,8 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     border-radius: var(--border-radius);
     padding: 1rem 1.1rem 0.8rem;
     margin-bottom: 1.25rem;
+    /* Keep the picker's top clear of the sticky site header when scrolled to. */
+    scroll-margin-top: 6.5rem;
 }
 .interest-picker-head {
     display: flex; justify-content: space-between; align-items: center;

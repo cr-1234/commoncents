@@ -196,6 +196,32 @@
         }
     }
 
+    // Bring the picker to the reader. The old code used a bare
+    // scrollIntoView({ block: 'start' }) fired in the same frame as the
+    // display:none -> open flip: it parked the picker's top edge flush
+    // with the viewport top — hidden under the sticky site header — and
+    // the smooth scroll often never landed at all, so the picker opened
+    // at the top of the deals column, far above wherever the reader was,
+    // and they never saw it. Instead: wait for the expanded layout to
+    // settle (double rAF), then compute the exact window scroll that
+    // lands the picker's top just below the sticky header. The picker
+    // has no scrollable ancestor (the sidebar is a sibling, not an
+    // ancestor), so the window scroll is the only scroll needed.
+    function revealPicker() {
+        if (!els.picker) return;
+        var go = function () {
+            var header = document.querySelector('.site-header');
+            var offset = (header && header.offsetHeight ? header.offsetHeight : 96) + 10;
+            var y = els.picker.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top: y > 0 ? y : 0, behavior: 'smooth' });
+        };
+        if (window.requestAnimationFrame) {
+            window.requestAnimationFrame(function () { window.requestAnimationFrame(go); });
+        } else {
+            go();
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         els.picker = document.getElementById('interestPicker');
         els.chips = document.getElementById('interestChips');
@@ -213,7 +239,7 @@
         if (els.widgetChange) els.widgetChange.addEventListener('click', function () {
             expanded = true;
             paintAll();
-            els.picker.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            revealPicker();
         });
         if (els.backBtn) els.backBtn.addEventListener('click', function () {
             mode = 'mine';
