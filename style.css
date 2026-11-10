@@ -303,10 +303,16 @@ body:not(.dark-mode) .glass {
 /* ── Category List with Liquid Glass Hover ──────────────────── */
 .category-list li { margin-bottom: 0.25rem; }
 .category-list a {
-    color: var(--text-secondary); display: block;
+    color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
     padding: 0.45rem 1rem; border-radius: 9999px !important;
     transition: all 0.2s; border: 1px solid transparent;
     font-size: 0.9rem;
+}
+.category-list a .cat-count {
+    background: #EDE5F8; color: var(--highlight);
+    border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+    padding: 0.08rem 0.55rem; line-height: 1.5; flex: none;
 }
 .category-list a:hover,
 .category-list a.active {

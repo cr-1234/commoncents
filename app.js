@@ -97,6 +97,7 @@ function initApp() {
     });
 
     renderDeals();
+    paintCategoryCounts();
     setupEventListeners();
     updateEntryCount();
 
@@ -120,7 +121,10 @@ function setupEventListeners() {
     [...navLinks, ...categoryLinks].forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const category = e.target.dataset.category;
+            // Read the category off the link itself, not e.target: a
+            // sidebar link contains a count badge, and a tap on the
+            // badge must still filter by the link's category.
+            const category = link.dataset.category;
             if (!category) return; // safety guard
             setCategory(category);
         });
@@ -404,6 +408,40 @@ function setCategory(category) {
         link.classList.toggle('active', link.dataset.category === category);
     });
     renderDeals();
+}
+
+// Sidebar category counts: each Categories row shows how many LIVE
+// deals it holds right now ("All Deals" shows the total), and a
+// category with none is hidden entirely. Computed from the deals
+// array at page load — never hard-coded — so newly posted deals
+// update the counts on the next load with no code change. The top
+// nav intentionally gets no counts.
+function paintCategoryCounts() {
+    const tally = {};
+    let total = 0;
+    deals.forEach(d => {
+        if (isDealExpired(d)) return;
+        total++;
+        tally[d.category] = (tally[d.category] || 0) + 1;
+    });
+    categoryLinks.forEach(link => {
+        const cat = link.dataset.category;
+        const n = cat === 'all' ? total : (tally[cat] || 0);
+        const li = link.closest('li');
+        let badge = link.querySelector('.cat-count');
+        if (cat !== 'all' && n === 0) {
+            if (li) li.style.display = 'none';
+            if (badge) badge.remove();
+            return;
+        }
+        if (li) li.style.display = '';
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'cat-count';
+            link.appendChild(badge);
+        }
+        badge.textContent = n;
+    });
 }
 
 // Render Functions
@@ -888,6 +926,7 @@ async function loadGoogleSheetDeals() {
             }
         });
         renderDeals();
+        paintCategoryCounts();
     } catch (error) {
         console.error('Error loading Google Sheet deals:', error);
     }
