@@ -934,6 +934,12 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .auth-menu-link-row { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; box-sizing: border-box; font-size: 0.78rem; padding: 0.5rem 0.8rem; }
 .auth-menu-link-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .auth-menu-link-count { flex: 0 0 auto; white-space: nowrap; font-weight: 700; }
+/* Giveaway count = a counter badge, not run-on text (user, 2026-11-09):
+   a small white pill with plum bold text, clearly separated from the
+   label by the row gap. When the visitor hasn't entered, auth.js leaves
+   the span empty — it must not leave an empty white chip behind. */
+#authMenuGiveawayCount { background: #fff; color: #5B2D8E; font-weight: 700; font-size: 0.75rem; border-radius: 999px; padding: 0.1rem 0.55rem; }
+#authMenuGiveawayCount:empty { display: none; }
 /* The house ad is a picture now (the image carries its own panel,
    text and pill), so the wrapper only spaces it and the image itself
    takes the old panel's radius/border. */
