@@ -117,10 +117,7 @@ body:not(.dark-mode) .glass {
     backdrop-filter: blur(28px) saturate(200%);
     -webkit-backdrop-filter: blur(28px) saturate(200%);
     border-bottom: 1px solid var(--glass-border);
-    box-shadow:
-        0 1px 0 var(--glass-shine),
-        0 4px 24px rgba(0,0,0,0.2),
-        inset 0 -1px 0 rgba(0,0,0,0.08);
+    box-shadow: 0 4px 18px rgba(40,20,70,0.06);
     padding: 1rem 0;
     transition: background-color 0.3s;
 }
