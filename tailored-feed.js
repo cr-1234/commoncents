@@ -80,7 +80,34 @@
         return out;
     }
 
-    var mode = getInterests().length ? 'mine' : 'browse';
+    // Feed-view memory: the visitor's chosen view — My Feed ('mine') or
+    // a browse category — persists on this device (ccFeedView). Without
+    // it, every reload re-derived the view from "has picks = My Feed",
+    // so someone who clicked All Deals was thrown back into My Feed on
+    // the next visit and had to flip back with "Back to my feed" every
+    // time. The saved view wins when it exists; only a first-time
+    // visitor (nothing saved) gets the derived default. Signed-in
+    // visitors use the same local persistence — the view is NOT part of
+    // the account.
+    var VIEW_KEY = 'ccFeedView';
+    function loadSavedView() {
+        try {
+            var v = JSON.parse(lsGet(VIEW_KEY) || 'null');
+            if (!v || (v.mode !== 'mine' && v.mode !== 'browse')) return null;
+            if (typeof v.category !== 'string' || !v.category) v.category = 'all';
+            return v;
+        } catch (e) { return null; }
+    }
+    var savedView = loadSavedView();
+    var viewCategory = savedView ? savedView.category : 'all';
+    function saveView() {
+        lsSet(VIEW_KEY, JSON.stringify({ mode: mode, category: viewCategory }));
+    }
+
+    // 'mine' with zero picks is not a real view — it sanitizes to browse.
+    var mode = savedView
+        ? (savedView.mode === 'mine' && getInterests().length ? 'mine' : 'browse')
+        : (getInterests().length ? 'mine' : 'browse');
     // The picker invites once: it starts open only when the visitor has
     // no saved picks AND has never pressed Done (ccPickerDone). After
     // that it stays tucked away — only the explicit Change buttons
@@ -134,12 +161,19 @@
             return !isNaN(ts) && ts > prevVisit;
         },
         getInterests: getInterests,
+        // The browse category half of the saved view; app.js restores it
+        // at startup (and validates it against the actual nav links).
+        savedCategory: function () { return viewCategory; },
         setInterests: function (keys, fromAccount) {
             var valid = (keys || []).filter(function (k) {
                 return INTERESTS.some(function (i) { return i.key === k; });
             });
             lsSet('ccInterests', JSON.stringify(valid));
             mode = valid.length ? 'mine' : 'browse';
+            // An account sync is not a view choice: a saved view on this
+            // device still wins over the picks-derived mode.
+            var sv = loadSavedView();
+            if (sv) mode = (sv.mode === 'mine' && valid.length) ? 'mine' : 'browse';
             // Applying picks (e.g. an account sync) must never pop the
             // picker open for someone who has picks or already dismissed
             // the invite.
@@ -200,6 +234,7 @@
                     if (i === -1) cur.push(it.key); else cur.splice(i, 1);
                     lsSet('ccInterests', JSON.stringify(cur));
                     mode = cur.length ? 'mine' : 'browse';
+                    saveView();
                     notifyChange();
                     paintAll();
                     if (typeof renderDeals === 'function') renderDeals();
@@ -250,6 +285,9 @@
             // Done is forever: remember the dismissal so the picker
             // never auto-opens again on later loads.
             lsSet('ccPickerDone', '1');
+            // Done also confirms the current view (My Feed when picks
+            // exist — the chip clicks already derived the mode).
+            saveView();
             paintAll();
         });
         if (els.widgetChange) els.widgetChange.addEventListener('click', function () {
@@ -259,6 +297,7 @@
         });
         if (els.backBtn) els.backBtn.addEventListener('click', function () {
             mode = 'mine';
+            saveView();
             paintAll();
             if (typeof renderDeals === 'function') renderDeals();
         });
@@ -271,6 +310,8 @@
         document.querySelectorAll('[data-category]').forEach(function (el) {
             el.addEventListener('click', function () {
                 mode = 'browse';
+                viewCategory = el.getAttribute('data-category') || 'all';
+                saveView();
                 paintAll();
             });
         });

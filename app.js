@@ -98,6 +98,17 @@ function initApp() {
 
     renderDeals();
     paintCategoryCounts();
+    // Restore the browse category half of the saved feed view (see
+    // tailored-feed.js): if the visitor left browsing a category, land
+    // back on it — nav/sidebar active states painted to match — rather
+    // than always starting from All Deals. A saved slug that no longer
+    // matches a real link is ignored (falls back to All Deals).
+    if (window.CC_FEED && typeof CC_FEED.savedCategory === 'function') {
+        const sc = CC_FEED.savedCategory();
+        if (sc && sc !== 'all' && [...navLinks, ...categoryLinks].some(l => l.dataset.category === sc)) {
+            setCategory(sc);
+        }
+    }
     setupEventListeners();
     updateEntryCount();
 
