@@ -103,6 +103,13 @@ body:not(.dark-mode) .glass {
         var(--glass-inner-border);
 }
 
+/* ── Testing-mode banner ────────────────────────────────────── */
+/* Slim notice in normal flow above the header on every page while
+   the site is out for testing (the giveaway is not live yet). Not
+   dismissible; scrolls away with the page, so the sticky header and
+   the layout's sticky offsets are unaffected. */
+.testing-banner { background: #EDE5F8; color: #5B2D8E; text-align: center; font-size: 0.85rem; line-height: 1.45; padding: 0.55rem 1rem; }
+
 /* ── Header ─────────────────────────────────────────────────── */
 .site-header {
     position: sticky; top: 0; z-index: 100;
