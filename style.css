@@ -919,9 +919,9 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    pair that clearly reads as clickable. */
 .auth-menu-link { background: #EDE5F8; border: none; text-align: left; font: inherit; font-size: 0.82rem; font-weight: 600; color: var(--highlight); padding: 0.5rem 0.9rem; border-radius: 999px; cursor: pointer; white-space: nowrap; width: 100%; box-sizing: border-box; transition: background 0.15s; }
 .auth-menu-link:hover { background: #E1D1F8; }
-.auth-menu-link-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%; box-sizing: border-box; }
-.auth-menu-link-label { white-space: nowrap; }
-.auth-menu-link-count { white-space: nowrap; font-weight: 700; }
+.auth-menu-link-row { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; box-sizing: border-box; font-size: 0.78rem; padding: 0.5rem 0.8rem; }
+.auth-menu-link-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auth-menu-link-count { flex: 0 0 auto; white-space: nowrap; font-weight: 700; }
 .house-ad { margin-top: 1.25rem; background: #F9F6FD; border: 1px solid rgba(91,45,142,0.16); border-radius: 16px; padding: 1rem; }
 .house-ad-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.45rem; }
 .house-ad-title { font-weight: 800; color: var(--highlight); font-size: 1.02rem; line-height: 1.3; }
