@@ -159,7 +159,48 @@
         var nameInput = document.getElementById('authMenuNameInput');
         var nameSave = document.getElementById('authMenuNameSave');
         var nameMsg = document.getElementById('authMenuNameMsg');
+        var nameRow = document.getElementById('authMenuNameRow');
+        var nameLabel = document.getElementById('authMenuNameLabel');
+        var nameEditor = document.getElementById('authMenuNameEditor');
+        var nameCancel = document.getElementById('authMenuNameCancel');
         function closeMenu() { if (menu) menu.style.display = 'none'; }
+        // The comment-name setting lives behind a closed row ("Comment
+        // name: X" + Change): the editor opens only when asked and
+        // collapses back after a save or a Cancel. Every fresh menu open
+        // starts from the closed row.
+        function shownCommentName() {
+            var gen = (!profileUsername && window.CC_AUTH.fallbackName) ? window.CC_AUTH.fallbackName() : '';
+            return profileUsername || (currentUser && currentUser.displayName) || gen || '';
+        }
+        function paintNameRow() {
+            if (!nameLabel) return;
+            var shown = shownCommentName();
+            nameLabel.textContent = shown ? 'Comment name: ' + shown : 'Comment name';
+        }
+        function collapseNameEditor() {
+            if (nameEditor) nameEditor.style.display = 'none';
+            if (nameRow) nameRow.style.display = '';
+            if (nameMsg) nameMsg.style.display = 'none';
+            var cur = document.getElementById('authMenuCurrent');
+            if (cur) cur.style.display = 'none';
+        }
+        function openNameEditor() {
+            if (nameInput) nameInput.value = profileUsername || '';
+            if (nameMsg) nameMsg.style.display = 'none';
+            var cur = document.getElementById('authMenuCurrent');
+            if (cur) {
+                var shown = shownCommentName();
+                if (!profileUsername && shown) {
+                    cur.textContent = 'Right now your comments show as ' + shown + '.';
+                    cur.style.display = '';
+                } else {
+                    cur.style.display = 'none';
+                }
+            }
+            if (nameRow) nameRow.style.display = 'none';
+            if (nameEditor) nameEditor.style.display = '';
+            if (nameInput && nameInput.focus) nameInput.focus();
+        }
         // The menu shows a masked email only: first 3 characters of the
         // local part + "•••" + "@" + full domain (first character + "•••"
         // when the local part is 3 chars or fewer). The full address is
@@ -176,18 +217,9 @@
             if (!menu || !currentUser) return;
             if (menuEmail) menuEmail.textContent = maskEmail(currentUser.email || '');
             if (nameInput) nameInput.value = profileUsername || '';
-            if (nameMsg) nameMsg.style.display = 'none';
-            var cur = document.getElementById('authMenuCurrent');
-            if (cur) {
-                var gen = (!profileUsername && window.CC_AUTH.fallbackName) ? window.CC_AUTH.fallbackName() : '';
-                var shown = profileUsername || (currentUser && currentUser.displayName) || gen;
-                if (!profileUsername && shown) {
-                    cur.textContent = 'Right now your comments show as ' + shown + '.';
-                    cur.style.display = '';
-                } else {
-                    cur.style.display = 'none';
-                }
-            }
+            // Fresh open = the comment-name editor starts collapsed.
+            collapseNameEditor();
+            paintNameRow();
             var gwRow = document.getElementById('authMenuGiveaway');
             if (gwRow) {
                 var gwLabel = document.getElementById('authMenuGiveawayLabel');
@@ -229,11 +261,19 @@
             window.CC_AUTH.setUsername(v).then(function () {
                 nameSave.disabled = false;
                 show('Saved — your comments will show this name.', true);
-                setTimeout(closeMenu, 1100);
+                // Show the confirmation briefly, then collapse the editor
+                // back to the closed row (which now shows the new name).
+                // The menu itself stays open.
+                setTimeout(function () { collapseNameEditor(); paintNameRow(); }, 1100);
             }).catch(function () {
                 nameSave.disabled = false;
                 show('Could not save that name — try again.', false);
             });
+        });
+        if (nameRow) nameRow.addEventListener('click', function () { openNameEditor(); });
+        if (nameCancel) nameCancel.addEventListener('click', function () {
+            if (nameInput) nameInput.value = profileUsername || '';
+            collapseNameEditor();
         });
         var feedRow = document.getElementById('authMenuFeed');
         if (feedRow) feedRow.addEventListener('click', function () {
