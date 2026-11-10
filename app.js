@@ -642,13 +642,13 @@ function openModal(deal) {
     // outline versions read as scratchy at small sizes (user's complaint).
     const cmtPencil = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
     const cmtTrash = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
-    const commentsHTML = deal.comments.map((c, idx) => `
-        <div style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);">
+    const buildCommentsHTML = () => deal.comments.map((c, idx) => `
+        <div ${c.pending ? 'data-pending="1" ' : ''}style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);${c.pending ? ' opacity:0.6;' : ''}">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
                 <strong style="color:var(--text-primary);">${c.user}</strong>
                 <span style="display:inline-flex; align-items:center;">
-                    <span style="color:var(--text-secondary); font-size:0.85rem;">${c.time}</span>
-                    ${c.own ? `<span class="cmt-actions"><button type="button" class="cmt-act-btn" data-cact="edit" data-idx="${idx}" title="Edit comment" aria-label="Edit comment">${cmtPencil}</button><button type="button" class="cmt-act-btn del" data-cact="del" data-idx="${idx}" title="Delete comment" aria-label="Delete comment">${cmtTrash}</button></span>` : ''}
+                    <span style="color:var(--text-secondary); font-size:0.85rem;">${c.pending ? 'Posting\u2026' : c.time}</span>
+                    ${c.own && !c.pending ? `<span class="cmt-actions"><button type="button" class="cmt-act-btn" data-cact="edit" data-idx="${idx}" title="Edit comment" aria-label="Edit comment">${cmtPencil}</button><button type="button" class="cmt-act-btn del" data-cact="del" data-idx="${idx}" title="Delete comment" aria-label="Delete comment">${cmtTrash}</button></span>` : ''}
                 </span>
             </div>
             ${deal._editingIdx === idx ? `
@@ -680,6 +680,18 @@ function openModal(deal) {
     const showCommentError = (msg) => {
         const e = document.getElementById('commentError');
         if (e) { e.textContent = msg; e.style.display = ''; }
+    };
+    // Re-render ONLY the comments list, leaving the rest of the modal
+    // alone. Optimistic posting uses this: re-rendering the whole modal
+    // on every post (plus waiting on the server first) is what made
+    // posting feel so slow.
+    const renderCommentsList = (toBottom) => {
+        const cl = document.getElementById('commentsList');
+        if (!cl) return;
+        const st = cl.scrollTop;
+        cl.innerHTML = buildCommentsHTML();
+        bindCommentActions();
+        cl.scrollTop = toBottom ? cl.scrollHeight : st;
     };
     const ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
     const ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
@@ -724,7 +736,7 @@ function openModal(deal) {
         </div>
         <div class="comments-section">
                     <h3 style="font-size:1.05rem; margin-bottom:0.75rem;">Comments</h3>
-                    <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${commentsHTML}</div>
+                    <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${buildCommentsHTML()}</div>
                     <div>
                         ${commentFormHTML}
                     </div>
@@ -758,19 +770,37 @@ function openModal(deal) {
             const liveUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
             if (!liveUser) return; // the form only renders for members; stay safe
             if (window.CC_COMMENTS) {
-                // Stored comments: the server saves the comment (and derives
-                // the display name) — it appears once it's actually saved.
-                postBtn.disabled = true;
+                // Stored comments, posted OPTIMISTICALLY. The old flow
+                // waited on the ccPostComment Cloud Function (cold starts
+                // can take seconds) before showing anything — that's the
+                // slowness the user felt. Now the comment renders at the
+                // end of the thread (chronological: newest last) with a
+                // subtle pending state and the box clears immediately;
+                // the server call runs in the background. On success the
+                // server record swaps in by reference — no thread refetch.
+                // On failure the optimistic comment comes back out, the
+                // typed text is restored, and an error shows by the form.
+                const errEl0 = document.getElementById('commentError');
+                if (errEl0) errEl0.style.display = 'none';
+                const optimistic = { id: null, user: escHtml(ccDisplayName || 'Member').slice(0, 40), text: escHtml(textVal), time: 'Just now', own: true, pending: true };
+                deal.comments.push(optimistic);
+                const ta0 = document.getElementById('commentText');
+                if (ta0) ta0.value = '';
+                renderCommentsList(true);
                 CC_COMMENTS.post(deal.id, textVal).then(c => {
                     if (!c) throw new Error('empty');
-                    deal.comments.push({ id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: 'Just now', own: true });
-                    deal._skipLoadOnce = true;
-                    openModal(deal);
-                    const cl = document.getElementById('commentsList');
-                    if (cl) cl.scrollTop = cl.scrollHeight;
+                    const i = deal.comments.indexOf(optimistic);
+                    if (i !== -1) deal.comments.splice(i, 1, { id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts) || 'Just now', own: true });
+                    if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') renderCommentsList(false);
                 }).catch(() => {
-                    postBtn.disabled = false;
-                    showCommentError('Could not save your comment — check your connection and try again.');
+                    const i = deal.comments.indexOf(optimistic);
+                    if (i !== -1) deal.comments.splice(i, 1);
+                    if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') {
+                        renderCommentsList(false);
+                        const ta1 = document.getElementById('commentText');
+                        if (ta1) ta1.value = textVal;
+                        showCommentError('Couldn\u2019t post \u2014 check your connection and try again.');
+                    }
                 });
                 return;
             }
@@ -794,9 +824,11 @@ function openModal(deal) {
         });
     }
 
-    // Own-comment actions: pencil edits in place, trash deletes. Comments
-    // live in this page session only, so "own" means posted here, now.
-    modalBody.querySelectorAll('[data-cact]').forEach(btn => {
+    // Own-comment actions: pencil edits in place, trash deletes. Bound
+    // through a helper so the list-only re-renders (optimistic posting)
+    // can rebind after swapping the list's HTML.
+    const bindCommentActions = () => {
+    modalBody.querySelectorAll('#commentsList [data-cact]').forEach(btn => {
         btn.addEventListener('click', () => {
             const act = btn.getAttribute('data-cact');
             const idx = parseInt(btn.getAttribute('data-idx'), 10);
@@ -849,6 +881,8 @@ function openModal(deal) {
             if (cl1) cl1.scrollTop = st;
         });
     });
+    };
+    bindCommentActions();
 
     // Stored comments: fetch the saved thread for this deal and swap it in
     // (the server is the source of truth once it answers). Skipped on the
