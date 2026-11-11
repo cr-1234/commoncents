@@ -105,5 +105,26 @@
     "shelvedAt": "2026-11-10",
     "shelvedReason": "Promo-code savings path gone — no coupon on the page and live base price $49.99 is at the $49.99 list price (posted deal price was $27.49 with code F14H0XL9).",
     "lastSeenPrice": 49.99
+  },
+  {
+    "id": 1045,
+    "title": "AstroAI H2 Pro Cordless Portable Tire Inflator For $43.99 From Amazon",
+    "category": "tools",
+    "fc": "Tools",
+    "price": 43.99,
+    "originalPrice": 62.99,
+    "discount": 30,
+    "image": "https://m.media-amazon.com/images/I/71yWSeTLEUL._AC_SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B0GGGTLJ9F?tag=commoncents0050-20",
+    "description": "A cordless tire inflator that runs on its own battery or your car’s 12V outlet, with auto shut-off at your set pressure. Toss it in the trunk and flat tires stop being an emergency.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-10T12:25:00Z",
+    "source": "techbargains",
+    "shelvedAt": "2026-11-11",
+    "shelvedReason": "Price rose to full list price $62.99 — no longer a discount",
+    "lastSeenPrice": 62.99
   }
 ]
