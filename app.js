@@ -557,8 +557,29 @@ function renderPagination(totalPages) {
         el.appendChild(b);
     };
     makeBtn('← Prev', currentPage - 1, { nav: true, disabled: currentPage <= 1 });
-    for (let p = 1; p <= totalPages; p++) {
+    // Windowed page numbers: with many pages, showing every number would
+    // stretch the row without end. Show page 1, the last page, the current
+    // page and one neighbor on each side; collapse any gap to a single "…".
+    // (Seven or fewer pages fit comfortably, so show them all.)
+    let pageList;
+    if (totalPages <= 7) {
+        pageList = [];
+        for (let p = 1; p <= totalPages; p++) pageList.push(p);
+    } else {
+        const keep = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+        pageList = [...keep].filter(p => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+    }
+    let prevShown = 0;
+    for (const p of pageList) {
+        if (prevShown && p - prevShown > 1) {
+            const gap = document.createElement('span');
+            gap.className = 'page-gap';
+            gap.textContent = '…';
+            gap.setAttribute('aria-hidden', 'true');
+            el.appendChild(gap);
+        }
         makeBtn(String(p), p, { active: p === currentPage });
+        prevShown = p;
     }
     makeBtn('Next →', currentPage + 1, { nav: true, disabled: currentPage >= totalPages });
 }

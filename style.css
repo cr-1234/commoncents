@@ -442,6 +442,7 @@ body:not(.dark-mode) .dropdown-item:hover {
 .page-btn.active { background: linear-gradient(135deg, var(--highlight), var(--highlight-hover)); color: #fff; border-color: transparent; }
 body.dark-mode .page-btn.active { color: #000; }
 .page-btn:disabled { opacity: 0.4; cursor: default; }
+.page-gap { padding: 0 0.15rem; color: #6b6b7a; user-select: none; }
 
 /* ── Deal Card ──────────────────────────────────────────────── */
 .deal-card {
