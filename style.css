@@ -852,7 +852,10 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .modal-deal-btn { margin-left: auto; }
 .comments-section { border-top: 1px solid var(--border-color); margin-top: 1.25rem; padding-top: 1.1rem; }
 .modal-media-banner {
-    background: #EDE5F8; border-radius: 14px; height: 280px;
+    /* White, not plum: product photos sit on white backgrounds, so a
+       colored panel made every picture look like a white box floating
+       on lavender. White lets the photo blend in seamlessly. */
+    background: #fff; border-radius: 14px; height: 280px;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 1.25rem; overflow: hidden;
 }
