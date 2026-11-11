@@ -668,6 +668,16 @@ function handleVote(e, deal, type) {
 function openModal(deal) {
     if (!deal.comments) deal.comments = [];
     window._ccOpenDealId = deal.id;
+    // Opening a deal counts as seeing it: clear its NEW FOR YOU badge
+    // from the card right away, and persist the seen mark (CC_FEED owns
+    // it) so the badge doesn't come back on later loads either.
+    if (window.CC_FEED && CC_FEED.markSeen) {
+        try { CC_FEED.markSeen(deal); } catch (e) {}
+        const anyBtn = document.querySelector('#dealGrid .deal-card [data-id="' + deal.id + '"]');
+        const openCard = anyBtn ? anyBtn.closest('.deal-card') : null;
+        const openBadge = openCard ? openCard.querySelector('.new-badge') : null;
+        if (openBadge) openBadge.remove();
+    }
     const skipLoadOnce = !!deal._skipLoadOnce;
     delete deal._skipLoadOnce;
     // Standard solid icons (the Material shapes every site uses) — the thin

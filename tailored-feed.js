@@ -116,6 +116,25 @@
     var prevVisit = parseInt(lsGet('ccLastVisit') || '0', 10) || 0;
     lsSet('ccLastVisit', String(Date.now()));
 
+    // Deals the visitor has actually opened. Opening a deal clears its
+    // NEW FOR YOU badge immediately and for good (persisted here), even
+    // though the deal stays "new" by the last-visit rule for the rest of
+    // the session — app.js calls CC_FEED.markSeen() from openModal().
+    var seenDeals = new Set();
+    try {
+        (JSON.parse(lsGet('ccSeenDeals') || '[]') || []).forEach(function (id) { seenDeals.add(id); });
+    } catch (e) {}
+    // Prune ids whose deals have left the inventory, so the stored set
+    // stays small as deals come and go.
+    if (typeof deals !== 'undefined' && Array.isArray(deals)) {
+        var liveIds = new Set(deals.map(function (d) { return d.id; }));
+        var keptSeen = [...seenDeals].filter(function (id) { return liveIds.has(id); });
+        if (keptSeen.length !== seenDeals.size) {
+            seenDeals = new Set(keptSeen);
+            lsSet('ccSeenDeals', JSON.stringify(keptSeen));
+        }
+    }
+
     function notifyChange() {
         if (window.CC_AUTH && CC_AUTH.noteInterestsChanged) {
             try { CC_AUTH.noteInterestsChanged(getInterests()); } catch (e) {}
@@ -157,8 +176,14 @@
         },
         isNew: function (deal) {
             if (!deal.ts) return false;
+            if (seenDeals.has(deal.id)) return false;
             var ts = Date.parse(deal.ts);
             return !isNaN(ts) && ts > prevVisit;
+        },
+        markSeen: function (deal) {
+            if (!deal || deal.id == null || seenDeals.has(deal.id)) return;
+            seenDeals.add(deal.id);
+            lsSet('ccSeenDeals', JSON.stringify([...seenDeals]));
         },
         getInterests: getInterests,
         // The browse category half of the saved view; app.js restores it
