@@ -117,9 +117,8 @@
     lsSet('ccLastVisit', String(Date.now()));
 
     // Deals the visitor has actually opened. Opening a deal clears its
-    // NEW FOR YOU badge immediately and for good (persisted here), even
-    // though the deal stays "new" by the last-visit rule for the rest of
-    // the session — app.js calls CC_FEED.markSeen() from openModal().
+    // NEW FOR YOU badge immediately and for good (persisted here) —
+    // app.js calls CC_FEED.markSeen() from openModal().
     var seenDeals = new Set();
     try {
         (JSON.parse(lsGet('ccSeenDeals') || '[]') || []).forEach(function (id) { seenDeals.add(id); });
@@ -133,6 +132,37 @@
             seenDeals = new Set(keptSeen);
             lsSet('ccSeenDeals', JSON.stringify(keptSeen));
         }
+    }
+
+    // The deals currently carrying a NEW FOR YOU badge. A deal joins
+    // this set when it arrives (posted after the pre-advance last-visit
+    // snapshot above) and leaves it ONLY when the visitor opens that
+    // deal — never just because a page loaded. Badges used to be
+    // computed straight from the visit clock, which advances on every
+    // load, so all unopened badges vanished at once on the next visit
+    // (user's complaint, 2026-11-10): he wants each card's badge to go
+    // away only when he opens THAT card. Persisted, so a badge survives
+    // reloads indefinitely until its own deal is opened.
+    var newBadges = new Set();
+    try {
+        (JSON.parse(lsGet('ccNewBadges') || '[]') || []).forEach(function (id) { newBadges.add(id); });
+    } catch (e) {}
+    if (typeof deals !== 'undefined' && Array.isArray(deals)) {
+        var liveBadgeIds = new Set(deals.map(function (d) { return d.id; }));
+        // Union in this visit's new arrivals — the same rule as before:
+        // posted after the last-visit snapshot taken at the top.
+        deals.forEach(function (d) {
+            if (!d.ts) return;
+            var ts = Date.parse(d.ts);
+            if (!isNaN(ts) && ts > prevVisit) newBadges.add(d.id);
+        });
+        // Prune: only deals still in the inventory and not yet opened
+        // keep their badge.
+        var keptBadges = [...newBadges].filter(function (id) {
+            return liveBadgeIds.has(id) && !seenDeals.has(id);
+        });
+        newBadges = new Set(keptBadges);
+        lsSet('ccNewBadges', JSON.stringify(keptBadges));
     }
 
     function notifyChange() {
@@ -175,15 +205,19 @@
             return mine.some(function (k) { return d[k]; });
         },
         isNew: function (deal) {
-            if (!deal.ts) return false;
             if (seenDeals.has(deal.id)) return false;
-            var ts = Date.parse(deal.ts);
-            return !isNaN(ts) && ts > prevVisit;
+            return newBadges.has(deal.id);
         },
         markSeen: function (deal) {
-            if (!deal || deal.id == null || seenDeals.has(deal.id)) return;
-            seenDeals.add(deal.id);
-            lsSet('ccSeenDeals', JSON.stringify([...seenDeals]));
+            if (!deal || deal.id == null) return;
+            if (!seenDeals.has(deal.id)) {
+                seenDeals.add(deal.id);
+                lsSet('ccSeenDeals', JSON.stringify([...seenDeals]));
+            }
+            // Opening the deal retires its badge for good.
+            if (newBadges.delete(deal.id)) {
+                lsSet('ccNewBadges', JSON.stringify([...newBadges]));
+            }
         },
         getInterests: getInterests,
         // The browse category half of the saved view; app.js restores it
