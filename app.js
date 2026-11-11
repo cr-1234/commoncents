@@ -20,7 +20,8 @@ let searchQuery = '';
 // My Feed). The page resets to 1 whenever the filter inputs change —
 // renderDeals detects that via a filter key, so every path that funnels
 // into renderDeals (nav, sidebar, search box, sort menu, feed picker,
-// "Back to my feed") is covered without each caller having to remember.
+// the Categories lists' "My Feed" row) is covered without each caller
+// having to remember.
 const DEALS_PER_PAGE = 12;
 let currentPage = 1;
 let lastFilterKey = null;
@@ -418,6 +419,9 @@ function setCategory(category) {
     [...navLinks, ...categoryLinks].forEach(link => {
         link.classList.toggle('active', link.dataset.category === category);
     });
+    // Keep the Categories lists' "My Feed" rows in sync with the view
+    // (in My Feed they carry the active state instead of a category).
+    if (window.CC_FEED && typeof CC_FEED.refreshMyFeedNav === 'function') CC_FEED.refreshMyFeedNav();
     renderDeals();
 }
 
@@ -437,6 +441,7 @@ function paintCategoryCounts() {
     });
     categoryLinks.forEach(link => {
         const cat = link.dataset.category;
+        if (!cat) return; // the "My Feed" row — painted by tailored-feed.js
         const n = cat === 'all' ? total : (tally[cat] || 0);
         const li = link.closest('li');
         let badge = link.querySelector('.cat-count');
@@ -453,6 +458,9 @@ function paintCategoryCounts() {
         }
         badge.textContent = n;
     });
+    // The "My Feed" row's badge/visibility is tailored-feed.js's job;
+    // refresh it here too so it tracks deals loaded after first paint.
+    if (window.CC_FEED && typeof CC_FEED.refreshMyFeedNav === 'function') CC_FEED.refreshMyFeedNav();
 }
 
 // Render Functions

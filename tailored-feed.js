@@ -12,9 +12,13 @@
 // records the dismissal (localStorage ccPickerDone); from then on —
 // and whenever picks exist — the picker stays tucked away on every
 // load, and category clicks never reopen it. The feed's status lives
-// in the sidebar's "Your Feed" widget instead (picks + deal count, a
-// Change button that reopens the picker, and a "Back to my feed"
-// button while browsing). Every interest renders a chip in the picker
+// in the sidebar's "Your Feed" widget instead (picks + deal count and
+// a Change button that reopens the picker). Jumping back to My Feed
+// lives in the Categories lists: a "My Feed" row tops both the sidebar
+// list and the top nav whenever the visitor has picks (user's design,
+// 2026-11-10 — it sits where people already go to filter, instead of
+// a button in the widget that read as clutter). Every interest
+// renders a chip in the picker
 // at all times — including sections with no deals right now — because
 // the picker is where a visitor makes a standing choice, deals or
 // no deals.
@@ -220,6 +224,10 @@
             }
         },
         getInterests: getInterests,
+        // app.js calls this after it (re)paints the sidebar category
+        // counts, so the My Feed row's badge/visibility track deals
+        // loaded after the first paint too.
+        refreshMyFeedNav: function () { paintMyFeedNav(); },
         // The browse category half of the saved view; app.js restores it
         // at startup (and validates it against the actual nav links).
         savedCategory: function () { return viewCategory; },
@@ -250,6 +258,48 @@
     };
 
     var els = {};
+    // The "My Feed" rows in the Categories lists (sidebar + top nav,
+    // marked data-myfeed). They exist only while the visitor has picks:
+    // no picks, no row anywhere. The sidebar row also carries the
+    // .cat-count badge with the number of live deals matching the
+    // picks — matchCount(), the same matching the My Feed view itself
+    // uses — shown even when that number is 0. Active painting agrees
+    // with the view on screen: in My Feed the rows are active and the
+    // category links are not; browsing, the selected category is.
+    // app.js setCategory paints the category half of that too — this
+    // keeps both halves consistent on the paths that never call
+    // setCategory (entering/leaving My Feed from the picker, and the
+    // saved-view restore at startup).
+    function paintMyFeedNav() {
+        if (!els.myFeedRows || !els.myFeedRows.length) return;
+        var mine = getInterests();
+        var has = mine.length > 0;
+        var inMine = has && mode === 'mine';
+        els.myFeedRows.forEach(function (row) {
+            var wrap = row.closest('li') || row;
+            wrap.style.display = has ? '' : 'none';
+            row.classList.toggle('active', inMine);
+        });
+        var cc = 'all';
+        try { if (typeof currentCategory !== 'undefined' && currentCategory) cc = currentCategory; } catch (e) {}
+        document.querySelectorAll('.main-nav a[data-category], .category-list a[data-category]').forEach(function (l) {
+            l.classList.toggle('active', !inMine && l.getAttribute('data-category') === cc);
+        });
+        if (els.myFeedBadgeHost) {
+            var badge = els.myFeedBadgeHost.querySelector('.cat-count');
+            if (has) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'cat-count';
+                    els.myFeedBadgeHost.appendChild(badge);
+                }
+                badge.textContent = matchCount();
+            } else if (badge) {
+                badge.remove();
+            }
+        }
+    }
+
     function paintAll() {
         if (!els.picker) return;
         var mine = getInterests();
@@ -267,7 +317,7 @@
             }
         }
         if (els.widgetChange) els.widgetChange.textContent = mine.length ? 'Change' : 'Build your feed';
-        if (els.backBtn) els.backBtn.style.display = (mine.length && mode !== 'mine') ? '' : 'none';
+        paintMyFeedNav();
         // expanded status line
         if (els.status) {
             if (mode === 'mine' && mine.length) {
@@ -276,7 +326,7 @@
                     + ' — ' + c + ' deal' + (c === 1 ? '' : 's')
                     + '. Tap "Done" to tuck this picker away.';
             } else if (mine.length) {
-                els.status.textContent = 'Browsing by category. Your interests are saved — use "Back to my feed" in the sidebar to jump back.';
+                els.status.textContent = 'Browsing by category. Your interests are saved — use "My Feed" in the Categories list to jump back.';
             } else {
                 els.status.textContent = 'Pick what you care about and this page becomes your feed — only those deals, from every site we collect.';
             }
@@ -341,7 +391,8 @@
         els.status = document.getElementById('feedStatus');
         els.widgetText = document.getElementById('feedWidgetText');
         els.widgetChange = document.getElementById('feedWidgetChange');
-        els.backBtn = document.getElementById('feedWidgetBack');
+        els.myFeedRows = document.querySelectorAll('[data-myfeed]');
+        els.myFeedBadgeHost = document.querySelector('.category-list a[data-myfeed]');
         var doneBtn = document.getElementById('feedDoneBtn');
         if (!els.picker) return;
 
@@ -360,15 +411,22 @@
             paintAll();
             revealPicker();
         });
-        if (els.backBtn) els.backBtn.addEventListener('click', function () {
-            mode = 'mine';
-            saveView();
-            paintAll();
-            if (typeof renderDeals === 'function') renderDeals();
+        // The "My Feed" rows in the Categories lists are the way back
+        // into My Feed (the sidebar widget's old "Back to my feed"
+        // button moved here). Exactly the old button's behavior: enter
+        // My Feed and remember the choice.
+        els.myFeedRows.forEach(function (row) {
+            row.addEventListener('click', function (e) {
+                e.preventDefault();
+                mode = 'mine';
+                saveView();
+                paintAll();
+                if (typeof renderDeals === 'function') renderDeals();
+            });
         });
 
         // Any category browsing switches back to "browse" mode; the saved
-        // interests stay put for the slim bar's "Back to my feed". This
+        // interests stay put for the Categories lists' "My Feed" row. This
         // deliberately never touches `expanded`: category clicks (All
         // Deals included) must never reopen a tucked picker — the
         // Change buttons are the only way back in.
