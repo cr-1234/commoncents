@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <title>Submit a Deal | CommonCents</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="testing-banner">Please note: this site is currently in testing mode and the giveaway is not active yet. We'd love you to explore — and let us know if you find any bugs or anything we can improve. The giveaway will go live once we officially launch.</div>
+    <header class="site-header">
+        <div class="container header-content">
+            <a href="index.html" class="logo-link">
+                <div class="logo-container">
+                    <img class="logo-mark-img" src="logo-tag.png" alt="" aria-hidden="true">
+                    <div class="logo-text-group">
+                        <div class="logo-title"><span class="txt-shiny">COMMONCENTS</span></div>
+                        <div class="logo-tagline">PREMIUM DEALS. SMARTER CHOICES.</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <div class="container" style="max-width:600px; margin: 4rem auto; padding: 0 20px;">
+        <div class="glass" style="padding: 3rem; border-radius: var(--border-radius); border: 1px solid var(--glass-border); box-shadow: var(--shadow-md);">
+            <h1 style="font-size: 2.2rem; margin-bottom: 1rem; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: var(--font-display); font-weight: 800; text-align: center;">Submit a Deal</h1>
+            <p style="color: var(--text-secondary); text-align: center; margin-bottom: 2rem;">Found a great Amazon deal? Send it in — if it checks out, we'll post it in the feed.</p>
+
+            <form id="submitDealForm" novalidate>
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Your Name</label>
+                    <input type="text" id="sdName" name="name" required placeholder="e.g., John Doe" style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Your Email (optional)</label>
+                    <input type="email" id="sdEmail" name="email" placeholder="name@domain.com" style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Amazon Product Link</label>
+                    <input type="url" id="sdUrl" name="url" required placeholder="https://www.amazon.com/dp/..." style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Price You Saw (optional)</label>
+                    <input type="text" id="sdPrice" name="priceSeen" placeholder="e.g., $19.99" style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Anything Else? (optional)</label>
+                    <textarea rows="4" id="sdNote" name="note" placeholder="Coupon code, where you found it, anything that helps..." style="width:100%; padding:1rem 1.25rem; border-radius:20px; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none; font-family:inherit;"></textarea>
+                </div>
+                <input type="text" id="sdWebsite" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none;">
+                <button type="submit" id="sdSubmit" class="btn btn-primary full-width" style="border-radius:9999px !important; padding:0.8rem; font-weight:700; font-size:1rem;">Submit Deal</button>
+                <p id="sdStatus" role="status" style="display:none; text-align:center; margin-top:1.25rem; font-size:0.95rem; line-height:1.5;"></p>
+            </form>
+            <script>
+            (function () {
+                var ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccSubmitDeal';
+                var form = document.getElementById('submitDealForm');
+                var status = document.getElementById('sdStatus');
+                var btn = document.getElementById('sdSubmit');
+                function showStatus(text, ok) {
+                    status.textContent = text;
+                    status.style.color = ok ? '#1F6F4A' : '#dc2626';
+                    status.style.display = 'block';
+                }
+                form.addEventListener('submit', function (ev) {
+                    ev.preventDefault();
+                    if (btn.disabled) return;
+                    var name = document.getElementById('sdName').value.trim();
+                    var url = document.getElementById('sdUrl').value.trim();
+                    if (!name || !url) {
+                        showStatus('Please fill in your name and the Amazon product link.', false);
+                        return;
+                    }
+                    btn.disabled = true;
+                    var originalLabel = btn.textContent;
+                    btn.textContent = 'Sending…';
+                    status.style.display = 'none';
+                    fetch(ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: name,
+                            email: document.getElementById('sdEmail').value.trim(),
+                            url: url,
+                            priceSeen: document.getElementById('sdPrice').value.trim(),
+                            note: document.getElementById('sdNote').value.trim(),
+                            website: document.getElementById('sdWebsite').value
+                        })
+                    }).then(function (res) {
+                        return res.json().catch(function () { return null; }).then(function (data) {
+                            if (res.status === 200 && data && data.ok === true) {
+                                form.reset();
+                                showStatus("Thanks! We check every submission — if the price checks out, it'll appear in the feed.", true);
+                            } else {
+                                showStatus('Something went wrong sending your submission — please try again.', false);
+                            }
+                        });
+                    }).catch(function () {
+                        showStatus('Something went wrong sending your submission — please try again.', false);
+                    }).then(function () {
+                        btn.disabled = false;
+                        btn.textContent = originalLabel;
+                    });
+                });
+            })();
+            </script>
+            <p style="color: var(--text-secondary); text-align: center; margin-top: 1.75rem; font-size: 0.9rem; line-height: 1.6;">Deals are checked before anything is posted — the price, that it's in stock, and that the link goes to the real product. Only Amazon deals for now.</p>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div class="footer-disclosure">
+                Affiliate Disclosure: CommonCents is a participant in the Amazon Services LLC Associates Program and other affiliate programs. As an Amazon Associate, we earn from qualifying purchases. We may receive a commission when you click our links and make purchases at no additional cost to you.
+            </div>
+            <div class="footer-brand" style="font-family: var(--font-display); letter-spacing: 0.05em; font-weight: 800; font-size: 1.4rem; margin-bottom: 0.25rem;">
+                <span class="txt-shiny">COMMONCENTS</span>
+            </div>
+            <p class="footer-tagline">Making every cent count with the best deals online.</p>
+            <nav class="footer-nav">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+                <a href="cookies.html">Cookies</a>
+                <a href="advertise.html">Advertise</a>
+                <a href="submit-deal.html">Submit a Deal</a>
+            </nav>
+            <p class="footer-copyright">&copy; 2026 CommonCents. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
