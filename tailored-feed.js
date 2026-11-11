@@ -42,10 +42,16 @@
         { key: 'baby',     label: 'Baby & Kids',        cats: ['kids'],      kw: ['baby', 'toddler', 'kids', 'children', 'diaper', 'stroller', 'lego', 'toy', 'infant', 'nursery', 'crayola'] },
         { key: 'beauty',   label: 'Health & Beauty',    cats: ['beauty'],    kw: ['skincare', 'makeup', 'shampoo', 'beauty', 'serum', 'lotion', 'toothbrush', 'vitamin', 'melatonin', 'supplement'] },
         { key: 'clothing', label: 'Clothing & Shoes',   cats: ['clothing'],  kw: ['shoes', 'sneakers', 'jacket', 'boots', 'hoodie', 'jeans', 'nike', 'adidas', 'sweater'] },
-        { key: 'pets',     label: 'Pets',               cats: ['pets'],      kw: ['dog', 'cat', 'pet', 'litter', 'puppy', 'kitten', 'aquarium'] }
+        { key: 'pets',     label: 'Pets',               cats: ['pets'],      kw: ['dog', 'cat', 'pet', 'litter', 'puppy', 'kitten', 'aquarium'] },
+        // General is pickable too (user ruling, 2026-11-10): deals the
+        // collector files as General matched NO interest, so they could
+        // never appear in any My Feed — even for a visitor who picked
+        // everything. It matches by filing only (fc/cats), deliberately
+        // no keywords, so it stays exactly the General pile, no more.
+        { key: 'general',  label: 'General',            cats: ['general'],   kw: [] }
     ];
     // Collector category (verbatim) -> interest key.
-    var FC2KEY = { 'Tech': 'tech', 'Tools': 'tools', 'Household': 'home', 'Groceries': 'food', 'Kids': 'baby', 'Beauty': 'beauty', 'Clothing': 'clothing', 'Pets': 'pets' };
+    var FC2KEY = { 'Tech': 'tech', 'Tools': 'tools', 'Household': 'home', 'Groceries': 'food', 'Kids': 'baby', 'Beauty': 'beauty', 'Clothing': 'clothing', 'Pets': 'pets', 'General': 'general' };
 
     function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
