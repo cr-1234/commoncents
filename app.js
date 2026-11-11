@@ -557,30 +557,30 @@ function renderPagination(totalPages) {
         el.appendChild(b);
     };
     makeBtn('← Prev', currentPage - 1, { nav: true, disabled: currentPage <= 1 });
-    // Windowed page numbers: with many pages, showing every number would
-    // stretch the row without end. Show page 1, the last page, the current
-    // page and one neighbor on each side; collapse any gap to a single "…".
-    // (Seven or fewer pages fit comfortably, so show them all.)
-    let pageList;
-    if (totalPages <= 7) {
-        pageList = [];
-        for (let p = 1; p <= totalPages; p++) pageList.push(p);
-    } else {
-        const keep = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
-        pageList = [...keep].filter(p => p >= 1 && p <= totalPages).sort((a, b) => a - b);
-    }
-    let prevShown = 0;
-    for (const p of pageList) {
-        if (prevShown && p - prevShown > 1) {
-            const gap = document.createElement('span');
-            gap.className = 'page-gap';
-            gap.textContent = '…';
-            gap.setAttribute('aria-hidden', 'true');
-            el.appendChild(gap);
-        }
+    // Sliding window of at most 3 page numbers (the user's stricter cap,
+    // 2026-11-10): the window always holds the current page — in the
+    // middle when it can — and slides/clamps at the ends (page 1 shows
+    // 1 2 3; the last page shows last-2, last-1, last). A single "…"
+    // marks hidden pages on a side, only where pages actually are
+    // hidden; the first/last pages are NOT forced in as extra buttons.
+    // Three or fewer pages simply show in full, with no dots.
+    const winSize = Math.min(3, totalPages);
+    let winStart = currentPage - 1;
+    if (winStart < 1) winStart = 1;
+    if (winStart > totalPages - winSize + 1) winStart = totalPages - winSize + 1;
+    const winEnd = winStart + winSize - 1;
+    const makeGap = () => {
+        const gap = document.createElement('span');
+        gap.className = 'page-gap';
+        gap.textContent = '…';
+        gap.setAttribute('aria-hidden', 'true');
+        el.appendChild(gap);
+    };
+    if (winStart > 1) makeGap();
+    for (let p = winStart; p <= winEnd; p++) {
         makeBtn(String(p), p, { active: p === currentPage });
-        prevShown = p;
     }
+    if (winEnd < totalPages) makeGap();
     makeBtn('Next →', currentPage + 1, { nav: true, disabled: currentPage >= totalPages });
 }
 
