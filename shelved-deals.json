@@ -104,5 +104,50 @@
     "shelvedAt": "2026-11-11",
     "shelvedReason": "Price rose to full list price $62.99 — no longer a discount",
     "lastSeenPrice": 62.99
+  },
+  {
+    "id": 1070,
+    "title": "Luseta Curl Enhancing Coconut Oil Shampoo & Conditioner Set For $14.09 From Amazon",
+    "category": "beauty",
+    "fc": "Beauty",
+    "price": 14.09,
+    "originalPrice": 29.99,
+    "discount": 53,
+    "image": "https://m.media-amazon.com/images/I/71T+c1bINFL._SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B07SHD63KP?tag=commoncents0050-20",
+    "description": "A shampoo and conditioner duo with coconut oil that defines curls and restores bounce without sulfates or parabens. At $14.09 with the code and Subscribe & Save, it's over half off its $29.99 list.",
+    "code": "CA2I1Z4M",
+    "dealNote": "Use promo code CA2I1Z4M at checkout and opt for Subscribe & Save to get this price — without the code and Subscribe & Save, it's $29.99.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-11T20:06:21Z",
+    "source": "hip2save",
+    "shelvedAt": "2026-11-11",
+    "shelvedReason": "Promo code CA2I1Z4M + Subscribe & Save savings path gone — no coupon on the page and live base price $29.99 is back at full list.",
+    "lastSeenPrice": 29.99
+  },
+  {
+    "id": 1071,
+    "title": "Partywind Glow-In-The-Dark Christmas Temporary Tattoos 10-Sheet Set For $2.99 From Amazon",
+    "category": "kids",
+    "fc": "Kids",
+    "price": 2.99,
+    "originalPrice": 5.99,
+    "discount": 50,
+    "image": "https://m.media-amazon.com/images/I/71LTCZSKI9L._SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B08K7BFPX9?tag=commoncents0050-20",
+    "description": "Ten sheets of glow-in-the-dark Christmas temporary tattoos — Santa, penguins, snowmen, and trees that light up after dark. A stocking-stuffer ten-pack for $2.99 with the code below.",
+    "code": "61HEB7AN",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-11T20:06:21Z",
+    "source": "hip2save",
+    "shelvedAt": "2026-11-11",
+    "shelvedReason": "Promo code 61HEB7AN savings path gone — no coupon on the page and live base price $5.99 is back at full list.",
+    "lastSeenPrice": 5.99
   }
 ]
