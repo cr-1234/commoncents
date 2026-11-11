@@ -32,21 +32,75 @@
             <h1 style="font-size: 2.2rem; margin-bottom: 1rem; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: var(--font-display); font-weight: 800; text-align: center;">Contact Us</h1>
             <p style="color: var(--text-secondary); text-align: center; margin-bottom: 2rem;">Have a question, feedback, or a deal partnership suggestion? Send us a message!</p>
             
-            <form onsubmit="event.preventDefault(); alert('✉️ Thank you! Your message has been sent successfully.'); this.reset();">
+            <form id="contactForm" novalidate>
                 <div style="margin-bottom:1.25rem;">
                     <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Your Name</label>
-                    <input type="text" required placeholder="e.g., John Doe" style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                    <input type="text" id="cfName" name="name" required placeholder="e.g., John Doe" style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
                 </div>
                 <div style="margin-bottom:1.25rem;">
                     <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Your Email Address</label>
-                    <input type="email" required placeholder="name@domain.com" style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
+                    <input type="email" id="cfEmail" name="email" required placeholder="name@domain.com" style="width:100%; padding:0.8rem 1.25rem; border-radius:9999px !important; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none;">
                 </div>
                 <div style="margin-bottom:1.5rem;">
                     <label style="display:block; margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Message</label>
-                    <textarea rows="5" required placeholder="Write your message here..." style="width:100%; padding:1rem 1.25rem; border-radius:20px; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none; font-family:inherit;"></textarea>
+                    <textarea rows="5" id="cfMessage" name="message" required placeholder="Write your message here..." style="width:100%; padding:1rem 1.25rem; border-radius:20px; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); outline:none; font-family:inherit;"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary full-width" style="border-radius:9999px !important; padding:0.8rem; font-weight:700; font-size:1rem;">Send Message</button>
+                <input type="text" id="cfWebsite" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none;">
+                <button type="submit" id="cfSubmit" class="btn btn-primary full-width" style="border-radius:9999px !important; padding:0.8rem; font-weight:700; font-size:1rem;">Send Message</button>
+                <p id="cfStatus" role="status" style="display:none; text-align:center; margin-top:1.25rem; font-size:0.95rem; line-height:1.5;"></p>
             </form>
+            <script>
+            (function () {
+                var ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccContact';
+                var form = document.getElementById('contactForm');
+                var status = document.getElementById('cfStatus');
+                var btn = document.getElementById('cfSubmit');
+                function showStatus(text, ok) {
+                    status.textContent = text;
+                    status.style.color = ok ? '#1F6F4A' : '#dc2626';
+                    status.style.display = 'block';
+                }
+                form.addEventListener('submit', function (ev) {
+                    ev.preventDefault();
+                    if (btn.disabled) return;
+                    var name = document.getElementById('cfName').value.trim();
+                    var email = document.getElementById('cfEmail').value.trim();
+                    var message = document.getElementById('cfMessage').value.trim();
+                    if (!name || !email || !message) {
+                        showStatus('Please fill in your name, email, and message.', false);
+                        return;
+                    }
+                    btn.disabled = true;
+                    var originalLabel = btn.textContent;
+                    btn.textContent = 'Sending…';
+                    status.style.display = 'none';
+                    fetch(ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            message: message,
+                            website: document.getElementById('cfWebsite').value
+                        })
+                    }).then(function (res) {
+                        return res.json().catch(function () { return null; }).then(function (data) {
+                            if (res.status === 200 && data && data.ok === true) {
+                                form.reset();
+                                showStatus('✉️ Thank you! Your message has been sent successfully.', true);
+                            } else {
+                                showStatus('Something went wrong sending your message — please try again.', false);
+                            }
+                        });
+                    }).catch(function () {
+                        showStatus('Something went wrong sending your message — please try again.', false);
+                    }).then(function () {
+                        btn.disabled = false;
+                        btn.textContent = originalLabel;
+                    });
+                });
+            })();
+            </script>
         </div>
     </div>
 
