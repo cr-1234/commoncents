@@ -212,5 +212,49 @@
     "shelvedAt": "2026-11-12",
     "shelvedReason": "Unavailable on Amazon — no price and no buy box",
     "lastSeenPrice": null
+  },
+  {
+    "id": 1034,
+    "title": "Set Of 12 Stone Lain Cairo Stoneware Dinnerware Set For $69.99 Shipped From Amazon",
+    "category": "household",
+    "fc": "Household",
+    "price": 69.99,
+    "originalPrice": 99.99,
+    "discount": 30,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/02112921/product-B0DZDD13QV-1.jpg",
+    "url": "https://www.amazon.com/dp/B0DZDD13QV?tag=commoncents0050-20",
+    "description": "Service for four in modern stoneware — dinner plates, salad plates, and bowls with a clean, restaurant-style look.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-03T04:42:35Z",
+    "source": "dansdeals",
+    "dealNote": "Clip the $30 coupon on the Amazon product page to get this price — without the coupon, it's $99.99.",
+    "shelvedAt": "2026-11-12",
+    "shelvedReason": "$30 clip coupon gone; price back at full $99.99 list",
+    "lastSeenPrice": 99.99
+  },
+  {
+    "id": 1035,
+    "title": "Gold Bond Friction Defense Stick For Just $1.85-$2.48 From Amazon",
+    "category": "beauty",
+    "fc": "Beauty",
+    "price": 1.85,
+    "originalPrice": 6.28,
+    "discount": 71,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/02220255/product-B007VC9DKI.jpg",
+    "url": "https://www.amazon.com/dp/B007VC9DKI?tag=commoncents0050-20",
+    "description": "A friction-defense stick that stops chafing before it starts — a runner and summer staple.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-03T04:42:35Z",
+    "source": "dansdeals",
+    "dealNote": "Clip the $3.49 coupon on the Amazon product page and check out with Subscribe & Save to get this price.",
+    "shelvedAt": "2026-11-12",
+    "shelvedReason": "$3.49 coupon and Subscribe & Save savings gone; price back at full $6.28 list",
+    "lastSeenPrice": 6.28
   }
 ]
