@@ -601,12 +601,13 @@ function createDealCard(deal) {
     article.innerHTML = `
         <div class="card-image">
             <img src="${deal.image}" alt="${deal.title}" loading="lazy">
-            ${expired ? '<span class="expired-badge">EXPIRED</span>' : ((window.CC_FEED && CC_FEED.isNew(deal)) ? '<span class="new-badge">NEW FOR YOU</span>' : '')}
+            ${expired ? '<span class="expired-badge">EXPIRED</span>' : ((window.CC_FEED && CC_FEED.isNew(deal)) ? '<span class="new-badge">NEW DEAL</span>' : '')}
         </div>
         <div class="card-content">
             <div class="card-meta">
                 <span class="card-source">${getStoreName(deal.url)}</span>
                 <span class="card-category">${deal.category}</span>
+                ${deal.sponsored ? '<span class="sponsored-tag">Sponsored</span>' : ''}
             </div>
             <h3 class="card-title">${deal.title}</h3>
             ${deal.description ? `<p class="card-desc">${deal.description}</p>` : ''}
@@ -676,7 +677,7 @@ function handleVote(e, deal, type) {
 function openModal(deal) {
     if (!deal.comments) deal.comments = [];
     window._ccOpenDealId = deal.id;
-    // Opening a deal counts as seeing it: clear its NEW FOR YOU badge
+    // Opening a deal counts as seeing it: clear its NEW DEAL badge
     // from the card right away, and persist the seen mark (CC_FEED owns
     // it) so the badge doesn't come back on later loads either.
     if (window.CC_FEED && CC_FEED.markSeen) {
@@ -761,7 +762,7 @@ function openModal(deal) {
 
     modalBody.innerHTML = `
         <div class="modal-media-banner"><img src="${deal.image}" alt="${deal.title}"></div>
-        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${getStoreName(deal.url)} &middot; ${deal.category}</div>
+        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${getStoreName(deal.url)} &middot; ${deal.category}${deal.sponsored ? ' &middot; <span style="color:var(--highlight); font-weight:700;">Sponsored</span>' : ''}</div>
         <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
         <div class="modal-buy-row">
             <div class="card-price" style="font-size:2rem;">

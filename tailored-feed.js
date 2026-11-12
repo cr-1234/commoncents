@@ -24,7 +24,7 @@
 // no deals.
 //
 // Also the on-site half of deal alerts: deals collected since your last
-// visit get a "NEW FOR YOU" badge. (Email alerts are a later add-on.)
+// visit get a "NEW DEAL" badge. (Email alerts are a later add-on.)
 //
 // Matching rules (kept strict — a polluted feed kills the whole idea):
 // - A collected deal's interest comes from the collector's own category
@@ -127,7 +127,7 @@
     lsSet('ccLastVisit', String(Date.now()));
 
     // Deals the visitor has actually opened. Opening a deal clears its
-    // NEW FOR YOU badge immediately and for good (persisted here) —
+    // NEW DEAL badge immediately and for good (persisted here) —
     // app.js calls CC_FEED.markSeen() from openModal().
     var seenDeals = new Set();
     try {
@@ -144,7 +144,7 @@
         }
     }
 
-    // The deals currently carrying a NEW FOR YOU badge. A deal joins
+    // The deals currently carrying a NEW DEAL badge. A deal joins
     // this set when it arrives (posted after the pre-advance last-visit
     // snapshot above) and leaves it ONLY when the visitor opens that
     // deal — never just because a page loaded. Badges used to be
@@ -199,6 +199,7 @@
         var mine = getInterests();
         return deals.filter(function (d) {
             if (isExpired(d)) return false;
+            if (d.sponsored === true) return true;
             var di = dealInterests(d);
             return mine.some(function (k) { return di[k]; });
         }).length;
@@ -210,6 +211,9 @@
         match: function (deal) {
             if (mode !== 'mine') return true;
             if (isExpired(deal)) return false;
+            // Sponsored posts appear in every feed, picks or not —
+            // disclosed in the feed picker and the Terms.
+            if (deal.sponsored === true) return true;
             var mine = getInterests();
             var d = dealInterests(deal);
             return mine.some(function (k) { return d[k]; });

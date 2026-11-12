@@ -752,6 +752,8 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     border-color: transparent; font-weight: 700;
 }
 .feed-status { color: var(--text-secondary); font-size: 0.83rem; margin: 0.65rem 0 0.2rem; }
+.feed-note { color: var(--text-secondary); font-size: 0.8rem; margin: 0.35rem 0 0.2rem; }
+.sponsored-tag { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--highlight); border: 1px solid var(--highlight); padding: 0.08rem 0.45rem; border-radius: 999px; flex: none; }
 .new-badge {
     position: absolute; top: 10px; left: 10px; z-index: 2;
     background: var(--gold-gradient); color: #ffffff;
