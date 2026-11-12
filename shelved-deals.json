@@ -149,5 +149,26 @@
     "shelvedAt": "2026-11-11",
     "shelvedReason": "Promo code 61HEB7AN savings path gone — no coupon on the page and live base price $5.99 is back at full list.",
     "lastSeenPrice": 5.99
+  },
+  {
+    "id": 1076,
+    "title": "Bose QuietComfort Wireless Bluetooth Headphones With Active Noise Cancelling For $124.88 Shipped From Amazon",
+    "category": "tech",
+    "fc": "Tech",
+    "price": 124.88,
+    "originalPrice": 359,
+    "discount": 65,
+    "image": "https://m.media-amazon.com/images/I/51VyH2KY-eL._AC_SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B0F2LCBKVN?tag=commoncents0050-20",
+    "description": "Bose’s QuietComfort over-ears with active noise cancelling, plush cushions, and up to 24 hours of battery — a flagship headphone at nearly two-thirds off its $359 list.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-12T02:25:15Z",
+    "source": "dansdeals",
+    "shelvedAt": "2026-11-11",
+    "shelvedReason": "Live price rose to $359.00 — full list price, no discount left (posted $124.88).",
+    "lastSeenPrice": 359
   }
 ]
