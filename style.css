@@ -895,6 +895,18 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    plum shows on light photos, a white halo keeps it readable on
    dark ones, and it's inside the button, so a tap on the arrow is a
    tap on the picture: the menu opens. */
+/* Notification badge on the avatar + the list inside the account
+   menu (engagement plan, 2026-11-13). Red badge = the standard
+   "you have something new" signal; it clears when the menu opens. */
+.cc-note-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; border-radius: 999px; background: #dc2626; color: #fff; font-size: .66rem; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #fff; z-index: 4; }
+.auth-menu-notes { border-top: 1px solid var(--border-color); margin-top: .35rem; padding-top: .5rem; }
+.auth-menu-notes-head { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); margin: 0 0 .35rem; }
+.auth-menu-note { font-size: .85rem; padding: .35rem 0; border-bottom: 1px solid var(--border-color); color: var(--text-primary); line-height: 1.45; }
+.auth-menu-note:last-child { border-bottom: none; }
+.auth-menu-note .an-site { color: var(--highlight); font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
+.auth-menu-note .an-text { color: var(--text-secondary); }
+.auth-menu-note .an-when { color: var(--text-secondary); font-size: .75rem; white-space: nowrap; }
+.cmt-reply-btn { background: none; border: none; color: var(--highlight); font-weight: 600; font-size: .82rem; cursor: pointer; padding: .2rem 0 0; font-family: inherit; }
 .auth-email.as-avatar::before {
     content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
     border-left: 4px solid transparent; border-right: 4px solid transparent;

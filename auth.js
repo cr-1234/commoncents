@@ -69,11 +69,76 @@
         saveTimer = setTimeout(function () { saveNow(user, keys); }, 600);
     }
 
+    // ── Notifications (engagement plan, 2026-11-13) ──
+    // One inbox serves both sites. A red count badge sits on the
+    // avatar; the account menu lists the latest notes; opening the
+    // menu marks them read and clears the badge.
+    var notesCache = null;
+    var notesUnread = 0;
+    function escNote(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function noteWhen(ts) {
+        if (!ts) return '';
+        var d = new Date(ts); if (isNaN(d)) return '';
+        var mins = Math.max(0, Math.round((Date.now() - d.getTime()) / 60000));
+        if (mins < 2) return 'just now';
+        if (mins < 60) return mins + 'm ago';
+        if (mins < 1440) return Math.round(mins / 60) + 'h ago';
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+    function paintNoteBadge() {
+        var av = document.getElementById('authEmail');
+        if (!av) return;
+        var b = av.querySelector('.cc-note-badge');
+        if (!currentUser || !notesUnread) { if (b) b.remove(); return; }
+        if (!b) { b = document.createElement('span'); b.className = 'cc-note-badge'; av.appendChild(b); }
+        b.textContent = notesUnread > 9 ? '9+' : String(notesUnread);
+    }
+    function paintNotesList() {
+        var wrap = document.getElementById('authMenuNotes');
+        var list = document.getElementById('authMenuNotesList');
+        if (!wrap || !list) return;
+        if (!notesCache || !notesCache.length) { wrap.style.display = 'none'; list.innerHTML = ''; return; }
+        list.innerHTML = notesCache.slice(0, 8).map(function (n) {
+            var site = n.site === 'gb' ? 'Gifting Butler' : 'CommonCents';
+            var what = n.type === 'reply'
+                ? '<strong>' + escNote(n.fromName || 'Someone') + '</strong> replied to your comment'
+                : '<strong>Your submission is live</strong>';
+            var txt = n.text ? ' <span class="an-text">&ldquo;' + escNote(n.text) + '&rdquo;</span>' : '';
+            var when = n.ts ? ' <span class="an-when">&middot; ' + noteWhen(n.ts) + '</span>' : '';
+            return '<div class="auth-menu-note"><span class="an-site">' + site + '</span> ' + what + txt + when + '</div>';
+        }).join('');
+        wrap.style.display = '';
+    }
+    function loadNotes(user) {
+        if (!user) return;
+        user.getIdToken().then(function (token) {
+            return postFn('getNotifications', {}, token);
+        }).then(function (res) {
+            if (!res || res.error) return;
+            notesCache = Array.isArray(res.items) ? res.items : [];
+            notesUnread = res.unread || 0;
+            paintNoteBadge();
+            paintNotesList();
+        }).catch(function () { /* notes retry on the next sign-in */ });
+    }
+    function markNotesRead() {
+        if (!currentUser || !notesUnread) return;
+        var user = currentUser;
+        notesUnread = 0;
+        paintNoteBadge();
+        user.getIdToken().then(function (token) {
+            return postFn('markNotificationsRead', {}, token);
+        }).catch(function () { /* the badge may reappear next visit */ });
+    }
+
     function syncFromAccount(user, tries) {
         if (!window.CC_FEED || !CC_FEED.getInterests) {
             if ((tries || 0) < 10) setTimeout(function () { syncFromAccount(user, (tries || 0) + 1); }, 300);
             return;
         }
+        loadNotes(user);
         user.getIdToken().then(function (token) {
             return postFn('ccGetProfile', {}, token);
         }).then(function (res) {
@@ -155,6 +220,9 @@
             var menuEl0 = document.getElementById('authMenu');
             if (menuEl0) menuEl0.style.display = 'none';
         }
+        // paintHeader rebuilds the avatar's insides, which would wipe
+        // the notification badge — re-apply it after every repaint.
+        paintNoteBadge();
     }
 
     function wireUi() {
@@ -255,6 +323,8 @@
                     if (gwCount) gwCount.textContent = '';
                 }
             }
+            paintNotesList();
+            markNotesRead();
             menu.style.display = '';
         }
         if (avatarEl) avatarEl.addEventListener('click', function (e) {

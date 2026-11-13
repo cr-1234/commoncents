@@ -29,8 +29,10 @@
         load: function (dealId) {
             return call('ccGetComments', { dealId: String(dealId) }).then(function (j) { return j.comments || []; });
         },
-        post: function (dealId, text) {
-            return call('ccPostComment', { dealId: String(dealId), text: text }).then(function (j) { return j.comment; });
+        post: function (dealId, text, parentId) {
+            var body = { dealId: String(dealId), text: text };
+            if (parentId) body.parentId = String(parentId);
+            return call('ccPostComment', body).then(function (j) { return j.comment; });
         },
         edit: function (id, text) {
             return call('ccEditComment', { commentId: id, text: text }).then(function (j) { return j.comment; });

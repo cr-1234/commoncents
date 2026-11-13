@@ -727,8 +727,8 @@ function openModal(deal) {
     // outline versions read as scratchy at small sizes (user's complaint).
     const cmtPencil = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
     const cmtTrash = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
-    const buildCommentsHTML = () => deal.comments.map((c, idx) => `
-        <div ${c.pending ? 'data-pending="1" ' : ''}style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);${c.pending ? ' opacity:0.6;' : ''}">
+    const oneCommentHTML = (c, idx, isReply) => `
+        <div ${c.pending ? 'data-pending="1" ' : ''}style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);${c.pending ? ' opacity:0.6;' : ''}${isReply ? ' margin-left:1.4rem; padding-left:0.8rem; border-left:2px solid var(--plum-lt);' : ''}">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
                 <strong style="color:var(--text-primary);">${c.user}</strong>
                 <span style="display:inline-flex; align-items:center;">
@@ -742,7 +742,36 @@ function openModal(deal) {
                     <button type="button" class="btn btn-primary" data-cact="save" data-idx="${idx}" style="font-size:0.8rem; padding:0.3rem 1rem;">Save</button>
                     <button type="button" class="btn" data-cact="cancel" data-idx="${idx}" style="font-size:0.8rem; padding:0.3rem 1rem;">Cancel</button>
                 </div>` : `<p style="color:var(--text-secondary); font-size:0.95rem; white-space:pre-wrap;">${c.text}</p>`}
-        </div>`).join('');
+            ${!isReply && c.id && !c.pending && ccUser ? `<button type="button" class="cmt-reply-btn" data-cact="reply" data-idx="${idx}">Reply</button>` : ''}
+        </div>`;
+    const replyBoxHTML = (idx) => `
+        <div style="margin:0 0 1rem 1.4rem; padding-left:0.8rem; border-left:2px solid var(--plum-lt);">
+            <textarea id="commentReplyText" rows="2" placeholder="Write a reply..." style="width:100%; padding:0.5rem; margin-bottom:0.4rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
+            <div style="display:flex; gap:0.4rem;">
+                <button type="button" class="btn btn-primary" data-cact="reply-post" data-idx="${idx}" style="font-size:0.8rem; padding:0.3rem 1rem;">Post reply</button>
+                <button type="button" class="btn" data-cact="reply-cancel" data-idx="${idx}" style="font-size:0.8rem; padding:0.3rem 1rem;">Cancel</button>
+            </div>
+        </div>`;
+    // Threaded render (2026-11-13): top-level comments in order, each
+    // followed by its replies (one level, indented). A reply whose
+    // parent is gone renders as its own block. The flat array order
+    // stays chronological; indices still address the flat array.
+    const buildCommentsHTML = () => {
+        const ids = {};
+        deal.comments.forEach(c => { if (c.id) ids[c.id] = true; });
+        const consumed = {};
+        let html = '';
+        deal.comments.forEach((c, idx) => {
+            if (consumed[idx]) return;
+            if (c.parentId && ids[c.parentId]) return; // rendered under its parent
+            html += oneCommentHTML(c, idx, false);
+            deal.comments.forEach((r, ridx) => {
+                if (r.parentId && r.parentId === c.id && ridx !== idx) { html += oneCommentHTML(r, ridx, true); consumed[ridx] = true; }
+            });
+            if (deal._replyingIdx === idx) html += replyBoxHTML(idx);
+        });
+        return html;
+    };
 
     // Comments are members-only (no anonymous free-for-all). A signed-in user
     // comments under the username saved on their account — falling back to
@@ -867,7 +896,7 @@ function openModal(deal) {
                 // typed text is restored, and an error shows by the form.
                 const errEl0 = document.getElementById('commentError');
                 if (errEl0) errEl0.style.display = 'none';
-                const optimistic = { id: null, user: escHtml(ccDisplayName || 'Member').slice(0, 40), text: escHtml(textVal), time: 'Just now', own: true, pending: true };
+                const optimistic = { id: null, user: escHtml(ccDisplayName || 'Member').slice(0, 40), text: escHtml(textVal), time: 'Just now', own: true, pending: true, parentId: '' };
                 deal.comments.push(optimistic);
                 const ta0 = document.getElementById('commentText');
                 if (ta0) ta0.value = '';
@@ -875,7 +904,7 @@ function openModal(deal) {
                 CC_COMMENTS.post(deal.id, textVal).then(c => {
                     if (!c) throw new Error('empty');
                     const i = deal.comments.indexOf(optimistic);
-                    if (i !== -1) deal.comments.splice(i, 1, { id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts) || 'Just now', own: true });
+                    if (i !== -1) deal.comments.splice(i, 1, { id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts) || 'Just now', own: true, parentId: c.parentId || '' });
                     if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') renderCommentsList(false);
                 }).catch(() => {
                     const i = deal.comments.indexOf(optimistic);
@@ -961,6 +990,45 @@ function openModal(deal) {
                 delete deal._editingIdx;
                 deal._skipLoadOnce = true;
                 openModal(deal);
+            } else if (act === 'reply') {
+                deal._replyingIdx = idx;
+                renderCommentsList(false);
+                const rt = document.getElementById('commentReplyText');
+                if (rt) rt.focus();
+                return;
+            } else if (act === 'reply-cancel') {
+                delete deal._replyingIdx;
+                renderCommentsList(false);
+                return;
+            } else if (act === 'reply-post') {
+                const parent = deal.comments[idx];
+                const rta = document.getElementById('commentReplyText');
+                const v = rta ? rta.value.trim() : '';
+                if (!parent || !parent.id || !v || !window.CC_COMMENTS) return;
+                const liveUser2 = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
+                if (!liveUser2) return;
+                const liveName2 = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser2.displayName || (typeof CC_AUTH.fallbackName === 'function' ? CC_AUTH.fallbackName() : '') || 'Member';
+                const opt = { id: null, user: escHtml(liveName2).slice(0, 40), text: escHtml(v), time: 'Just now', own: true, pending: true, parentId: parent.id };
+                deal.comments.push(opt);
+                delete deal._replyingIdx;
+                renderCommentsList(false);
+                CC_COMMENTS.post(deal.id, v, parent.id).then(c => {
+                    if (!c) throw new Error('empty');
+                    const i = deal.comments.indexOf(opt);
+                    if (i !== -1) deal.comments.splice(i, 1, { id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts) || 'Just now', own: true, parentId: c.parentId || parent.id });
+                    if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') renderCommentsList(false);
+                }).catch(() => {
+                    const i = deal.comments.indexOf(opt);
+                    if (i !== -1) deal.comments.splice(i, 1);
+                    if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') {
+                        deal._replyingIdx = idx;
+                        renderCommentsList(false);
+                        const rt2 = document.getElementById('commentReplyText');
+                        if (rt2) rt2.value = v;
+                        showCommentError('Couldn\u2019t post that reply \u2014 try again.');
+                    }
+                });
+                return;
             }
             const cl1 = document.getElementById('commentsList');
             if (cl1) cl1.scrollTop = st;
@@ -977,7 +1045,7 @@ function openModal(deal) {
         CC_COMMENTS.load(myDealId).then(list => {
             if (!Array.isArray(list)) return;
             if (window._ccOpenDealId !== myDealId || modal.style.display === 'none') return;
-            deal.comments = list.map(c => ({ id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts), own: !!c.mine }));
+            deal.comments = list.map(c => ({ id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts), own: !!c.mine, parentId: c.parentId || '' }));
             deal._skipLoadOnce = true;
             openModal(deal);
         }).catch(() => { /* backend unreachable: keep whatever is shown */ });
