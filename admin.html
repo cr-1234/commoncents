@@ -73,6 +73,15 @@
                     <tbody id="memberRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
             </div>
+
+            <h2 class="admin-h">Deal submissions <span class="admin-note" id="subCount"></span></h2>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Deals readers sent in — the ones still waiting sit on top, newest first. Nothing is ever posted automatically; you review each one here. <strong>Posted</strong> asks which deal number it became, marks it done, and tells the submitter it's live (only when they sent it while signed in, so we know who they are). <strong>Passed</strong> files it away.</p>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead><tr><th>Submitter</th><th>Deal link</th><th>Price seen</th><th>Note</th><th>Date</th><th>Status</th><th></th></tr></thead>
+                    <tbody id="subRows"><tr><td colspan="7">Loading…</td></tr></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -119,6 +128,11 @@
         });
         els.signOut.addEventListener('click', function () { auth.signOut(); });
         document.getElementById('adminRefresh').addEventListener('click', loadDash);
+        document.getElementById('subRows').addEventListener('click', function (ev) {
+            var b = ev.target && ev.target.closest ? ev.target.closest('[data-subact]') : null;
+            if (!b) return;
+            setSubStatus(b.getAttribute('data-subid'), b.getAttribute('data-subact'));
+        });
 
         auth.onAuthStateChanged(function (user) {
             if (user && user.email === OWNER_EMAIL) {
@@ -169,6 +183,81 @@
             });
 
             loadMembers();
+            loadSubmissions();
+        }
+
+        function loadSubmissions() {
+            var user = auth.currentUser;
+            if (!user) return;
+            user.getIdToken().then(function (token) {
+                return fetch(FN + 'ccListSubmissions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: '{}'
+                });
+            }).then(function (r) { return r.json(); }).then(function (res) {
+                var tb = document.getElementById('subRows');
+                if (!res || !res.ok || !Array.isArray(res.submissions)) {
+                    tb.innerHTML = '<tr><td colspan="7">Could not load submissions.</td></tr>';
+                    return;
+                }
+                document.getElementById('subCount').textContent = '— ' + res.submissions.length + ' in the queue';
+                if (!res.submissions.length) {
+                    tb.innerHTML = '<tr><td colspan="7">No submissions yet.</td></tr>';
+                    return;
+                }
+                tb.innerHTML = res.submissions.map(function (s) {
+                    var who = '<strong>' + esc(s.username || s.name || '—') + '</strong>';
+                    if (s.username && s.name && s.name !== s.username) {
+                        who += '<br><span style="color:var(--text-secondary); font-size:0.82rem;">' + esc(s.name) + '</span>';
+                    }
+                    if (!s.username) {
+                        who += '<br><span style="color:var(--text-secondary); font-size:0.82rem;">not signed in</span>';
+                    }
+                    var deal = '<a href="' + esc(s.url || '').replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">' + esc(s.url || '') + '</a>';
+                    var st = s.status === 'posted' ? '<span class="tag-live">Posted</span>'
+                        : s.status === 'passed' ? '<span class="tag-shelved">Passed</span>'
+                        : s.status === 'pending' ? '<strong>Waiting</strong>'
+                        : esc(s.status || '');
+                    var acts = '';
+                    if (s.status === 'pending') {
+                        acts = '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="posted" data-subid="' + esc(s.id) + '">Posted</button> ' +
+                            '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="passed" data-subid="' + esc(s.id) + '">Passed</button>';
+                    }
+                    return '<tr><td>' + who + '</td>' +
+                        '<td style="max-width:260px; word-break:break-all;">' + deal + '</td>' +
+                        '<td>' + esc(s.priceSeen || '—') + '</td>' +
+                        '<td>' + esc(s.note || '—') + '</td>' +
+                        '<td>' + fmtDate(s.createdAt) + '</td>' +
+                        '<td>' + st + '</td>' +
+                        '<td style="white-space:nowrap;">' + acts + '</td></tr>';
+                }).join('');
+            }).catch(function () {
+                document.getElementById('subRows').innerHTML = '<tr><td colspan="7">Could not load submissions.</td></tr>';
+            });
+        }
+
+        function setSubStatus(id, status) {
+            var dealId = null;
+            if (status === 'posted') {
+                dealId = window.prompt('Which deal number did it become? (the number in the feed — leave blank if you don\'t have it handy)');
+                if (dealId === null) return;
+                dealId = String(dealId).trim() || null;
+            }
+            var user = auth.currentUser;
+            if (!user) return;
+            user.getIdToken().then(function (token) {
+                var body = { id: id, status: status };
+                if (dealId) body.dealId = dealId;
+                return fetch(FN + 'ccSetSubmissionStatus', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(body)
+                });
+            }).then(function (r) { return r.json(); }).then(function (res) {
+                if (res && res.ok) loadSubmissions();
+                else alert('That did not save — try again.');
+            }).catch(function () { alert('That did not save — try again.'); });
         }
 
         function fmtDate(ms) {

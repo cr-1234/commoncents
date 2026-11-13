@@ -57,6 +57,9 @@
                 <button type="submit" id="sdSubmit" class="btn btn-primary full-width" style="border-radius:9999px !important; padding:0.8rem; font-weight:700; font-size:1rem;">Submit Deal</button>
                 <p id="sdStatus" role="status" style="display:none; text-align:center; margin-top:1.25rem; font-size:0.95rem; line-height:1.5;"></p>
             </form>
+            <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+            <script src="auth.js"></script>
             <script>
             (function () {
                 var ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccSubmitDeal';
@@ -81,17 +84,33 @@
                     var originalLabel = btn.textContent;
                     btn.textContent = 'Sending…';
                     status.style.display = 'none';
-                    fetch(ENDPOINT, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            name: name,
-                            email: document.getElementById('sdEmail').value.trim(),
-                            url: url,
-                            priceSeen: document.getElementById('sdPrice').value.trim(),
-                            note: document.getElementById('sdNote').value.trim(),
-                            website: document.getElementById('sdWebsite').value
-                        })
+                    var payload = {
+                        name: name,
+                        email: document.getElementById('sdEmail').value.trim(),
+                        url: url,
+                        priceSeen: document.getElementById('sdPrice').value.trim(),
+                        note: document.getElementById('sdNote').value.trim(),
+                        website: document.getElementById('sdWebsite').value
+                    };
+                    // Signed in? Attach the account token so the
+                    // submission carries their username in the review
+                    // queue (and they can be notified if it goes
+                    // live). Signed out, or anything failing here,
+                    // submits anonymously — exactly as before.
+                    var tokenP = Promise.resolve(null);
+                    try {
+                        if (window.CC_AUTH && CC_AUTH.user()) {
+                            tokenP = CC_AUTH.idToken().catch(function () { return null; });
+                        }
+                    } catch (e) { tokenP = Promise.resolve(null); }
+                    tokenP.then(function (token) {
+                        var headers = { 'Content-Type': 'application/json' };
+                        if (token) headers['Authorization'] = 'Bearer ' + token;
+                        return fetch(ENDPOINT, {
+                            method: 'POST',
+                            headers: headers,
+                            body: JSON.stringify(payload)
+                        });
                     }).then(function (res) {
                         return res.json().catch(function () { return null; }).then(function (data) {
                             if (res.status === 200 && data && data.ok === true) {
