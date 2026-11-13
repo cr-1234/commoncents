@@ -727,7 +727,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .logo-title { font-size: 1.08rem; }
     .logo-tagline { font-size: 0.44rem; }
     .auth-area { flex: 0 0 auto; }
-    .search-bar { order: 3; flex: 1 1 100%; width: 100%; max-width: 100%; min-width: 0; margin: 0.4rem 0 0; }
+    /* The search no longer runs side to side (owner on Pixel 8 and
+       folding phones, 2026-11-12: full-width still looked too big).
+       It is a centered pill, at most 430px and never wider than 88%
+       of the screen. Where it fits beside the logo (wide tablets) it
+       sits between logo and sign-in; otherwise it wraps to its own
+       centered row. */
+    .search-bar { order: 3; flex: 0 1 430px; width: min(88%, 430px); max-width: 430px; min-width: 0; margin: 0.4rem auto 0; }
     /* The search kept its chunky desktop padding on phones and read
        as a big empty lozenge floating on its own row (owner: "the big
        search bar looks funny", 2026-11-12). Slimmer profile here. */
@@ -766,7 +772,6 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    and the search keeps a sane centered width. */
 @media (min-width: 560px) and (max-width: 900px) {
     .deal-grid { grid-template-columns: repeat(2, 1fr); }
-    .search-bar { flex: 0 1 520px; max-width: 520px; margin-left: auto; margin-right: auto; }
 }
 
 /* ── Tailored feed: interest picker + NEW badge ─────────────────── */
@@ -839,16 +844,24 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     box-shadow: 0 3px 10px rgba(91,45,142,0.35);
     overflow: hidden;
 }
-.auth-email.as-avatar { cursor: pointer; position: relative; }
-/* Menu hint (owner, 2026-11-12): nothing told a visitor the picture
-   opens a menu (comment name, feed picks, giveaway). A small white
-   notch at the bottom of the circle is the hint — it sits inside the
-   circle so the photo's round crop (overflow:hidden) can't clip it. */
+.auth-email.as-avatar { cursor: pointer; position: relative; overflow: visible; }
+/* Menu hint v2 (owner, 2026-11-12): the first hint — a white notch
+   ON the picture — washed out on light photos (his own picture is a
+   bright beach scene). Instead the hint is a small white badge with
+   a plum arrow, overlapping the circle's bottom-right corner like a
+   notification badge: visible on any photo, still small. The img
+   carries its own border-radius:50%, so the circle no longer needs
+   overflow:hidden (which would have clipped the badge). */
+.auth-email.as-avatar::after {
+    content: ''; position: absolute; right: -4px; bottom: -4px; width: 14px; height: 14px;
+    border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(40,20,70,0.4);
+    pointer-events: none; z-index: 3;
+}
 .auth-email.as-avatar::before {
-    content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
-    border-left: 4px solid transparent; border-right: 4px solid transparent;
-    border-top: 5px solid rgba(255,255,255,0.95);
-    filter: drop-shadow(0 0 2px rgba(0,0,0,0.4)); pointer-events: none; z-index: 2;
+    content: ''; position: absolute; right: 2px; bottom: 3px;
+    border-left: 3px solid transparent; border-right: 3px solid transparent;
+    border-top: 4px solid var(--highlight);
+    pointer-events: none; z-index: 4;
 }
 .auth-email { color: var(--text-secondary); font-size: 0.85rem; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .auth-btn {
