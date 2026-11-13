@@ -64,6 +64,15 @@
                     <tbody id="clickRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
             </div>
+
+            <h2 class="admin-h">Members <span class="admin-note" id="memberCount"></span></h2>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Everyone who has ever signed up — both sites share one account system, so this is the combined list for CommonCents and Gifting Butler, newest first. Visible only to you: the server checks it's really your account before it sends anything, the list is never public.</p>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead><tr><th>Member</th><th>Joined</th><th>Last active</th><th class="n">CC picks</th><th class="n">CC votes</th><th class="n">GB wishlist</th><th class="n">GB reminders</th></tr></thead>
+                    <tbody id="memberRows"><tr><td colspan="7">Loading…</td></tr></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -157,6 +166,49 @@
                 }
             }).catch(function () {
                 document.getElementById('gwStatus').textContent = 'Giveaway: status unavailable.';
+            });
+
+            loadMembers();
+        }
+
+        function fmtDate(ms) {
+            return ms ? new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+        }
+
+        function loadMembers() {
+            var user = auth.currentUser;
+            if (!user) return;
+            user.getIdToken().then(function (token) {
+                return fetch(FN + 'listMembers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: '{}'
+                });
+            }).then(function (r) { return r.json(); }).then(function (res) {
+                var tb = document.getElementById('memberRows');
+                if (!res || !res.ok || !Array.isArray(res.members)) {
+                    tb.innerHTML = '<tr><td colspan="7">Could not load the member list.</td></tr>';
+                    return;
+                }
+                document.getElementById('memberCount').textContent = '— ' + res.members.length + ' total';
+                if (!res.members.length) {
+                    tb.innerHTML = '<tr><td colspan="7">No members yet.</td></tr>';
+                    return;
+                }
+                tb.innerHTML = res.members.map(function (m) {
+                    var who = esc(m.email);
+                    if (m.name && m.name !== m.email) who = '<strong>' + esc(m.name) + '</strong><br><span style="color:var(--text-secondary); font-size:0.82rem;">' + esc(m.email) + '</span>';
+                    if (m.disabled) who += ' <span class="tag-shelved">(disabled)</span>';
+                    return '<tr><td>' + who + '</td>' +
+                        '<td>' + fmtDate(m.joinedAt) + '</td>' +
+                        '<td>' + fmtDate(m.lastActiveAt) + '</td>' +
+                        '<td class="n">' + (m.ccPicks || 0) + '</td>' +
+                        '<td class="n">' + (m.ccVotes || 0) + '</td>' +
+                        '<td class="n">' + (m.gbWishlist || 0) + '</td>' +
+                        '<td class="n">' + (m.gbReminders || 0) + '</td></tr>';
+                }).join('');
+            }).catch(function () {
+                document.getElementById('memberRows').innerHTML = '<tr><td colspan="7">Could not load the member list.</td></tr>';
             });
         }
 
