@@ -728,6 +728,11 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .logo-tagline { font-size: 0.44rem; }
     .auth-area { flex: 0 0 auto; }
     .search-bar { order: 3; flex: 1 1 100%; width: 100%; max-width: 100%; min-width: 0; margin: 0.4rem 0 0; }
+    /* The search kept its chunky desktop padding on phones and read
+       as a big empty lozenge floating on its own row (owner: "the big
+       search bar looks funny", 2026-11-12). Slimmer profile here. */
+    .search-bar input { padding: 0.55rem 0.9rem; padding-right: 2.6rem; font-size: 0.92rem; }
+    .search-bar button { right: 0.3rem; padding: 0.35rem; }
     /* Pagination must stay on ONE line at phone widths (owner's SE
        shot, 2026-11-12: "Next" wrapped under the numbers at 375px
        while it fit at 393px). Tighter buttons + no wrap. */
