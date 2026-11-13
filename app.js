@@ -621,7 +621,7 @@ function createDealCard(deal) {
             </div>
             ${expired
                 ? `<span class="btn btn-primary full-width view-deal-btn expired-btn" style="margin-bottom:1rem;">Deal Expired</span>`
-                : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" style="margin-bottom:1rem;">View Deal</a>`}
+                : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" data-deal-id="${deal.id}" style="margin-bottom:1rem;">View Deal</a>`}
             ${expired && deal.deadNote ? `<p class="dead-note">${deal.deadNote}</p>` : ''}
             <div class="vote-container" style="border-top:none; padding-top:0;">
                 <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}" data-id="${deal.id}">
@@ -770,7 +770,7 @@ function openModal(deal) {
                 ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
                 ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
-            <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn">Get This Deal</a>
+            <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
         </div>
         <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
         ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
@@ -984,6 +984,27 @@ function copyDealCode(el, code) {
         done();
     }
 }
+
+// ── Per-deal click counting (2026-11-12) ────────────────────────
+// Every outbound tap (card "View Deal" / modal "Get This Deal") is
+// counted per deal on the backend (ccClick) so the owner can see
+// which deals people actually click. Fire-and-forget: it never
+// delays or blocks the visitor's trip to the store.
+const CC_CLICK_ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccClick';
+document.addEventListener('click', function (e) {
+    const a = e.target && e.target.closest ? e.target.closest('a.view-deal-btn, a.modal-deal-btn') : null;
+    if (!a) return;
+    const dealId = a.getAttribute('data-deal-id');
+    if (!dealId) return;
+    try {
+        fetch(CC_CLICK_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dealId: dealId }),
+            keepalive: true
+        }).catch(function () {});
+    } catch (err) {}
+});
 
 function getAffiliateUrl(url) {
     if (!url) return '#';

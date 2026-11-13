@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — CommonCents</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-wrap { max-width: 980px; margin: 2.5rem auto 4rem; padding: 0 20px; }
+        .admin-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+        .admin-head h1 { font-size: 1.6rem; color: var(--text-primary); }
+        .admin-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.75rem; }
+        .admin-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.1rem 1.25rem; }
+        .admin-card .num { font-size: 1.9rem; font-weight: 800; color: var(--highlight); line-height: 1.1; }
+        .admin-card .lbl { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; }
+        .admin-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; }
+        .admin-table th, .admin-table td { padding: 0.6rem 0.8rem; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .admin-table th { color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .admin-table td.n, .admin-table th.n { text-align: right; font-variant-numeric: tabular-nums; }
+        .admin-table tr:last-child td { border-bottom: none; }
+        .tag-shelved { color: #b45309; font-weight: 600; font-size: 0.8rem; }
+        .tag-live { color: #15803d; font-weight: 600; font-size: 0.8rem; }
+        .admin-login { max-width: 380px; margin: 3rem auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; }
+        .admin-login input { width: 100%; box-sizing: border-box; padding: 0.65rem 0.9rem; border-radius: 999px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.95rem; margin-bottom: 0.7rem; }
+        .admin-err { color: #dc2626; font-size: 0.88rem; min-height: 1.2em; margin: 0.4rem 0; }
+        .admin-note { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.55; }
+        h2.admin-h { font-size: 1.15rem; color: var(--text-primary); margin: 1.75rem 0 0.75rem; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrap">
+        <div class="admin-head">
+            <h1>CommonCents Admin</h1>
+            <button type="button" class="btn" id="adminSignOut" style="display:none;">Sign out</button>
+        </div>
+
+        <div class="admin-login" id="adminLogin">
+            <p class="admin-note" style="margin-bottom:1rem;">Owner sign-in — the same account you use on the site.</p>
+            <input type="email" id="adminEmail" placeholder="Email" autocomplete="username">
+            <input type="password" id="adminPass" placeholder="Password" autocomplete="current-password">
+            <p class="admin-err" id="adminErr"></p>
+            <button type="button" class="btn btn-primary full-width" id="adminEmailBtn" style="margin-bottom:0.6rem;">Sign in</button>
+            <button type="button" class="btn full-width" id="adminGoogleBtn">Continue with Google</button>
+        </div>
+
+        <div id="adminDash" style="display:none;">
+            <div class="admin-cards">
+                <div class="admin-card"><div class="num" id="statLive">–</div><div class="lbl">Live deals</div></div>
+                <div class="admin-card"><div class="num" id="statShelf">–</div><div class="lbl">On the shelf (dead deals)</div></div>
+                <div class="admin-card"><div class="num" id="statClicks">–</div><div class="lbl">Total deal clicks</div></div>
+                <div class="admin-card"><div class="num" id="statToday">–</div><div class="lbl">Clicks today</div></div>
+            </div>
+
+            <p class="admin-note" id="gwStatus">Giveaway: checking…</p>
+
+            <h2 class="admin-h">Deal clicks <button type="button" class="btn" id="adminRefresh" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Every tap on a deal's "View Deal" / "Get This Deal" button, counted per deal since counting started (Nov 12, 2026). Most-clicked first — the deals at the bottom are the ones nobody's tapping.</p>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead><tr><th>Deal</th><th class="n">Price</th><th class="n">Clicks</th><th class="n">Today</th><th>Last clicked</th><th>Status</th></tr></thead>
+                    <tbody id="clickRows"><tr><td colspan="6">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="feed-data.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script>
+    (function () {
+        var OWNER_EMAIL = 'ebayrocks2017@gmail.com';
+        var FN = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/';
+        var firebaseConfig = {
+    apiKey:"AIzaSyBPvwf-ilWhc5G_jAEaRDwlom0jJY678w4",
+    authDomain:"giftingbutler-74395.firebaseapp.com",
+    projectId:"giftingbutler-74395",
+    storageBucket:"giftingbutler-74395.firebasestorage.app",
+    messagingSenderId:"37308175610",
+    appId:"1:37308175610:web:547281f014be448b292543",
+    measurementId:"G-KTPDVDSNWV"
+  };
+        if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var auth = firebase.auth();
+
+        var els = {
+            login: document.getElementById('adminLogin'),
+            dash: document.getElementById('adminDash'),
+            err: document.getElementById('adminErr'),
+            signOut: document.getElementById('adminSignOut')
+        };
+
+        function showErr(msg) { els.err.textContent = msg || ''; }
+
+        document.getElementById('adminEmailBtn').addEventListener('click', function () {
+            showErr('');
+            auth.signInWithEmailAndPassword(
+                document.getElementById('adminEmail').value.trim(),
+                document.getElementById('adminPass').value
+            ).catch(function (e) { showErr('Sign-in failed — check the email and password.'); });
+        });
+        document.getElementById('adminGoogleBtn').addEventListener('click', function () {
+            showErr('');
+            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+                .catch(function (e) { showErr('Google sign-in failed.'); });
+        });
+        els.signOut.addEventListener('click', function () { auth.signOut(); });
+        document.getElementById('adminRefresh').addEventListener('click', loadDash);
+
+        auth.onAuthStateChanged(function (user) {
+            if (user && user.email === OWNER_EMAIL) {
+                els.login.style.display = 'none';
+                els.dash.style.display = '';
+                els.signOut.style.display = '';
+                loadDash();
+            } else {
+                els.dash.style.display = 'none';
+                els.signOut.style.display = 'none';
+                els.login.style.display = '';
+                if (user) { showErr('That account is not the site owner account.'); auth.signOut(); }
+            }
+        });
+
+        function todayEt() {
+            return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+        }
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function loadDash() {
+            var live = (typeof deals !== 'undefined' ? deals : []).slice();
+            document.getElementById('statLive').textContent = live.length;
+
+            fetch('shelved-deals.json').then(function (r) { return r.json(); }).then(function (shelf) {
+                document.getElementById('statShelf').textContent = shelf.length;
+                loadClicks(live, shelf);
+            }).catch(function () {
+                document.getElementById('statShelf').textContent = '?';
+                loadClicks(live, []);
+            });
+
+            fetch(FN + 'ccGiveawayStatus', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: '{}'
+            }).then(function (r) { return r.json(); }).then(function (g) {
+                var el = document.getElementById('gwStatus');
+                if (g && typeof g.count === 'number') {
+                    el.textContent = 'Giveaway: ' + (g.active ? 'ON' : 'off') + ' — ' + g.count + ' people entered this week' + (g.prize ? ', prize $' + g.prize : '') + '.';
+                } else {
+                    el.textContent = 'Giveaway: status unavailable.';
+                }
+            }).catch(function () {
+                document.getElementById('gwStatus').textContent = 'Giveaway: status unavailable.';
+            });
+        }
+
+        function loadClicks(live, shelf) {
+            fetch(FN + 'ccGetClicks').then(function (r) { return r.json(); }).then(function (res) {
+                var clicks = (res && res.clicks) || {};
+                var today = todayEt();
+                var total = 0, todayTotal = 0;
+                Object.keys(clicks).forEach(function (id) {
+                    if (id === '999999') return; // backend test id
+                    total += clicks[id].total || 0;
+                    todayTotal += (clicks[id].days && clicks[id].days[today]) || 0;
+                });
+                document.getElementById('statClicks').textContent = total;
+                document.getElementById('statToday').textContent = todayTotal;
+
+                var byId = {};
+                live.forEach(function (d) { byId[d.id] = { deal: d, shelved: false }; });
+                shelf.forEach(function (d) { if (!byId[d.id]) byId[d.id] = { deal: d, shelved: true }; });
+                var rows = Object.keys(byId).map(function (id) {
+                    var entry = byId[id];
+                    var c = clicks[id] || { total: 0, days: {}, lastAt: null };
+                    return { deal: entry.deal, shelved: entry.shelved, total: c.total || 0, today: (c.days && c.days[today]) || 0, lastAt: c.lastAt };
+                });
+                rows.sort(function (a, b) { return b.total - a.total || a.deal.id - b.deal.id; });
+                document.getElementById('clickRows').innerHTML = rows.map(function (r) {
+                    var last = r.lastAt ? new Date(r.lastAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+                    return '<tr><td>' + esc(r.deal.title) + '</td>' +
+                        '<td class="n">$' + esc(r.deal.price) + '</td>' +
+                        '<td class="n"><strong>' + r.total + '</strong></td>' +
+                        '<td class="n">' + r.today + '</td>' +
+                        '<td>' + last + '</td>' +
+                        '<td>' + (r.shelved ? '<span class="tag-shelved">Shelved</span>' : '<span class="tag-live">Live</span>') + '</td></tr>';
+                }).join('');
+            }).catch(function () {
+                document.getElementById('clickRows').innerHTML = '<tr><td colspan="6">Could not load click counts.</td></tr>';
+            });
+        }
+    })();
+    </script>
+</body>
+</html>
