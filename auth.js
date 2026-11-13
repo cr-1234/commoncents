@@ -46,6 +46,21 @@
         }).catch(function () { /* saving retries on the next change */ });
     }
 
+    var voteSaveTimer = null;
+    function saveVotesNow(user, map) {
+        return user.getIdToken().then(function (token) {
+            return postFn('ccSaveVotes', { votes: map }, token);
+        }).catch(function () { /* saving retries on the next change */ });
+    }
+    // Called by app.js whenever the local vote map changes.
+    function noteVotesChanged(map) {
+        if (!currentUser) return;
+        clearTimeout(voteSaveTimer);
+        var user = currentUser;
+        var copy = Object.assign({}, map || {});
+        voteSaveTimer = setTimeout(function () { saveVotesNow(user, copy); }, 600);
+    }
+
     // Called by tailored-feed.js whenever the picks change locally.
     function noteInterestsChanged(keys) {
         if (!currentUser) return;
@@ -73,6 +88,16 @@
                 // First sign-in with picks already made on this device:
                 // lift them into the account.
                 saveNow(user, local);
+            }
+            // Votes merge the same never-lose way: union of the
+            // account's map and this device's — the account fills gaps,
+            // the device keeps its own, and the union goes back up.
+            if (window.CC_VOTES) {
+                var acctVotes = (res.votes && typeof res.votes === 'object' && !Array.isArray(res.votes)) ? res.votes : {};
+                var localVotes = CC_VOTES.get();
+                var merged = Object.assign({}, acctVotes, localVotes);
+                if (Object.keys(merged).length > Object.keys(localVotes).length) CC_VOTES.set(merged);
+                else if (Object.keys(localVotes).length > Object.keys(acctVotes).length) saveVotesNow(user, localVotes);
             }
         }).catch(function () { /* guest picks remain in effect */ });
     }
@@ -307,6 +332,47 @@
         inBtn.addEventListener('click', openModal);
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
         modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+        // Restore (Account Guard): two-tap, like Gifting Butler's —
+        // first tap arms the row, second pulls the backup snapshot and
+        // applies votes + picks + comment name from it.
+        var restoreBtn = document.getElementById('authMenuRestore');
+        var restoreMsg = document.getElementById('authMenuRestoreMsg');
+        var restoreArmed = false, restoreArmTimer = null;
+        function showRestoreMsg(txt) {
+            if (!restoreMsg) return;
+            restoreMsg.textContent = txt;
+            restoreMsg.style.display = txt ? '' : 'none';
+        }
+        if (restoreBtn) restoreBtn.addEventListener('click', function () {
+            if (!currentUser) return;
+            if (!restoreArmed) {
+                restoreArmed = true;
+                restoreBtn.textContent = 'Tap again to restore';
+                clearTimeout(restoreArmTimer);
+                restoreArmTimer = setTimeout(function () {
+                    restoreArmed = false;
+                    restoreBtn.textContent = 'Restore my votes & picks';
+                }, 4000);
+                return;
+            }
+            restoreArmed = false;
+            restoreBtn.textContent = 'Restore my votes & picks';
+            showRestoreMsg('Restoring…');
+            var user = currentUser;
+            user.getIdToken().then(function (token) {
+                return postFn('ccRestoreBackup', {}, token);
+            }).then(function (res) {
+                if (!res || res.error) { showRestoreMsg('Restore failed — try again.'); return; }
+                if (res.empty) { showRestoreMsg('No backup yet — one is saved automatically if your votes or picks ever shrink.'); return; }
+                if (window.CC_VOTES && res.votes) CC_VOTES.set(res.votes);
+                if (window.CC_FEED && Array.isArray(res.interests) && res.interests.length) CC_FEED.setInterests(res.interests, true);
+                if (res.username) { profileUsername = res.username; paintNameRow(); }
+                var when = res.savedAt ? new Date(res.savedAt).toLocaleDateString() : '';
+                var n = res.votes ? Object.keys(res.votes).length : 0;
+                showRestoreMsg('Restored ' + n + ' vote' + (n === 1 ? '' : 's') + (res.interests && res.interests.length ? ' and your feed picks' : '') + (when ? ' from ' + when : '') + '.');
+            }).catch(function () { showRestoreMsg('Restore failed — try again.'); });
+        });
+
         var menuOutBtn = document.getElementById('authMenuSignOut');
         if (menuOutBtn) menuOutBtn.addEventListener('click', function () { closeMenu(); if (auth) auth.signOut(); });
         toggle.addEventListener('click', function () { setMode(mode === 'signin' ? 'signup' : 'signin'); });
@@ -343,6 +409,7 @@
             return currentUser ? currentUser.getIdToken() : Promise.reject(new Error('not signed in'));
         },
         noteInterestsChanged: noteInterestsChanged,
+        noteVotesChanged: noteVotesChanged,
         username: function () { return profileUsername; },
         // Deterministic friendly default name from the account id — so a
         // member who never picks a comment name still shows as SOMEONE

@@ -7,7 +7,24 @@ let currentCategory = 'all';
 // removes one instead of adding mine.
 let myVotes = {};
 try { myVotes = JSON.parse(localStorage.getItem('ccMyVotes') || '{}'); } catch (e) { myVotes = {}; }
-function saveMyVotes() { try { localStorage.setItem('ccMyVotes', JSON.stringify(myVotes)); } catch (e) {} }
+function saveMyVotes() {
+    try { localStorage.setItem('ccMyVotes', JSON.stringify(myVotes)); } catch (e) {}
+    // Account Guard: signed-in members also keep their votes on their
+    // account (auth.js debounces and pushes them to ccSaveVotes).
+    if (window.CC_AUTH && CC_AUTH.noteVotesChanged) { try { CC_AUTH.noteVotesChanged(myVotes); } catch (e) {} }
+}
+// Bridge for auth.js: read the local vote map, or replace it wholesale
+// (sign-in union merge / Restore from backup) and repaint the counts.
+window.CC_VOTES = {
+    get: function () { return Object.assign({}, myVotes); },
+    set: function (map) {
+        var clean = {};
+        if (map && typeof map === 'object') Object.keys(map).forEach(function (k) { if (map[k] === 'up' || map[k] === 'down') clean[k] = map[k]; });
+        myVotes = clean;
+        saveMyVotes();
+        if (typeof renderDeals === 'function') renderDeals();
+    }
+};
 // Displayed count = the deal's stored tally + my own vote if I cast it.
 // The stored tallies reset on every page load but myVotes persists, so the
 // counts must be DERIVED, never mutated — mutating them let a returning
