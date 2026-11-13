@@ -423,6 +423,12 @@ function setCategory(category) {
     // (in My Feed they carry the active state instead of a category).
     if (window.CC_FEED && typeof CC_FEED.refreshMyFeedNav === 'function') CC_FEED.refreshMyFeedNav();
     renderDeals();
+    // Owner request 2026-11-12: switching category while scrolled down
+    // must jump back to the very top — otherwise the visitor is left
+    // staring at the bottom of the old list and sees nothing.
+    if (window.scrollY > 0) {
+        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+    }
 }
 
 // Sidebar category counts: each Categories row shows how many LIVE

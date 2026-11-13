@@ -432,6 +432,11 @@
                 saveView();
                 paintAll();
                 if (typeof renderDeals === 'function') renderDeals();
+                // Same rule as category clicks (owner, 2026-11-12):
+                // switching feed while scrolled down jumps to the top.
+                if (window.scrollY > 0) {
+                    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (err) { window.scrollTo(0, 0); }
+                }
             });
         });
 

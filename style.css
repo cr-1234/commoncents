@@ -285,7 +285,12 @@ body:not(.dark-mode) .glass {
 .ad-rail-contact a:hover { color: var(--highlight); }
 @media (max-width: 1150px) {
     .main-content { grid-template-columns: 250px 1fr; }
-    .ad-rail { display: none; }
+    /* Ads must work on tablets and phones too (owner, 2026-11-12:
+       most visitors are on phones) — below this width the rail stops
+       being a side column and becomes a centered strip under the
+       deals instead of disappearing. */
+    .ad-rail { position: static; grid-column: 1 / -1; width: 100%; max-width: 430px; margin: 0 auto; }
+    .main-content.no-ads .ad-rail { display: none; }
 }
 .sidebar {
     position: sticky; top: 6rem;
@@ -709,7 +714,20 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .auth-menu { top: calc(100% + 6px); right: 8px; width: min(300px, calc(100vw - 16px)); }
     .deal-grid { grid-template-columns: 1fr; }
     .header-content { flex-wrap: wrap; }
-    .search-bar { order: 3; width: 100%; max-width: 100%; margin-top: 1rem; }
+    /* One fixed phone header at every width (owner's video,
+       2026-11-12: sign-out and search kept swapping sides and the
+       search got cut off). The base .search-bar is flex:1 — basis 0% —
+       which silently beat the old width:100% and let the search
+       squeeze onto whatever row had room. Now: logo + sign-in always
+       share row 1 (the logo shrinks a touch so they always fit),
+       search always gets its own full-width row, nav strip under it. */
+    .header-content { row-gap: 0.6rem; column-gap: 0.9rem; }
+    .logo-link { flex: 0 1 auto; min-width: 0; }
+    .logo-mark-img { height: 36px; }
+    .logo-title { font-size: 1.08rem; }
+    .logo-tagline { font-size: 0.44rem; }
+    .auth-area { flex: 0 0 auto; }
+    .search-bar { order: 3; flex: 1 1 100%; width: 100%; max-width: 100%; min-width: 0; margin: 0.4rem 0 0; }
     .main-nav {
         display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.5rem;
         width: 100%; order: 4; margin-top: 0.75rem; white-space: nowrap; align-items: center;

@@ -49,18 +49,18 @@
             <div class="admin-cards">
                 <div class="admin-card"><div class="num" id="statLive">–</div><div class="lbl">Live deals</div></div>
                 <div class="admin-card"><div class="num" id="statShelf">–</div><div class="lbl">On the shelf (dead deals)</div></div>
-                <div class="admin-card"><div class="num" id="statClicks">–</div><div class="lbl">Total deal clicks</div></div>
+                <div class="admin-card"><div class="num" id="statClicks">–</div><div class="lbl">Total clicks to Amazon</div></div>
                 <div class="admin-card"><div class="num" id="statViews">–</div><div class="lbl">Total deal views</div></div>
-                <div class="admin-card"><div class="num" id="statToday">–</div><div class="lbl">Clicks today</div></div>
+                <div class="admin-card"><div class="num" id="statToday">–</div><div class="lbl">Amazon clicks today</div></div>
             </div>
 
             <p class="admin-note" id="gwStatus">Giveaway: checking…</p>
 
-            <h2 class="admin-h">Deal clicks <button type="button" class="btn" id="adminRefresh" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
-            <p class="admin-note" style="margin-bottom:0.75rem;">Clicks = every tap on a deal's "View Deal" / "Get This Deal" button. Views = every time a deal's window was opened (counted since Nov 12, 2026 — views started a few hours after clicks). Most-viewed first — the deals at the bottom are the ones nobody's even opening.</p>
+            <h2 class="admin-h">Deal views &amp; clicks <button type="button" class="btn" id="adminRefresh" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Two different signals (counted since Nov 12, 2026 — views started a few hours after clicks): <strong>Views</strong> = someone opened the deal's window — pure interest; that's what decides whether a deal earns its place on the site. <strong>Clicks to Amazon</strong> = someone tapped "View Deal" / "Get This Deal" and went to the store — those are the ones that can turn into sales. Most-viewed first — the deals at the bottom are the ones nobody's even opening.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
-                    <thead><tr><th>Deal</th><th class="n">Price</th><th class="n">Views</th><th class="n">Clicks</th><th class="n">Today</th><th>Last clicked</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Deal</th><th class="n">Price</th><th class="n">Views (opened)</th><th class="n">Clicks to Amazon</th><th class="n">Amazon today</th><th>Last Amazon click</th><th>Status</th></tr></thead>
                     <tbody id="clickRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
             </div>
