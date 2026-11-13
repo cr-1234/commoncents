@@ -100,7 +100,15 @@
         var wrap = document.getElementById('authMenuNotes');
         var list = document.getElementById('authMenuNotesList');
         if (!wrap || !list) return;
-        if (!notesCache || !notesCache.length) { wrap.style.display = 'none'; list.innerHTML = ''; return; }
+        if (!notesCache || !notesCache.length) {
+            // Always show the block (owner, 2026-11-13: he went looking for
+            // where notifications come out and found nothing — the block
+            // used to stay hidden until the first reply arrived). An empty
+            // state tells him where they will land.
+            list.innerHTML = '<div class="auth-menu-note auth-menu-notes-empty">Nothing yet — replies to your comments will show up here.</div>';
+            wrap.style.display = '';
+            return;
+        }
         list.innerHTML = notesCache.slice(0, 8).map(function (n) {
             var site = n.site === 'gb' ? 'Gifting Butler' : 'CommonCents';
             var what = n.type === 'reply'

@@ -843,7 +843,12 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
     box-shadow: 0 18px 40px rgba(40,20,70,0.18); padding: 1rem; text-align: left;
 }
-.auth-menu-email { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.7rem; word-break: break-all; padding-right: 1.6rem; }
+.auth-menu-email { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0; word-break: break-all; padding-right: 1.6rem; }
+/* One even rhythm for the whole menu (owner, 2026-11-13: "why are those
+   buttons not evenly spaced?"): a single gap rule for every direct
+   child, instead of margins sprinkled per element — the ✕ is absolutely
+   positioned, so it is excluded as a spacing source. */
+.auth-menu > :not(.auth-menu-close) + * { margin-top: 0.45rem; }
 /* Close X's (owner, 2026-11-12: "there's no X's anywhere" — every
    page and panel gets a clear way out). */
 .auth-menu-close {
@@ -878,7 +883,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 #authMenuNameEditor { margin-top: 0.15rem; }
 .auth-menu-cancel { display: block; background: none; border: none; padding: 0.45rem 0.2rem 0; font: inherit; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 .auth-menu-msg { font-size: 0.8rem; margin-top: 0.5rem; }
-.auth-menu-note { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.6rem; line-height: 1.45; }
+.auth-menu-note { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45; }
 .auth-email.as-avatar {
     width: 32px; height: 32px; border-radius: 50%;
     background: linear-gradient(135deg, #7C3AED, #5B2D8E);
@@ -899,7 +904,8 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    menu (engagement plan, 2026-11-13). Red badge = the standard
    "you have something new" signal; it clears when the menu opens. */
 .cc-note-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; border-radius: 999px; background: #dc2626; color: #fff; font-size: .66rem; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #fff; z-index: 4; }
-.auth-menu-notes { border-top: 1px solid var(--border-color); margin-top: .35rem; padding-top: .5rem; }
+.auth-menu-notes { border-top: 1px solid var(--border-color); margin-top: 0; padding-top: .5rem; }
+.auth-menu-notes-empty { color: var(--text-secondary); border-bottom: none; }
 .auth-menu-notes-head { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); margin: 0 0 .35rem; }
 .auth-menu-note { font-size: .85rem; padding: .35rem 0; border-bottom: 1px solid var(--border-color); color: var(--text-primary); line-height: 1.45; }
 .auth-menu-note:last-child { border-bottom: none; }
@@ -1055,7 +1061,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    a stray line and a double-size gap between the Comment name pill and
    the My feed picks pill. Top spacing now equals the row gap (0.45rem)
    so all three pills stack evenly, spacing only, no line. */
-.auth-menu-links { margin-top: 0.45rem; display: flex; flex-direction: column; gap: 0.45rem; }
+.auth-menu-links { margin-top: 0; display: flex; flex-direction: column; gap: 0.45rem; }
 /* Both menu rows are the same pill button (user ruling, 2026-11-09):
    full-width, light-plum fill, plum text, 999px radius — a matched
    pair that clearly reads as clickable. */
@@ -1064,7 +1070,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 /* Sign out lives in the menu now (owner, 2026-11-12: the standalone
    pill under the avatar kept getting tapped by mistake). A quiet red
    tint marks it as the exit without shouting. */
-.auth-menu-signout { margin-top: 0.45rem; background: #FDECEC; color: #B3261E; text-align: center; }
+.auth-menu-signout { margin-top: 0; background: #FDECEC; color: #B3261E; text-align: center; }
 .auth-menu-signout:hover { background: #FAD9D9; }
 .auth-menu-link-row { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; box-sizing: border-box; font-size: 0.78rem; padding: 0.5rem 0.8rem; }
 .auth-menu-link-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
