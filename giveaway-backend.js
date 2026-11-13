@@ -29,8 +29,19 @@
             headers: headers,
             body: JSON.stringify(body || {})
         }).then(function (r) {
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            return r.json();
+            // Parse the body even on an error status — the giveaway gate
+            // answers refusals with a machine-readable error code
+            // (email_not_verified / connection_cap) that enter() maps
+            // to a plain message. The code rides on the thrown error.
+            return r.json().catch(function () { return null; }).then(function (parsed) {
+                if (!r.ok) {
+                    var e = new Error('HTTP ' + r.status);
+                    e.code = (parsed && (parsed.error || parsed.code)) || '';
+                    e.status = r.status;
+                    throw e;
+                }
+                return parsed;
+            });
         });
     }
 
@@ -93,6 +104,9 @@
     function enter(email, idToken) {
         // Signed-in entry: pass the account's ID token — the server uses
         // the account email and ignores the body's email field.
+        // Gate refusals come back as coded errors and map to their own
+        // results so the modal can explain them in plain words:
+        // 'unverified' | 'conncap' (see app.js).
         return postFn('ccEnterGiveaway', { email: email }, idToken).then(function (res) {
             if (!res || !res.ok) return 'error';
             lsSet('ccGiveawayEmail', email);
@@ -100,7 +114,11 @@
             recordVisit();
             refreshCount();
             return res.result; // 'entered' | 'already'
-        }).catch(function () { return 'error'; });
+        }).catch(function (err) {
+            if (err && err.code === 'email_not_verified') return 'unverified';
+            if (err && err.code === 'connection_cap') return 'conncap';
+            return 'error';
+        });
     }
 
     function lastWinner(cb) {

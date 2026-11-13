@@ -203,6 +203,10 @@
                 var el = document.getElementById('gwStatus');
                 if (g && typeof g.count === 'number') {
                     el.textContent = 'Giveaway: ' + (g.active ? 'ON' : 'off') + ' — ' + g.count + (g.count === 1 ? ' person' : ' people') + ' entered this week' + (g.prize ? ', prize ' + g.prize : '') + '.';
+                    if (g.lastWinner && g.lastWinner.review === 'shared-connection') {
+                        var peers = g.lastWinner.connPeers || 0;
+                        el.textContent += ' ⚠ Last winner shared a connection with ' + peers + ' other entrant' + (peers === 1 ? '' : 's') + ' — review before paying.';
+                    }
                 } else {
                     el.textContent = 'Giveaway: status unavailable.';
                 }

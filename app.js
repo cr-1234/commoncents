@@ -319,6 +319,26 @@ function setupEventListeners() {
                         if (res === 'entered' || res === 'already') {
                             updateEntryCount();
                             showGwSuccess(res === 'already');
+                        } else if (res === 'unverified' && errEl0) {
+                            // Gate: the account email isn't verified yet.
+                            // Offer to (re)send the verification email —
+                            // only email/password accounts can be
+                            // unverified; Google accounts always are.
+                            errEl0.innerHTML = 'Your email address isn\u2019t verified yet \u2014 please verify it first, then enter. '
+                                + '<button type="button" id="gwSendVerifyBtn" style="background:var(--plum);color:#fff;border:none;border-radius:999px;padding:.3rem .9rem;font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;margin-left:.35rem;">Send verification email</button>';
+                            errEl0.style.display = 'block';
+                            const vBtn = document.getElementById('gwSendVerifyBtn');
+                            if (vBtn) vBtn.addEventListener('click', () => {
+                                const u = window.CC_AUTH && CC_AUTH.user && CC_AUTH.user();
+                                if (!u || typeof u.sendEmailVerification !== 'function') return;
+                                vBtn.disabled = true;
+                                u.sendEmailVerification()
+                                    .then(() => { vBtn.textContent = 'Sent \u2014 check your inbox'; })
+                                    .catch(() => { vBtn.disabled = false; vBtn.textContent = 'Send verification email'; });
+                            });
+                        } else if (res === 'conncap' && errEl0) {
+                            errEl0.textContent = 'This internet connection already has 3 entries this week \u2014 that\u2019s the maximum.';
+                            errEl0.style.display = 'block';
                         } else if (errEl0) {
                             errEl0.textContent = 'Something went wrong entering you — please try again.';
                             errEl0.style.display = 'block';
@@ -363,6 +383,9 @@ function setupEventListeners() {
                 if (res === 'entered' || res === 'already') {
                     updateEntryCount();
                     showGwSuccess(res === 'already');
+                } else if (res === 'conncap' && errEl) {
+                    errEl.textContent = 'This internet connection already has 3 entries this week \u2014 that\u2019s the maximum.';
+                    errEl.style.display = 'block';
                 } else if (errEl) {
                     errEl.textContent = 'Something went wrong entering you — please try again.';
                     errEl.style.display = 'block';
