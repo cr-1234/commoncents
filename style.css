@@ -699,6 +699,14 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 @media (max-width: 900px) {
     .main-content { grid-template-columns: 1fr; }
     .sidebar { display: none; }
+    /* Account menu: on phone widths the avatar sits at the left of the
+       header, so a menu right-aligned to the avatar ran off the left
+       edge of the screen (only its right-side chips stayed visible —
+       seen in the owner's 2026-11-12 phone video). Anchor the menu to
+       the sticky header itself instead: full-width header, menu pinned
+       to its right edge just below it, never wider than the screen. */
+    .auth-area { position: static; }
+    .auth-menu { top: calc(100% + 6px); right: 8px; width: min(300px, calc(100vw - 16px)); }
     .deal-grid { grid-template-columns: 1fr; }
     .header-content { flex-wrap: wrap; }
     .search-bar { order: 3; width: 100%; max-width: 100%; margin-top: 1rem; }
