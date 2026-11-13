@@ -775,6 +775,15 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .modal-content { margin: 2% auto; }
 }
 
+/* Page headings on small phones (owner's SE screenshot, 2026-11-12):
+   every subpage h1 carries an inline 2.2rem, so "CommonCents" in
+   "About CommonCents" overflowed the card and lost its last letters.
+   Shrink all h1s at phone widths — the feed's own h1 rule has higher
+   specificity and is unaffected. */
+@media (max-width: 640px) {
+    h1 { font-size: 1.55rem !important; }
+}
+
 /* Tablet band (owner's Tab S4 shot, 2026-11-12): at 560–900px the
    one-card-per-row phone layout stretched each card across the whole
    tablet and the search bar ran screen-wide. Two cards per row here,
