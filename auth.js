@@ -96,12 +96,10 @@
 
     function paintHeader() {
         var inBtn = document.getElementById('signInBtn');
-        var outBtn = document.getElementById('signOutBtn');
         var emailEl = document.getElementById('authEmail');
-        if (!inBtn || !outBtn || !emailEl) return;
+        if (!inBtn || !emailEl) return;
         if (currentUser) {
             inBtn.style.display = 'none';
-            outBtn.style.display = '';
             emailEl.style.display = '';
             // No raw email in the header (the user disliked it). If the
             // account has a picture (Google sign-ins do), show it in the
@@ -125,7 +123,6 @@
             }
         } else {
             inBtn.style.display = '';
-            outBtn.style.display = 'none';
             emailEl.style.display = 'none';
             emailEl.textContent = '';
             emailEl.title = '';
@@ -138,7 +135,6 @@
     function wireUi() {
         var modal = document.getElementById('authModal');
         var inBtn = document.getElementById('signInBtn');
-        var outBtn = document.getElementById('signOutBtn');
         var closeBtn = document.getElementById('authClose');
         var form = document.getElementById('authForm');
         var emailIn = document.getElementById('authEmailInput');
@@ -311,7 +307,8 @@
         inBtn.addEventListener('click', openModal);
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
         modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
-        if (outBtn) outBtn.addEventListener('click', function () { if (auth) auth.signOut(); });
+        var menuOutBtn = document.getElementById('authMenuSignOut');
+        if (menuOutBtn) menuOutBtn.addEventListener('click', function () { closeMenu(); if (auth) auth.signOut(); });
         toggle.addEventListener('click', function () { setMode(mode === 'signin' ? 'signup' : 'signin'); });
 
         if (googleBtn) googleBtn.addEventListener('click', function () {

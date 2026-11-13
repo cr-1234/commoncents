@@ -1038,6 +1038,11 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    pair that clearly reads as clickable. */
 .auth-menu-link { background: #EDE5F8; border: none; text-align: left; font: inherit; font-size: 0.82rem; font-weight: 600; color: var(--highlight); padding: 0.5rem 0.9rem; border-radius: 999px; cursor: pointer; white-space: nowrap; width: 100%; box-sizing: border-box; transition: background 0.15s; }
 .auth-menu-link:hover { background: #E1D1F8; }
+/* Sign out lives in the menu now (owner, 2026-11-12: the standalone
+   pill under the avatar kept getting tapped by mistake). A quiet red
+   tint marks it as the exit without shouting. */
+.auth-menu-signout { margin-top: 0.45rem; background: #FDECEC; color: #B3261E; text-align: center; }
+.auth-menu-signout:hover { background: #FAD9D9; }
 .auth-menu-link-row { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; box-sizing: border-box; font-size: 0.78rem; padding: 0.5rem 0.8rem; }
 .auth-menu-link-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .auth-menu-link-count { flex: 0 0 auto; white-space: nowrap; font-weight: 700; }
