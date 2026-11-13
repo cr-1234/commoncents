@@ -27,6 +27,9 @@
         .admin-err { color: #dc2626; font-size: 0.88rem; min-height: 1.2em; margin: 0.4rem 0; }
         .admin-note { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.55; }
         h2.admin-h { font-size: 1.15rem; color: var(--text-primary); margin: 1.75rem 0 0.75rem; }
+        .admin-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1.1rem 0 0.25rem; }
+        .admin-tab { font: inherit; font-size: 0.9rem; font-weight: 700; padding: 0.5rem 1.1rem; border-radius: 999px; border: 1px solid rgba(91,45,142,0.35); background: #fff; color: #5B2D8E; cursor: pointer; }
+        .admin-tab.active { background: #5B2D8E; border-color: #5B2D8E; color: #fff; }
     </style>
 </head>
 <body>
@@ -56,6 +59,13 @@
 
             <p class="admin-note" id="gwStatus">Giveaway: checking…</p>
 
+            <div class="admin-tabs">
+                <button type="button" class="admin-tab active" data-tab="deals">Deals</button>
+                <button type="button" class="admin-tab" data-tab="subs">Deal submissions</button>
+                <button type="button" class="admin-tab" data-tab="members">Members</button>
+            </div>
+
+            <div id="tab-deals">
             <h2 class="admin-h">Deal views &amp; clicks <button type="button" class="btn" id="adminRefresh" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
             <p class="admin-note" style="margin-bottom:0.75rem;">Two different signals (counted since Nov 12, 2026 — views started a few hours after clicks): <strong>Views</strong> = someone opened the deal's window — pure interest; that's what decides whether a deal earns its place on the site. <strong>Clicks to Amazon</strong> = someone tapped "View Deal" / "Get This Deal" and went to the store — those are the ones that can turn into sales. Most-viewed first — the deals at the bottom are the ones nobody's even opening.</p>
             <div style="overflow-x:auto;">
@@ -64,7 +74,9 @@
                     <tbody id="clickRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
             </div>
+            </div>
 
+            <div id="tab-members" style="display:none;">
             <h2 class="admin-h">Members <span class="admin-note" id="memberCount"></span></h2>
             <p class="admin-note" style="margin-bottom:0.75rem;">Everyone who has ever signed up — both sites share one account system, so this is the combined list for CommonCents and Gifting Butler, newest first. Visible only to you: the server checks it's really your account before it sends anything, the list is never public.</p>
             <div style="overflow-x:auto;">
@@ -73,7 +85,9 @@
                     <tbody id="memberRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
             </div>
+            </div>
 
+            <div id="tab-subs" style="display:none;">
             <h2 class="admin-h">Deal submissions <span class="admin-note" id="subCount"></span></h2>
             <p class="admin-note" style="margin-bottom:0.75rem;">Deals readers sent in — the ones still waiting sit on top, newest first. Nothing is ever posted automatically; you review each one here. <strong>Posted</strong> asks which deal number it became, marks it done, and tells the submitter it's live (only when they sent it while signed in, so we know who they are). <strong>Passed</strong> files it away.</p>
             <div style="overflow-x:auto;">
@@ -81,6 +95,7 @@
                     <thead><tr><th>Submitter</th><th>Deal link</th><th>Price seen</th><th>Note</th><th>Date</th><th>Status</th><th></th></tr></thead>
                     <tbody id="subRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
+            </div>
             </div>
         </div>
     </div>
@@ -128,6 +143,9 @@
         });
         els.signOut.addEventListener('click', function () { auth.signOut(); });
         document.getElementById('adminRefresh').addEventListener('click', loadDash);
+        document.querySelectorAll('.admin-tab').forEach(function (b) {
+            b.addEventListener('click', function () { showAdminTab(b.getAttribute('data-tab')); });
+        });
         document.getElementById('subRows').addEventListener('click', function (ev) {
             var b = ev.target && ev.target.closest ? ev.target.closest('[data-subact]') : null;
             if (!b) return;
@@ -155,6 +173,16 @@
             return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
+        function showAdminTab(name) {
+            ['deals', 'subs', 'members'].forEach(function (t) {
+                var p = document.getElementById('tab-' + t);
+                if (p) p.style.display = (t === name) ? '' : 'none';
+            });
+            document.querySelectorAll('.admin-tab').forEach(function (b) {
+                b.classList.toggle('active', b.getAttribute('data-tab') === name);
+            });
+        }
+
         function loadDash() {
             var live = (typeof deals !== 'undefined' ? deals : []).slice();
             document.getElementById('statLive').textContent = live.length;
@@ -174,7 +202,7 @@
             }).then(function (r) { return r.json(); }).then(function (g) {
                 var el = document.getElementById('gwStatus');
                 if (g && typeof g.count === 'number') {
-                    el.textContent = 'Giveaway: ' + (g.active ? 'ON' : 'off') + ' — ' + g.count + ' people entered this week' + (g.prize ? ', prize $' + g.prize : '') + '.';
+                    el.textContent = 'Giveaway: ' + (g.active ? 'ON' : 'off') + ' — ' + g.count + (g.count === 1 ? ' person' : ' people') + ' entered this week' + (g.prize ? ', prize ' + g.prize : '') + '.';
                 } else {
                     el.textContent = 'Giveaway: status unavailable.';
                 }

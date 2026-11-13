@@ -103,12 +103,16 @@
         if (!notesCache || !notesCache.length) {
             // Always show the block (owner, 2026-11-13: he went looking for
             // where notifications come out and found nothing — the block
-            // used to stay hidden until the first reply arrived). An empty
-            // state tells him where they will land.
-            list.innerHTML = '<div class="auth-menu-note auth-menu-notes-empty">Nothing yet — replies to your comments will show up here.</div>';
+            // used to stay hidden until the first reply arrived). Empty, it
+            // renders as ONE pill row like the other menu bars (his note
+            // the same day: a heading + grey sentence in the middle looked
+            // messy); with real notes it expands into the list below.
+            wrap.classList.add('is-empty');
+            list.innerHTML = '<div class="auth-menu-note auth-menu-notes-empty">Notifications — nothing yet</div>';
             wrap.style.display = '';
             return;
         }
+        wrap.classList.remove('is-empty');
         list.innerHTML = notesCache.slice(0, 8).map(function (n) {
             var site = n.site === 'gb' ? 'Gifting Butler' : 'CommonCents';
             var what = n.type === 'reply'
@@ -436,12 +440,12 @@
                 clearTimeout(restoreArmTimer);
                 restoreArmTimer = setTimeout(function () {
                     restoreArmed = false;
-                    restoreBtn.textContent = 'Restore my votes & picks';
+                    restoreBtn.textContent = 'Restore my account';
                 }, 4000);
                 return;
             }
             restoreArmed = false;
-            restoreBtn.textContent = 'Restore my votes & picks';
+            restoreBtn.textContent = 'Restore my account';
             showRestoreMsg('Restoring…');
             var user = currentUser;
             user.getIdToken().then(function (token) {
