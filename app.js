@@ -677,6 +677,17 @@ function handleVote(e, deal, type) {
 function openModal(deal) {
     if (!deal.comments) deal.comments = [];
     window._ccOpenDealId = deal.id;
+    // Count the view (owner request 2026-11-12): opening the deal
+    // window is interest even when the visitor never taps through to
+    // the store. Fire-and-forget to ccView; never blocks the window.
+    try {
+        fetch(CC_VIEW_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dealId: String(deal.id) }),
+            keepalive: true
+        }).catch(function () {});
+    } catch (e) {}
     // Opening a deal counts as seeing it: clear its NEW DEAL badge
     // from the card right away, and persist the seen mark (CC_FEED owns
     // it) so the badge doesn't come back on later loads either.
@@ -991,6 +1002,9 @@ function copyDealCode(el, code) {
 // which deals people actually click. Fire-and-forget: it never
 // delays or blocks the visitor's trip to the store.
 const CC_CLICK_ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccClick';
+// Views are counted separately (ccView): a view = the deal window
+// was opened (see openModal); a click = an outbound tap to the store.
+const CC_VIEW_ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccView';
 document.addEventListener('click', function (e) {
     const a = e.target && e.target.closest ? e.target.closest('a.view-deal-btn, a.modal-deal-btn') : null;
     if (!a) return;

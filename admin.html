@@ -50,17 +50,18 @@
                 <div class="admin-card"><div class="num" id="statLive">–</div><div class="lbl">Live deals</div></div>
                 <div class="admin-card"><div class="num" id="statShelf">–</div><div class="lbl">On the shelf (dead deals)</div></div>
                 <div class="admin-card"><div class="num" id="statClicks">–</div><div class="lbl">Total deal clicks</div></div>
+                <div class="admin-card"><div class="num" id="statViews">–</div><div class="lbl">Total deal views</div></div>
                 <div class="admin-card"><div class="num" id="statToday">–</div><div class="lbl">Clicks today</div></div>
             </div>
 
             <p class="admin-note" id="gwStatus">Giveaway: checking…</p>
 
             <h2 class="admin-h">Deal clicks <button type="button" class="btn" id="adminRefresh" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
-            <p class="admin-note" style="margin-bottom:0.75rem;">Every tap on a deal's "View Deal" / "Get This Deal" button, counted per deal since counting started (Nov 12, 2026). Most-clicked first — the deals at the bottom are the ones nobody's tapping.</p>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Clicks = every tap on a deal's "View Deal" / "Get This Deal" button. Views = every time a deal's window was opened (counted since Nov 12, 2026 — views started a few hours after clicks). Most-viewed first — the deals at the bottom are the ones nobody's even opening.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
-                    <thead><tr><th>Deal</th><th class="n">Price</th><th class="n">Clicks</th><th class="n">Today</th><th>Last clicked</th><th>Status</th></tr></thead>
-                    <tbody id="clickRows"><tr><td colspan="6">Loading…</td></tr></tbody>
+                    <thead><tr><th>Deal</th><th class="n">Price</th><th class="n">Views</th><th class="n">Clicks</th><th class="n">Today</th><th>Last clicked</th><th>Status</th></tr></thead>
+                    <tbody id="clickRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -160,16 +161,25 @@
         }
 
         function loadClicks(live, shelf) {
-            fetch(FN + 'ccGetClicks').then(function (r) { return r.json(); }).then(function (res) {
-                var clicks = (res && res.clicks) || {};
+            Promise.all([
+                fetch(FN + 'ccGetClicks').then(function (r) { return r.json(); }),
+                fetch(FN + 'ccGetViews').then(function (r) { return r.json(); }).catch(function () { return {}; })
+            ]).then(function (both) {
+                var clicks = (both[0] && both[0].clicks) || {};
+                var views = (both[1] && both[1].views) || {};
                 var today = todayEt();
-                var total = 0, todayTotal = 0;
+                var total = 0, todayTotal = 0, viewTotal = 0;
                 Object.keys(clicks).forEach(function (id) {
                     if (id === '999999') return; // backend test id
                     total += clicks[id].total || 0;
                     todayTotal += (clicks[id].days && clicks[id].days[today]) || 0;
                 });
+                Object.keys(views).forEach(function (id) {
+                    if (id === '999999') return; // backend test id
+                    viewTotal += views[id].total || 0;
+                });
                 document.getElementById('statClicks').textContent = total;
+                document.getElementById('statViews').textContent = viewTotal;
                 document.getElementById('statToday').textContent = todayTotal;
 
                 var byId = {};
@@ -178,20 +188,22 @@
                 var rows = Object.keys(byId).map(function (id) {
                     var entry = byId[id];
                     var c = clicks[id] || { total: 0, days: {}, lastAt: null };
-                    return { deal: entry.deal, shelved: entry.shelved, total: c.total || 0, today: (c.days && c.days[today]) || 0, lastAt: c.lastAt };
+                    var v = views[id] || { total: 0 };
+                    return { deal: entry.deal, shelved: entry.shelved, total: c.total || 0, views: v.total || 0, today: (c.days && c.days[today]) || 0, lastAt: c.lastAt };
                 });
-                rows.sort(function (a, b) { return b.total - a.total || a.deal.id - b.deal.id; });
+                rows.sort(function (a, b) { return b.views - a.views || b.total - a.total || a.deal.id - b.deal.id; });
                 document.getElementById('clickRows').innerHTML = rows.map(function (r) {
                     var last = r.lastAt ? new Date(r.lastAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
                     return '<tr><td>' + esc(r.deal.title) + '</td>' +
                         '<td class="n">$' + esc(r.deal.price) + '</td>' +
-                        '<td class="n"><strong>' + r.total + '</strong></td>' +
+                        '<td class="n"><strong>' + r.views + '</strong></td>' +
+                        '<td class="n">' + r.total + '</td>' +
                         '<td class="n">' + r.today + '</td>' +
                         '<td>' + last + '</td>' +
                         '<td>' + (r.shelved ? '<span class="tag-shelved">Shelved</span>' : '<span class="tag-live">Live</span>') + '</td></tr>';
                 }).join('');
             }).catch(function () {
-                document.getElementById('clickRows').innerHTML = '<tr><td colspan="6">Could not load click counts.</td></tr>';
+                document.getElementById('clickRows').innerHTML = '<tr><td colspan="7">Could not load click counts.</td></tr>';
             });
         }
     })();
