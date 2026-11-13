@@ -245,6 +245,8 @@
             if (menu && menu.style.display !== 'none' && !e.target.closest('.auth-area')) closeMenu();
         });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+        var menuCloseBtn = document.getElementById('authMenuClose');
+        if (menuCloseBtn) menuCloseBtn.addEventListener('click', function (e) { e.stopPropagation(); closeMenu(); });
         if (nameSave) nameSave.addEventListener('click', function () {
             var v = (nameInput && nameInput.value || '').trim();
             function show(txt, ok) {

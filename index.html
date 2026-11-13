@@ -89,6 +89,7 @@
                 <button type="button" class="auth-btn" id="signInBtn">Sign in</button>
                 <button type="button" class="auth-btn auth-btn-out" id="signOutBtn" style="display:none;">Sign out</button>
                 <div class="auth-menu" id="authMenu" style="display:none;">
+                    <button type="button" class="auth-menu-close" id="authMenuClose" aria-label="Close menu">✕</button>
                     <div class="auth-menu-email" id="authMenuEmail"></div>
                     <button type="button" class="auth-menu-link auth-menu-link-row" id="authMenuNameRow"><span class="auth-menu-link-label" id="authMenuNameLabel">Comment name</span><span class="auth-menu-link-count auth-menu-change-chip">Change</span></button>
                     <div id="authMenuNameEditor" style="display:none;">
@@ -161,6 +162,7 @@
                 <div class="interest-picker-head">
                     <span class="interest-picker-title">Build your feed — deals from every site, only what you care about</span>
                     <button type="button" class="my-feed-btn" id="feedDoneBtn">Done</button>
+                    <button type="button" class="picker-x" id="feedPickerX" aria-label="Close the feed picker">✕</button>
                 </div>
                 <div class="interest-chips" id="interestChips"></div>
                 <p class="feed-status" id="feedStatus"></p>

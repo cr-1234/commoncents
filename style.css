@@ -721,11 +721,19 @@ body.dark-mode .amazon-browse-btn { color: #000; }
        squeeze onto whatever row had room. Now: logo + sign-in always
        share row 1 (the logo shrinks a touch so they always fit),
        search always gets its own full-width row, nav strip under it. */
-    .header-content { row-gap: 0.6rem; column-gap: 0.9rem; }
-    .logo-link { flex: 0 1 auto; min-width: 0; }
-    .logo-mark-img { height: 36px; }
-    .logo-title { font-size: 1.08rem; }
-    .logo-tagline { font-size: 0.44rem; }
+    .header-content { row-gap: 0.6rem; column-gap: 0.6rem; }
+    /* The logo must NEVER shrink (owner, 2026-11-12: on phones the
+       "CENTS" end of COMMONCENTS got cut off — the shrinkable
+       logo-link let the auth column squeeze it). The logo is a fixed
+       block now, a touch smaller, with nowrap on both lines, sized
+       so logo + sign-in always fit side by side down to 360px. */
+    .logo-link { flex: 0 0 auto; }
+    .logo-container { gap: 0.5rem; }
+    .logo-text-group { flex: none; }
+    .logo-mark-img { height: 32px; }
+    .logo-title { font-size: 1rem; white-space: nowrap; }
+    .logo-tagline { font-size: 0.42rem; letter-spacing: 0.12em; white-space: nowrap; }
+    .auth-btn { padding: 0.38rem 0.85rem; font-size: 0.8rem; }
     .auth-area { flex: 0 0 auto; }
     /* The search no longer runs side to side (owner on Pixel 8 and
        folding phones, 2026-11-12: full-width still looked too big;
@@ -824,7 +832,30 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
     box-shadow: 0 18px 40px rgba(40,20,70,0.18); padding: 1rem; text-align: left;
 }
-.auth-menu-email { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.7rem; word-break: break-all; }
+.auth-menu-email { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.7rem; word-break: break-all; padding-right: 1.6rem; }
+/* Close X's (owner, 2026-11-12: "there's no X's anywhere" — every
+   page and panel gets a clear way out). */
+.auth-menu-close {
+    position: absolute; top: 0.45rem; right: 0.55rem; width: 28px; height: 28px;
+    border: none; border-radius: 50%; background: #EDE5F8; color: var(--highlight);
+    font-size: 0.8rem; font-weight: 700; cursor: pointer; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+}
+.auth-menu-close:hover { background: #E1D1F8; }
+.page-close {
+    display: flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; margin-left: auto; margin-bottom: 0.5rem;
+    border-radius: 50%; background: #EDE5F8; color: var(--highlight);
+    font-size: 1rem; font-weight: 700; text-decoration: none; line-height: 1;
+}
+.page-close:hover { background: #E1D1F8; }
+.picker-x {
+    width: 30px; height: 30px; flex: none;
+    border: none; border-radius: 50%; background: #EDE5F8; color: var(--highlight);
+    font-size: 0.82rem; font-weight: 700; cursor: pointer; line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.picker-x:hover { background: #E1D1F8; }
 .auth-menu-label { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.35rem; }
 .auth-menu input {
     width: 100%; box-sizing: border-box; padding: 0.55rem 0.9rem; border-radius: 999px;

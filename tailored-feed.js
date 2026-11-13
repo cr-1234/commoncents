@@ -404,6 +404,8 @@
         els.myFeedRows = document.querySelectorAll('[data-myfeed]');
         els.myFeedBadgeHost = document.querySelector('.category-list a[data-myfeed]');
         var doneBtn = document.getElementById('feedDoneBtn');
+        var pickerX = document.getElementById('feedPickerX');
+        if (pickerX && doneBtn) pickerX.addEventListener('click', function () { doneBtn.click(); });
         if (!els.picker) return;
 
         if (doneBtn) doneBtn.addEventListener('click', function () {
