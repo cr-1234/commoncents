@@ -22,6 +22,7 @@
     var auth = null;
     var currentUser = null;
     var profileUsername = '';
+    var profileSubBonus = 0;
     var saveTimer = null;
     try {
         if (window.firebase) {
@@ -144,6 +145,12 @@
         }).then(function (res) {
             if (!res || res.error) return;
             profileUsername = typeof res.username === 'string' ? res.username : '';
+            // Submitter rewards (engagement plan B): this week's
+            // submission bonus from the profile, painted into the
+            // giveaway modal by app.js when it's positive.
+            profileSubBonus = (typeof res.submissionBonus === 'number' && res.submissionBonus > 0)
+                ? Math.floor(res.submissionBonus) : 0;
+            if (typeof window.CC_PAINT_SUB_BONUS === 'function') window.CC_PAINT_SUB_BONUS();
             var acct = Array.isArray(res.interests) ? res.interests : [];
             var local = CC_FEED.getInterests();
             if (acct.length) {
@@ -481,6 +488,7 @@
         noteInterestsChanged: noteInterestsChanged,
         noteVotesChanged: noteVotesChanged,
         username: function () { return profileUsername; },
+        submissionBonus: function () { return profileSubBonus; },
         // Deterministic friendly default name from the account id — so a
         // member who never picks a comment name still shows as SOMEONE
         // distinct (never a generic "Member"), and the same account gets

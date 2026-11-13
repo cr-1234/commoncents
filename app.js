@@ -209,9 +209,29 @@ function setupEventListeners() {
     const closeGiveaway     = document.getElementById('closeGiveaway');
     const giveawaySubmitBtn = document.getElementById('giveawaySubmitBtn');
 
+    // Submitter rewards (2026-11-13): one plain line in the entered
+    // state when the member's submitted deals earned bonus entries
+    // this week. The number rides in on the account profile (auth.js
+    // exposes CC_AUTH.submissionBonus and calls CC_PAINT_SUB_BONUS
+    // when the profile lands).
+    function paintSubBonus() {
+        const el = document.getElementById('gwSubBonus');
+        if (!el) return;
+        const n = (window.CC_AUTH && CC_AUTH.submissionBonus) ? (CC_AUTH.submissionBonus() || 0) : 0;
+        if (n > 0) {
+            el.textContent = 'Submission bonus: +' + n + ' entries this week';
+            el.style.display = '';
+        } else {
+            el.textContent = '';
+            el.style.display = 'none';
+        }
+    }
+    window.CC_PAINT_SUB_BONUS = paintSubBonus;
+
     function showGwSuccess(already) {
         document.getElementById('giveawayForm').style.display    = 'none';
         document.getElementById('giveawaySuccess').style.display = 'block';
+        paintSubBonus();
         const bd = document.getElementById('gwEntriesBreakdown');
         if (bd && window.CC_GW) {
             const b = CC_GW.bonus();
@@ -1096,6 +1116,13 @@ const CC_CLICK_ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunction
 // Views are counted separately (ccView): a view = the deal window
 // was opened (see openModal); a click = an outbound tap to the store.
 const CC_VIEW_ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccView';
+// Submitter rewards (2026-11-13): a signed-in member's tap ALSO
+// fires the counted-click beacon with their ID token — the backend
+// decides whether it is a qualified click for the deal's submitter
+// (never their own deal, max 3 per person per deal per day). The
+// anonymous ccClick tally above is unchanged, and signed-out taps
+// send nothing here.
+const CC_COUNTED_CLICK_ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccCountedClick';
 document.addEventListener('click', function (e) {
     const a = e.target && e.target.closest ? e.target.closest('a.view-deal-btn, a.modal-deal-btn') : null;
     if (!a) return;
@@ -1108,6 +1135,20 @@ document.addEventListener('click', function (e) {
             body: JSON.stringify({ dealId: dealId }),
             keepalive: true
         }).catch(function () {});
+    } catch (err) {}
+    try {
+        if (window.CC_AUTH && CC_AUTH.user && CC_AUTH.user() && CC_AUTH.idToken) {
+            CC_AUTH.idToken().then(function (token) {
+                try {
+                    fetch(CC_COUNTED_CLICK_ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ dealId: dealId }),
+                        keepalive: true
+                    }).catch(function () {});
+                } catch (err) {}
+            }).catch(function () {});
+        }
     } catch (err) {}
 });
 
