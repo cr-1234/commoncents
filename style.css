@@ -737,12 +737,14 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .auth-area { flex: 0 0 auto; }
     /* The search no longer runs side to side (owner on Pixel 8 and
        folding phones, 2026-11-12: full-width still looked too big;
-       88% still read as "almost end to end" on the iPhone 16 Pro).
-       It is a centered pill, at most 340px and never wider than 72%
-       of the screen. Where it fits beside the logo (wide tablets) it
-       sits between logo and sign-in; otherwise it wraps to its own
-       centered row. */
-    .search-bar { order: 3; flex: 0 1 340px; width: min(72%, 340px); max-width: 340px; min-width: 0; margin: 0.4rem auto 0; }
+       88% still read as "almost end to end" on the iPhone 16 Pro, and
+       72% still read as "loooong" — alone on its row it was the
+       widest thing in the header). It is now a compact centered pill,
+       at most 270px and never wider than 60% of the screen — reads as
+       a search box, not a banner. Where it fits beside the logo
+       (wide tablets) it sits between logo and sign-in; otherwise it
+       wraps to its own centered row. */
+    .search-bar { order: 3; flex: 0 1 270px; width: min(60%, 270px); max-width: 270px; min-width: 0; margin: 0.4rem auto 0; }
     /* The search kept its chunky desktop padding on phones and read
        as a big empty lozenge floating on its own row (owner: "the big
        search bar looks funny", 2026-11-12). Slimmer profile here. */
