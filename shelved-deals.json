@@ -190,5 +190,26 @@
     "shelvedAt": "2026-11-13",
     "shelvedReason": "Coupon gone — no coupon on the page and live base price $99.99 is at the $99.99 list price (posted deal price was $69.99 with the $30 clip coupon)",
     "lastSeenPrice": 99.99
+  },
+  {
+    "id": 1048,
+    "title": "AOC 15.6\" FHD 1080p IPS USB-C Portable Laptop Screen For $47.48 From Amazon",
+    "category": "tech",
+    "fc": "Tech",
+    "price": 47.48,
+    "originalPrice": 69.99,
+    "discount": 32,
+    "image": "https://m.media-amazon.com/images/I/61z9-LCtffL._AC_SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B0F3MMK1J4?tag=commoncents0050-20",
+    "description": "A slim 15.6-inch portable monitor that plugs into a laptop with a single USB-C cable — a second screen for work, travel, or gaming anywhere. Under $50 for a full HD IPS panel with built-in speakers.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-10T12:25:00Z",
+    "source": "dansdeals",
+    "shelvedAt": "2026-11-14",
+    "shelvedReason": "Title mismatch — Amazon page is the 16-inch AOC 16T20 portable monitor, deal was posted as a 15.6-inch screen (live price $47.48, still 32% off $69.99 list)",
+    "lastSeenPrice": 47.48
   }
 ]
