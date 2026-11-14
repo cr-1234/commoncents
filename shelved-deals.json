@@ -168,5 +168,27 @@
     "shelvedAt": "2026-11-13",
     "shelvedReason": "Currently unavailable on Amazon",
     "lastSeenPrice": null
+  },
+  {
+    "id": 1034,
+    "title": "Set Of 12 Stone Lain Cairo Stoneware Dinnerware Set For $69.99 Shipped From Amazon",
+    "category": "household",
+    "fc": "Household",
+    "price": 69.99,
+    "originalPrice": 99.99,
+    "discount": 30,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/02112921/product-B0DZDD13QV-1.jpg",
+    "url": "https://www.amazon.com/dp/B0DZDD13QV?tag=commoncents0050-20",
+    "description": "Service for four in modern stoneware — dinner plates, salad plates, and bowls with a clean, restaurant-style look.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-13T16:30:40.930Z",
+    "source": "dansdeals",
+    "dealNote": "Clip the $30 coupon on the Amazon product page to get this price — without the coupon, it's $99.99.",
+    "shelvedAt": "2026-11-13",
+    "shelvedReason": "Coupon gone — no coupon on the page and live base price $99.99 is at the $99.99 list price (posted deal price was $69.99 with the $30 clip coupon)",
+    "lastSeenPrice": 99.99
   }
 ]
