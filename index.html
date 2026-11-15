@@ -76,6 +76,14 @@
 </svg>
     <header class="site-header">
         <div class="container header-content">
+            <!-- Phone menu button (owner, 2026-11-15 — SlickDeals-style):
+                 on phones the header is ONE compact row and this
+                 hamburger opens the panel under the header holding
+                 everything the old phone nav strip showed. Desktop
+                 never sees it (style.css keeps it display:none there). -->
+            <button type="button" class="hamburger-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileNavPanel">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+            </button>
             <a href="index.html" class="logo-link">
                 <div class="logo-container">
                     <img class="logo-mark-img" src="logo-tag.png" alt="" aria-hidden="true">
@@ -106,6 +114,17 @@
             </nav>
             <div class="auth-area" id="authArea">
                 <div class="auth-row">
+                    <!-- Giveaway icon (owner, 2026-11-15): on phones the
+                         sidebar is hidden, so the giveaway's entry point
+                         moves into the top row as the site's plum gift
+                         mark. Opens the exact same giveaway modal as
+                         the sidebar button and the desktop nav link
+                         (app.js wires all three to openGiveawayModal).
+                         Phones only (style.css); desktop keeps the nav
+                         link + sidebar box. -->
+                    <button type="button" class="cc-gw-btn" id="openGiveawayHeader" aria-label="Weekly Giveaway" title="Weekly Giveaway">
+                        <svg class="gw-gift-mark" aria-hidden="true"><use href="#gwGiftMark"></use></svg>
+                    </button>
                     <!-- Notifications bell (owner, 2026-11-15 — like
                          Gifting Butler): sits next to the avatar, shows
                          only while signed in, and carries the unread
@@ -146,6 +165,37 @@
                                     </div>
             </div>
         </div>
+        <!-- Phone menu panel (owner, 2026-11-15): everything the old
+             phone nav strip showed — My Feed, All Deals, the
+             categories, Free Stuff, Saved — plus the page links, in
+             one clean panel under the header. The category links
+             carry the same data-category wiring as the strip and the
+             sidebar, so a tap filters exactly like they do; the My
+             Feed row follows the same picks rule as the other My
+             Feed rows (painted by tailored-feed.js). Phones only:
+             style.css pins it shut above 900px no matter what. -->
+        <nav class="mobile-nav-panel" id="mobileNavPanel" style="display:none;" aria-label="Menu">
+            <ul class="mobile-nav-list">
+                <li style="display:none;"><a href="#" data-myfeed="1">My Feed</a></li>
+                <li><a href="#" data-category="all">All Deals</a></li>
+                <li><a href="#" data-category="tech">Tech</a></li>
+                <li><a href="#" data-category="tools">Tools</a></li>
+                <li><a href="#" data-category="household">Household</a></li>
+                <li><a href="#" data-category="groceries">Groceries</a></li>
+                <li><a href="#" data-category="kids">Kids</a></li>
+                <li><a href="#" data-category="beauty">Beauty</a></li>
+                <li><a href="#" data-category="clothing">Clothing</a></li>
+                <li><a href="#" data-category="pets">Pets</a></li>
+                <li><a href="#" data-category="freebies">Free Stuff</a></li>
+                <li><a href="#" data-category="saved">Saved</a></li>
+            </ul>
+            <div class="mobile-nav-pages">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="advertise.html">Advertise</a>
+                <a href="submit-deal.html">Submit a Deal</a>
+            </div>
+        </nav>
     </header>
 
     <div class="container main-content">

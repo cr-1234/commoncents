@@ -243,7 +243,7 @@ function updateEntryCount() {
 const dealGrid      = document.getElementById('dealGrid');
 const searchInput   = document.getElementById('searchInput');
 const searchBtn     = document.getElementById('searchBtn');
-const navLinks      = document.querySelectorAll('.nav-link:not(.giveaway-nav-link)'); // exclude giveaway btn
+const navLinks      = document.querySelectorAll('.nav-link:not(.giveaway-nav-link), .mobile-nav-panel a[data-category]'); // exclude giveaway btn; the phone menu panel's category links ride the same wiring (2026-11-15)
 const categoryLinks = document.querySelectorAll('.category-list a');
 const modal         = document.getElementById('dealModal');
 const modalBody     = document.getElementById('modalBody');
@@ -364,6 +364,7 @@ function setupEventListeners() {
     const giveawayModal     = document.getElementById('giveawayModal');
     const openGiveaway      = document.getElementById('openGiveaway');
     const openGiveawaySide  = document.getElementById('openGiveawaySidebar');
+    const openGiveawayHead  = document.getElementById('openGiveawayHeader');
     const closeGiveaway     = document.getElementById('closeGiveaway');
     const giveawaySubmitBtn = document.getElementById('giveawaySubmitBtn');
 
@@ -556,6 +557,7 @@ function setupEventListeners() {
 
     if (openGiveaway)     openGiveaway.addEventListener('click', openGiveawayModal);
     if (openGiveawaySide) openGiveawaySide.addEventListener('click', openGiveawayModal);
+    if (openGiveawayHead) openGiveawayHead.addEventListener('click', openGiveawayModal);
 
     // Coming-soon CTAs (sidebar + modal): send the visitor to the
     // sign-in modal — the same path the signed-out entry button uses.
@@ -1089,6 +1091,10 @@ function renderSaved() {
 
 function renderDeals() {
     dealGrid.innerHTML = '';
+    // On phones every browsing view renders compact list rows while
+    // the Saved view keeps the big cards (owner, 2026-11-15);
+    // style.css keys the row layout off this class.
+    dealGrid.classList.toggle('saved-view', currentCategory === 'saved');
     if (currentCategory === 'freebies') { renderFreebies(); return; }
     if (currentCategory === 'saved') { renderSaved(); return; }
     showFreebiesIntro(false);
@@ -2255,4 +2261,55 @@ document.addEventListener('DOMContentLoaded', initApp);
     }
     window.CC_SIDEBAR_HINT = { shouldShow: shouldShow, update: update };
     update();
+})();
+
+// ── Phone header: hamburger + menu panel ────────────────────────────────
+// Owner (2026-11-15, from his SlickDeals screenshot): on phones the
+// header + nav strip ate too much of the screen. The strip is gone
+// (style.css); the top row is now just the hamburger, the logo, and
+// the round icon buttons (giveaway, bell, avatar), and this panel —
+// holding My Feed, All Deals, the categories, Free Stuff, Saved and
+// the page links — is the menu the hamburger opens. Category taps
+// filter through the same setCategory wiring as the strip and the
+// sidebar (the panel's links are in app.js's navLinks); this block
+// only owns the panel's open/close. One header popover at a time:
+// opening the panel closes the account menu and the notes panel,
+// and auth.js closes this panel when either of those opens.
+(function () {
+    var btn = document.getElementById('mobileMenuBtn');
+    var panel = document.getElementById('mobileNavPanel');
+    if (!btn || !panel) return;
+    function isOpen() { return panel.style.display !== 'none'; }
+    function close() {
+        panel.style.display = 'none';
+        btn.setAttribute('aria-expanded', 'false');
+    }
+    function open() {
+        var menu = document.getElementById('authMenu');
+        if (menu) menu.style.display = 'none';
+        var notes = document.getElementById('notesPanel');
+        if (notes) notes.style.display = 'none';
+        panel.style.display = '';
+        btn.setAttribute('aria-expanded', 'true');
+    }
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (isOpen()) close(); else open();
+    });
+    // Any tap on a panel link has done its job (a category filtered,
+    // a page is loading) — the panel tucks away behind it.
+    panel.addEventListener('click', function (e) {
+        if (e.target.closest('a')) close();
+    });
+    // The giveaway icon opens its modal above everything; the panel
+    // should not still be hanging open underneath it.
+    var gwBtn = document.getElementById('openGiveawayHeader');
+    if (gwBtn) gwBtn.addEventListener('click', close);
+    document.addEventListener('click', function (e) {
+        if (isOpen() && !e.target.closest('#mobileNavPanel') && !e.target.closest('#mobileMenuBtn')) close();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') close();
+    });
+    window.CC_MOBILE_NAV = { open: open, close: close, isOpen: isOpen };
 })();

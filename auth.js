@@ -413,9 +413,18 @@
         var bellEl = document.getElementById('notesBell');
         var panelEl = document.getElementById('notesPanel');
         function closePanel() { if (panelEl) panelEl.style.display = 'none'; }
+        // The phone menu panel (app.js) is the third header popover:
+        // one at a time, so opening the menu or the notes closes it.
+        function closeMobileNav() {
+            var p = document.getElementById('mobileNavPanel');
+            if (p) p.style.display = 'none';
+            var b = document.getElementById('mobileMenuBtn');
+            if (b) b.setAttribute('aria-expanded', 'false');
+        }
         function openPanel() {
             if (!panelEl || !currentUser) return;
             closeMenu();
+            closeMobileNav();
             paintNotesList();
             markNotesRead();
             panelEl.style.display = '';
@@ -473,6 +482,7 @@
         }
         function openMenu() {
             if (!menu || !currentUser) return;
+            closeMobileNav();
             if (menuEmail) menuEmail.textContent = maskEmail(currentUser.email || '');
             if (nameInput) nameInput.value = profileUsername || '';
             // Fresh open = the comment-name editor starts collapsed.

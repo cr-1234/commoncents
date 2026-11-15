@@ -356,7 +356,7 @@
         });
         var cc = 'all';
         try { if (typeof currentCategory !== 'undefined' && currentCategory) cc = currentCategory; } catch (e) {}
-        document.querySelectorAll('.main-nav a[data-category], .category-list a[data-category]').forEach(function (l) {
+        document.querySelectorAll('.main-nav a[data-category], .category-list a[data-category], .mobile-nav-panel a[data-category]').forEach(function (l) {
             l.classList.toggle('active', !inMine && l.getAttribute('data-category') === cc);
         });
         if (els.myFeedBadgeHost) {

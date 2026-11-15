@@ -825,7 +825,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
        squeeze onto whatever row had room. Now: logo + sign-in always
        share row 1 (the logo shrinks a touch so they always fit),
        search always gets its own full-width row, nav strip under it. */
-    .header-content { row-gap: 0.6rem; column-gap: 0.6rem; }
+    .header-content { row-gap: 0.6rem; column-gap: 0.5rem; }
     /* The logo must NEVER shrink (owner, 2026-11-12: on phones the
        "CENTS" end of COMMONCENTS got cut off — the shrinkable
        logo-link let the auth column squeeze it). The logo is a fixed
@@ -876,14 +876,54 @@ body.dark-mode .amazon-browse-btn { color: #000; }
        cards are narrower than a phone's single column. */
     .vote-container { gap: 0.25rem; }
     .vote-btn { padding: 0.3rem 0.35rem; font-size: 0.85rem; white-space: nowrap; }
+    /* Compact list rows (owner, 2026-11-15 — the SlickDeals and
+       Dan's Deals phone views show 5–7 deals per screen; ours showed
+       ONE giant card). In every browsing view (All Deals, My Feed,
+       categories, search, Free Stuff) the card becomes a horizontal
+       row: the deal's clean picture as a ~104px thumbnail on the
+       left, then the store/category line, title, price row and the
+       vote row. No description and no View Deal button — the row
+       itself opens the same modal as always (the card's own click
+       handler), and the modal keeps its Get This Deal button. Share
+       and Save go icon-only so the vote row fits on ONE line beside
+       the thumbnail. The Saved view is a personal shelf, not a
+       scanning feed, so it keeps the big cards — renderDeals marks
+       its grid .saved-view and every rule here steps aside for it. */
+    .deal-grid { gap: 0.6rem; }
+    .deal-grid:not(.saved-view) .deal-card { flex-direction: row; }
+    .deal-grid:not(.saved-view) .card-image { flex: 0 0 104px; width: 104px; height: auto; }
+    .deal-grid:not(.saved-view) .card-image img { padding: 0.35rem; }
+    .deal-grid:not(.saved-view) .card-content { padding: 0.6rem 0.75rem 0.65rem 0.3rem; min-width: 0; }
+    .deal-grid:not(.saved-view) .card-meta { margin-bottom: 0.25rem; }
+    .deal-grid:not(.saved-view) .card-title { font-size: 0.95rem; min-height: 0; margin-bottom: 0.3rem; }
+    .deal-grid:not(.saved-view) .card-desc { display: none; }
+    .deal-grid:not(.saved-view) .card-price { margin-bottom: 0.4rem; }
+    .deal-grid:not(.saved-view) .card-date { display: none; }
+    .deal-grid:not(.saved-view) .view-deal-btn,
+    .deal-grid:not(.saved-view) .freebie-btn { display: none; }
+    .deal-grid:not(.saved-view) .dead-note { display: none; }
+    .deal-grid:not(.saved-view) .freebie-when { margin: 0.05rem 0 0.4rem; }
+    .deal-grid:not(.saved-view) .new-badge,
+    .deal-grid:not(.saved-view) .expired-badge,
+    .deal-grid:not(.saved-view) .free-badge,
+    .deal-grid:not(.saved-view) .gone-badge { top: 6px; left: 6px; }
+    .deal-grid:not(.saved-view) .vote-btn { padding: 0.25rem 0.3rem; }
+    .deal-grid:not(.saved-view) .vote-btn.share-btn span,
+    .deal-grid:not(.saved-view) .vote-btn .save-label { display: none; }
     /* "Today's Best Deals" carries an inline 1.5rem size; at phone
        widths it wrapped into a tall stack next to the sort control. */
     .feed-header { gap: 0.5rem 0.75rem; }
     .feed-header h1 { font-size: 1.22rem !important; }
-    .main-nav {
-        display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.5rem;
-        width: 100%; order: 4; margin-top: 0.75rem; white-space: nowrap; align-items: center;
-    }
+    /* The nav strip is RETIRED on phones (owner, 2026-11-15): it ate
+       a full row of the screen. Everything it showed now lives in
+       the hamburger's menu panel (.mobile-nav-panel), and the top
+       row is just hamburger + logo + the round icon buttons. The
+       .nav-link rules below stay for the strip markup, which remains
+       in the page (desktop hides it too, as it always has). */
+    .main-nav { display: none; }
+    .hamburger-btn { display: inline-flex; }
+    .cc-gw-btn { display: inline-flex; }
+    .auth-row { gap: 0.35rem; }
     .nav-link {
         color: var(--text-secondary); font-weight: 500; font-size: 0.88rem;
         padding: 0.4rem 1rem; border-radius: 9999px !important; transition: all 0.2s;
@@ -909,9 +949,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 /* Tablet band (owner's Tab S4 shot, 2026-11-12): at 560–900px the
    one-card-per-row phone layout stretched each card across the whole
    tablet and the search bar ran screen-wide. Two cards per row here,
-   and the search keeps a sane centered width. */
+   and the search keeps a sane centered width. Since 2026-11-15 the
+   browsing views are compact full-width rows at every phone/tablet
+   width, so the two-up grid survives only in the Saved view, whose
+   big cards are the ones that used to stretch. */
 @media (min-width: 560px) and (max-width: 900px) {
-    .deal-grid { grid-template-columns: repeat(2, 1fr); }
+    .deal-grid { grid-template-columns: 1fr; }
+    .deal-grid.saved-view { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ── Tailored feed: interest picker + NEW badge ─────────────────── */
@@ -1026,6 +1070,55 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 }
 .cc-bell:hover { background: #E1D1F8; }
 .cc-bell svg { display: block; }
+/* Phone header pieces (owner, 2026-11-15 — SlickDeals-style): the
+   hamburger, the giveaway icon and the menu panel live in the DOM at
+   every width, but only phones ever show them — the two buttons stay
+   display:none above 900px and the panel is pinned shut there
+   outright, so the desktop header is exactly what it was. */
+.hamburger-btn {
+    display: none; width: 36px; height: 36px; flex: 0 0 auto;
+    border: none; border-radius: 50%; background: #EDE5F8; color: var(--highlight);
+    cursor: pointer; padding: 0; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(91,45,142,0.18);
+}
+.hamburger-btn:hover { background: #E1D1F8; }
+.hamburger-btn svg { display: block; }
+/* The giveaway icon is the site's own gift mark (it carries its own
+   light-plum backdrop), so the button itself is bare. */
+.cc-gw-btn {
+    display: none; width: 34px; height: 34px; flex: none;
+    background: none; border: none; cursor: pointer; padding: 0;
+    align-items: center; justify-content: center;
+}
+.cc-gw-btn .gw-gift-mark { width: 30px; height: 30px; margin: 0; filter: drop-shadow(0 3px 8px rgba(91,45,142,0.18)); }
+/* The panel drops from the sticky header's bottom edge, full width,
+   one clean card: big tappable rows for the feed destinations, then
+   the page links in two quiet columns. */
+.mobile-nav-panel {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 120;
+    background: var(--bg-card); border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 18px 40px rgba(40,20,70,0.18);
+    padding: 0.6rem 20px 0.9rem;
+}
+@media (min-width: 901px) {
+    .mobile-nav-panel { display: none !important; }
+}
+.mobile-nav-list { list-style: none; margin: 0; padding: 0; }
+.mobile-nav-list a {
+    display: flex; align-items: center; min-height: 48px;
+    padding: 0.5rem 0.9rem; border-radius: 12px;
+    color: var(--text-primary); font-weight: 600; font-size: 0.98rem; text-decoration: none;
+}
+.mobile-nav-list a.active { background: #EDE5F8; color: var(--highlight); }
+.mobile-nav-pages {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem 0.5rem;
+    border-top: 1px solid var(--border-color); margin-top: 0.45rem; padding-top: 0.45rem;
+}
+.mobile-nav-pages a {
+    display: flex; align-items: center; min-height: 44px;
+    padding: 0.4rem 0.9rem; border-radius: 12px;
+    color: var(--text-secondary); font-weight: 600; font-size: 0.92rem; text-decoration: none;
+}
 .auth-menu {
     position: absolute; top: calc(100% + 8px); right: 0; width: 300px; z-index: 130;
     background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
