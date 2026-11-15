@@ -118,6 +118,15 @@
     var mode = savedView
         ? (savedView.mode === 'mine' && getInterests().length ? 'mine' : 'browse')
         : (getInterests().length ? 'mine' : 'browse');
+    // A saved view pairing My Feed with a special surface (Free Stuff /
+    // Saved) is contradictory: those are separate surfaces, not feed
+    // categories, and renderDeals swaps them in by category alone —
+    // which is how the pre-fix My Feed rows could save exactly this
+    // state (owner report, 2026-11-15). My Feed wins; the browse half
+    // falls back to All Deals so the startup restore lands on the feed.
+    if (mode === 'mine' && (viewCategory === 'freebies' || viewCategory === 'saved')) {
+        viewCategory = 'all';
+    }
     // The picker invites once: it starts open only when the visitor has
     // no saved picks AND has never pressed Done (ccPickerDone). After
     // that it stays tucked away — only the explicit Change buttons
@@ -478,6 +487,23 @@
             row.addEventListener('click', function (e) {
                 e.preventDefault();
                 mode = 'mine';
+                // Free Stuff and Saved are separate surfaces, not
+                // categories of the deals grid: renderDeals swaps them
+                // in whenever currentCategory names them, regardless of
+                // feed mode, so entering My Feed from one of them must
+                // step off the surface first or the feed never renders
+                // (owner report, 2026-11-15). setCategory('all') also
+                // repaints via renderDeals with mode already 'mine',
+                // i.e. the feed itself; paintAll below then settles the
+                // nav active states on the My Feed rows.
+                try {
+                    if ((typeof currentCategory !== 'undefined') &&
+                        (currentCategory === 'freebies' || currentCategory === 'saved') &&
+                        typeof setCategory === 'function') {
+                        viewCategory = 'all';
+                        setCategory('all');
+                    }
+                } catch (err) {}
                 saveView();
                 paintAll();
                 if (typeof renderDeals === 'function') renderDeals();
