@@ -914,6 +914,9 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .auth-menu-note .an-site { color: var(--highlight); font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
 .auth-menu-note .an-text { color: var(--text-secondary); }
 .auth-menu-note .an-when { color: var(--text-secondary); font-size: .75rem; white-space: nowrap; }
+.auth-menu-notes-toggle { width: 100%; margin: 0 0 .3rem; }
+.auth-menu-note.auth-menu-notes-off { display: block; width: 100%; text-align: left; border: none; cursor: pointer; font-family: inherit; }
+.auth-menu-note.auth-menu-notes-off:hover { background: #E2D5F5; }
 .cmt-reply-btn { background: none; border: none; color: var(--highlight); font-weight: 600; font-size: .82rem; cursor: pointer; padding: .2rem 0 0; font-family: inherit; }
 .auth-email.as-avatar::before {
     content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);

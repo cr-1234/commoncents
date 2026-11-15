@@ -76,6 +76,11 @@
     // menu marks them read and clears the badge.
     var notesCache = null;
     var notesUnread = 0;
+    // Mute switch (owner request 2026-11-14): stored server-side on
+    // the account (notifications/{uid}.muted) so it follows the member
+    // across devices. While muted the server creates nothing, and
+    // here the badge stays off and the menu shows the quiet off state.
+    var notesMuted = false;
     function escNote(s) {
         return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
@@ -92,7 +97,7 @@
         var av = document.getElementById('authEmail');
         if (!av) return;
         var b = av.querySelector('.cc-note-badge');
-        if (!currentUser || !notesUnread) { if (b) b.remove(); return; }
+        if (!currentUser || !notesUnread || notesMuted) { if (b) b.remove(); return; }
         if (!b) { b = document.createElement('span'); b.className = 'cc-note-badge'; av.appendChild(b); }
         b.textContent = notesUnread > 9 ? '9+' : String(notesUnread);
     }
@@ -100,6 +105,19 @@
         var wrap = document.getElementById('authMenuNotes');
         var list = document.getElementById('authMenuNotesList');
         if (!wrap || !list) return;
+        var toggle = document.getElementById('authMenuNotesToggle');
+        if (notesMuted) {
+            // Off state: the whole block collapses to ONE pill row,
+            // like the empty state — tapping it turns notes back on.
+            wrap.classList.add('is-empty');
+            if (toggle) toggle.style.display = 'none';
+            list.innerHTML = '<button type="button" class="auth-menu-note auth-menu-notes-empty auth-menu-notes-off" id="authMenuNotesTurnOn">Notifications are off — Turn on</button>';
+            var onBtn = document.getElementById('authMenuNotesTurnOn');
+            if (onBtn) onBtn.addEventListener('click', function () { setNotesMuted(false); });
+            wrap.style.display = '';
+            return;
+        }
+        if (toggle) toggle.style.display = '';
         if (!notesCache || !notesCache.length) {
             // Always show the block (owner, 2026-11-13: he went looking for
             // where notifications come out and found nothing — the block
@@ -132,9 +150,21 @@
             if (!res || res.error) return;
             notesCache = Array.isArray(res.items) ? res.items : [];
             notesUnread = res.unread || 0;
+            notesMuted = !!res.muted;
             paintNoteBadge();
             paintNotesList();
         }).catch(function () { /* notes retry on the next sign-in */ });
+    }
+    function setNotesMuted(muted) {
+        notesMuted = !!muted;
+        if (notesMuted) notesUnread = 0;
+        paintNoteBadge();
+        paintNotesList();
+        if (!currentUser) return;
+        var user = currentUser;
+        user.getIdToken().then(function (token) {
+            return postFn('setNotificationsMuted', { muted: notesMuted }, token);
+        }).catch(function () { /* the switch re-syncs on next sign-in */ });
     }
     function markNotesRead() {
         if (!currentUser || !notesUnread) return;
@@ -424,6 +454,8 @@
         // Restore (Account Guard): two-tap, like Gifting Butler's —
         // first tap arms the row, second pulls the backup snapshot and
         // applies votes + picks + comment name from it.
+        var notesToggleBtn = document.getElementById('authMenuNotesToggle');
+        if (notesToggleBtn) notesToggleBtn.addEventListener('click', function () { setNotesMuted(true); });
         var restoreBtn = document.getElementById('authMenuRestore');
         var restoreMsg = document.getElementById('authMenuRestoreMsg');
         var restoreArmed = false, restoreArmTimer = null;
