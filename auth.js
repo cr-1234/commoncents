@@ -62,6 +62,21 @@
         voteSaveTimer = setTimeout(function () { saveVotesNow(user, copy); }, 600);
     }
 
+    var savesSaveTimer = null;
+    function saveSavesNow(user, list) {
+        return user.getIdToken().then(function (token) {
+            return postFn('ccSaveSaves', { saves: list }, token);
+        }).catch(function () { /* saving retries on the next change */ });
+    }
+    // Called by app.js whenever the local saved-deal list changes.
+    function noteSavesChanged(list) {
+        if (!currentUser) return;
+        clearTimeout(savesSaveTimer);
+        var user = currentUser;
+        var copy = (list || []).map(function (s) { return Object.assign({}, s); });
+        savesSaveTimer = setTimeout(function () { saveSavesNow(user, copy); }, 600);
+    }
+
     // Called by tailored-feed.js whenever the picks change locally.
     function noteInterestsChanged(keys) {
         if (!currentUser) return;
@@ -212,6 +227,28 @@
                 var merged = Object.assign({}, acctVotes, localVotes);
                 if (Object.keys(merged).length > Object.keys(localVotes).length) CC_VOTES.set(merged);
                 else if (Object.keys(localVotes).length > Object.keys(acctVotes).length) saveVotesNow(user, localVotes);
+            }
+            // Saves merge the same never-lose way: union by deal id —
+            // the account's record wins when both sides saved the same
+            // deal, device-only saves are kept, and the union goes
+            // back up whenever either side was missing something.
+            if (window.CC_SAVES) {
+                var acctSaves = Array.isArray(res.saves) ? res.saves : [];
+                var localSaves = CC_SAVES.get();
+                var byId = {};
+                localSaves.forEach(function (s) { byId[s.id] = s; });
+                acctSaves.forEach(function (s) { byId[s.id] = s; });
+                var mergedSaves = Object.keys(byId).map(function (k) { return byId[k]; });
+                var localById = {};
+                localSaves.forEach(function (s) { localById[s.id] = s; });
+                var differs = mergedSaves.length !== localSaves.length || mergedSaves.some(function (s) {
+                    return !localById[s.id] || JSON.stringify(localById[s.id]) !== JSON.stringify(s);
+                });
+                var acctIds = {};
+                acctSaves.forEach(function (s) { acctIds[s.id] = true; });
+                var localHasNew = localSaves.some(function (s) { return !acctIds[s.id]; });
+                if (differs) CC_SAVES.set(mergedSaves); // set() also pushes the union back up
+                else if (localHasNew) saveSavesNow(user, mergedSaves);
             }
         }).catch(function () { /* guest picks remain in effect */ });
     }
@@ -376,6 +413,8 @@
                     if (gwCount) gwCount.textContent = '';
                 }
             }
+            var svCount = document.getElementById('authMenuSavedCount');
+            if (svCount) svCount.textContent = (window.CC_SAVES && CC_SAVES.get().length) ? String(CC_SAVES.get().length) : '';
             paintNotesList();
             markNotesRead();
             menu.style.display = '';
@@ -432,6 +471,12 @@
             closeMenu();
             var g = document.getElementById('openGiveaway');
             if (g) g.click();
+        });
+        var savedRowBtn = document.getElementById('authMenuSaved');
+        if (savedRowBtn) savedRowBtn.addEventListener('click', function () {
+            closeMenu();
+            var link = document.querySelector('.main-nav a[data-category="saved"]') || document.querySelector('.category-list a[data-category="saved"]');
+            if (link) link.click();
         });
         var mode = 'signin'; // or 'signup'
 
@@ -490,11 +535,13 @@
                 if (!res || res.error) { showRestoreMsg('Restore failed — try again.'); return; }
                 if (res.empty) { showRestoreMsg('No backup yet — one is saved automatically if your votes or picks ever shrink.'); return; }
                 if (window.CC_VOTES && res.votes) CC_VOTES.set(res.votes);
+                if (window.CC_SAVES && Array.isArray(res.saves)) CC_SAVES.set(res.saves);
                 if (window.CC_FEED && Array.isArray(res.interests) && res.interests.length) CC_FEED.setInterests(res.interests, true);
                 if (res.username) { profileUsername = res.username; paintNameRow(); }
                 var when = res.savedAt ? new Date(res.savedAt).toLocaleDateString() : '';
                 var n = res.votes ? Object.keys(res.votes).length : 0;
-                showRestoreMsg('Restored ' + n + ' vote' + (n === 1 ? '' : 's') + (res.interests && res.interests.length ? ' and your feed picks' : '') + (when ? ' from ' + when : '') + '.');
+                var ns = Array.isArray(res.saves) ? res.saves.length : 0;
+                showRestoreMsg('Restored ' + n + ' vote' + (n === 1 ? '' : 's') + (ns ? ' and ' + ns + ' saved deal' + (ns === 1 ? '' : 's') : '') + (res.interests && res.interests.length ? ' and your feed picks' : '') + (when ? ' from ' + when : '') + '.');
             }).catch(function () { showRestoreMsg('Restore failed — try again.'); });
         });
 
@@ -535,6 +582,7 @@
         },
         noteInterestsChanged: noteInterestsChanged,
         noteVotesChanged: noteVotesChanged,
+        noteSavesChanged: noteSavesChanged,
         username: function () { return profileUsername; },
         submissionBonus: function () { return profileSubBonus; },
         // Deterministic friendly default name from the account id — so a
@@ -569,6 +617,11 @@
             // The giveaway teaser swaps its account CTA for a "ready"
             // note on sign-in (and back on sign-out).
             if (typeof window.CC_PAINT_GW_STATE === 'function') window.CC_PAINT_GW_STATE();
+            // An open deal window re-reads its comments area on a
+            // sign-in change: auth resolves asynchronously, so a member
+            // who opened a deal before it landed must not stay stuck
+            // with the signed-out snapshot (app.js owns the hook).
+            if (typeof window.CC_ON_AUTH_CHANGED === 'function') window.CC_ON_AUTH_CHANGED();
             if (currentUser) {
                 // The giveaway treats the account email as "your email"
                 // everywhere (entry state, visit-day bonuses).

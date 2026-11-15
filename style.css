@@ -525,7 +525,13 @@ body.dark-mode .page-btn.active { color: #000; }
 }
 body.dark-mode .view-deal-btn { color: #000; }
 .view-deal-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(91,45,142,0.4); }
-.vote-container { display: flex; align-items: center; gap: 0.5rem; padding-top: 0.75rem; }
+/* flex-wrap is the guarantee the row can never spill out of the card:
+   the four buttons (up / down / Share / Save) cannot shrink below
+   their content width, so on narrow cards an unwrapped row overflowed
+   and the card's overflow:hidden clipped Save mid-word (owner's phone
+   screenshot, 2026-11-15). Wrapping changes nothing where the row
+   already fits on one line. */
+.vote-container { display: flex; align-items: center; gap: 0.5rem; padding-top: 0.75rem; flex-wrap: wrap; }
 .view-deal-btn { margin-top: auto; }
 .vote-btn {
     background: none; border: none; color: var(--text-secondary);
@@ -538,6 +544,20 @@ body.dark-mode .view-deal-btn { color: #000; }
 .vote-btn.active.downvote-btn { color: #dc2626; background: rgba(220,38,38,0.10); }
 @keyframes votePop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
 .vote-btn.pop { animation: votePop 0.35s ease; }
+
+/* ── Save deals (bookmark on cards + detail modal) ──────── */
+.save-btn.saved { color: var(--highlight); background: rgba(91,45,142,0.12); }
+.save-btn.saved svg { fill: currentColor; }
+.save-modal-btn { background: rgba(91,45,142,0.12); color: var(--highlight); }
+.save-modal-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(91,45,142,0.25); }
+.save-modal-btn.saved { background: var(--highlight); color: #fff; }
+.save-modal-btn.saved svg { fill: currentColor; }
+.gone-badge {
+    position: absolute; top: 10px; left: 10px; z-index: 2;
+    background: #6b7280; color: #fff;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+    padding: 0.25rem 0.55rem; border-radius: 999px;
+}
 
 /* ── Share (deal cards + detail modal) ──────────────────── */
 .share-btn { margin-left: auto; }
@@ -801,6 +821,15 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .pagination { flex-wrap: nowrap; gap: 0.3rem; }
     .page-btn { padding: 0.45rem 0.55rem; font-size: 0.88rem; }
     .page-btn:not(.page-nav) { min-width: 2.1rem; }
+    /* Card vote row (owner's phone screenshot, 2026-11-15): with Save
+       added as a fourth button, the row's full width ran past the
+       card's inner width at phone sizes and Save was clipped at the
+       card edge. Tighter gaps + button padding keep all four buttons
+       on one line at 360/390px; in the narrow end of the 560–900px
+       two-column band the base rule's flex-wrap folds the row inside
+       the card instead of clipping it. */
+    .vote-container { gap: 0.35rem; }
+    .vote-btn { padding: 0.25rem 0.45rem; }
     /* "Today's Best Deals" carries an inline 1.5rem size; at phone
        widths it wrapped into a tall stack next to the sort control. */
     .feed-header { gap: 0.5rem 0.75rem; }
@@ -871,6 +900,26 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     background: var(--gold-gradient); color: #ffffff;
     border-color: transparent; font-weight: 700;
 }
+/* ── Free Stuff ────────────────────────────────────────────────── */
+.freebies-intro {
+    background: #EDE5F8; border: 1px solid var(--border-color);
+    border-radius: var(--border-radius); color: var(--text-primary);
+    padding: 0.8rem 1rem; margin-bottom: 1.25rem; font-size: 0.92rem;
+}
+.free-badge {
+    position: absolute; top: 10px; left: 10px; z-index: 2;
+    background: var(--highlight); color: #ffffff;
+    font-size: 13px; font-weight: 800; letter-spacing: 0.06em;
+    padding: 0.35rem 0.8rem; border-radius: 999px;
+}
+.free-badge-inline { position: static; display: inline-block; margin-bottom: 0.55rem; }
+.freebie-howto { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45; }
+.freebie-when {
+    font-size: 0.78rem; font-weight: 700; color: var(--highlight);
+    text-transform: uppercase; letter-spacing: 0.05em; margin: 0.35rem 0 0.65rem;
+}
+.freebie-btn { margin-bottom: 0.25rem; }
+
 .audience-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.7rem; }
 .audience-label { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
 .feed-status { color: var(--text-secondary); font-size: 0.83rem; margin: 0.65rem 0 0.2rem; }

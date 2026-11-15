@@ -25,6 +25,85 @@ window.CC_VOTES = {
         if (typeof renderDeals === 'function') renderDeals();
     }
 };
+// ── Saved deals (owner-approved 2026-11-14) ─────────────────────
+// A visitor's bookmarked deals, kept as SNAPSHOTS captured at save
+// time ({id, title, price, image, url, ts}) — so a deal that later
+// leaves the feed can still be shown in the Saved view from its
+// snapshot, honestly tagged "No longer live", instead of vanishing.
+// Device-local in ccMySaves; signed-in members also keep the list on
+// their account (auth.js debounces and pushes it to ccSaveSaves,
+// protected by the same Account Guard backup as votes).
+let mySaves = [];
+try {
+    const rawSaves = JSON.parse(localStorage.getItem('ccMySaves') || '[]');
+    if (Array.isArray(rawSaves)) mySaves = rawSaves.filter(s => s && Number.isInteger(s.id) && s.id > 0);
+} catch (e) { mySaves = []; }
+function saveMySaves() {
+    try { localStorage.setItem('ccMySaves', JSON.stringify(mySaves)); } catch (e) {}
+    if (window.CC_AUTH && CC_AUTH.noteSavesChanged) { try { CC_AUTH.noteSavesChanged(mySaves); } catch (e) {} }
+    // Every saves mutation funnels through here (toggle, sign-in
+    // merge, Restore) — repaint the sidebar counts so the Saved
+    // row's number tracks the list with no reload (owner, 2026-11-15).
+    if (typeof paintCategoryCounts === 'function') { try { paintCategoryCounts(); } catch (e) {} }
+}
+function hasSave(id) { return mySaves.some(s => s.id === id); }
+function paintSaveButtons(id) {
+    const saved = hasSave(id);
+    document.querySelectorAll('[data-save-id="' + id + '"]').forEach(btn => {
+        btn.classList.toggle('saved', saved);
+        btn.setAttribute('aria-pressed', saved ? 'true' : 'false');
+        const lbl = btn.querySelector('.save-label');
+        if (lbl) lbl.textContent = saved ? 'Saved' : 'Save';
+    });
+}
+function toggleSave(deal) {
+    if (hasSave(deal.id)) {
+        mySaves = mySaves.filter(s => s.id !== deal.id);
+    } else {
+        mySaves.push({
+            id: deal.id,
+            title: deal.title || '',
+            price: (typeof deal.price === 'number' ? deal.price : 0),
+            image: deal.image || '',
+            url: deal.url || '',
+            ts: Date.now()
+        });
+    }
+    saveMySaves();
+    paintSaveButtons(deal.id);
+    // In the Saved view, unsaving removes the card from the list too.
+    if (currentCategory === 'saved') renderDeals();
+    return hasSave(deal.id);
+}
+// Bridge for auth.js: read the local saved list, replace it wholesale
+// (sign-in union merge / Restore from backup), or toggle a deal.
+window.CC_SAVES = {
+    get: function () { return mySaves.map(s => Object.assign({}, s)); },
+    set: function (list) {
+        const clean = [];
+        const seen = {};
+        if (Array.isArray(list)) list.forEach(s => {
+            if (s && Number.isInteger(s.id) && s.id > 0 && !seen[s.id]) {
+                seen[s.id] = true;
+                clean.push({
+                    id: s.id,
+                    title: s.title || '',
+                    price: (typeof s.price === 'number' ? s.price : 0),
+                    image: s.image || '',
+                    url: s.url || '',
+                    ts: (typeof s.ts === 'number' ? s.ts : 0)
+                });
+            }
+        });
+        mySaves = clean;
+        saveMySaves();
+        if (typeof renderDeals === 'function') renderDeals();
+    },
+    has: function (id) { return hasSave(id); },
+    toggle: function (deal) { return toggleSave(deal); }
+};
+const SAVE_BOOKMARK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>';
+
 // Displayed count = the deal's stored tally + my own vote if I cast it.
 // The stored tallies reset on every page load but myVotes persists, so the
 // counts must be DERIVED, never mutated — mutating them let a returning
@@ -589,6 +668,9 @@ function openSubmitDealModal() {
 
 function handleSearch() {
     searchQuery = searchInput.value;
+    // Freebies never appear in search results: searching from the Free
+    // Stuff view goes back to All Deals and searches the deals.
+    if (currentCategory === 'freebies' || currentCategory === 'saved') { setCategory('all'); return; }
     renderDeals();
 }
 
@@ -614,7 +696,10 @@ function setCategory(category) {
 // category with none is hidden entirely. Computed from the deals
 // array at page load — never hard-coded — so newly posted deals
 // update the counts on the next load with no code change. The top
-// nav intentionally gets no counts.
+// nav intentionally gets no counts. Free Stuff and Saved carry
+// counts too (owner, 2026-11-15): live freebies / this device's
+// saves — those two rows are permanent, so their badge shows the
+// number even at 0 instead of the row hiding.
 function paintCategoryCounts() {
     const tally = {};
     let total = 0;
@@ -623,12 +708,34 @@ function paintCategoryCounts() {
         total++;
         tally[d.category] = (tally[d.category] || 0) + 1;
     });
+    // Free Stuff count: live freebies only, by the same ET-date
+    // expiry rule the Free Stuff view itself renders by.
+    let freeCount = 0;
+    try {
+        if (typeof freebies !== 'undefined' && Array.isArray(freebies)) freeCount = freebies.filter(isFreebieLive).length;
+    } catch (e) {}
+    // Saved count: this device's saved deals.
+    let savedCount = 0;
+    try {
+        if (window.CC_SAVES && typeof window.CC_SAVES.get === 'function') savedCount = window.CC_SAVES.get().length;
+        else { const rawSaved = JSON.parse(localStorage.getItem('ccMySaves') || '[]'); if (Array.isArray(rawSaved)) savedCount = rawSaved.length; }
+    } catch (e) {}
     categoryLinks.forEach(link => {
         const cat = link.dataset.category;
         if (!cat) return; // the "My Feed" row — painted by tailored-feed.js
-        const n = cat === 'all' ? total : (tally[cat] || 0);
         const li = link.closest('li');
         let badge = link.querySelector('.cat-count');
+        if (cat === 'freebies' || cat === 'saved') {
+            if (li) li.style.display = '';
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'cat-count';
+                link.appendChild(badge);
+            }
+            badge.textContent = cat === 'freebies' ? freeCount : savedCount;
+            return;
+        }
+        const n = cat === 'all' ? total : (tally[cat] || 0);
         if (cat !== 'all' && n === 0) {
             if (li) li.style.display = 'none';
             if (badge) badge.remove();
@@ -658,8 +765,125 @@ function isDealExpired(deal) {
     return deal.dead === true;
 }
 
+// ── Free Stuff view ─────────────────────────────────────────────────
+// Freebies (freebies-data.js) are their own surface: they render ONLY
+// in the Free Stuff view (nav/sidebar category 'freebies'), never in
+// All Deals, My Feed, or search results. They are not affiliate deals —
+// their buttons link straight to the brand's official page (no
+// getAffiliateUrl, no click/view counting). Expired entries hide
+// automatically; the comparison date is today in Eastern Time.
+function etTodayStr() {
+    try {
+        return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    } catch (e) {
+        return new Date().toISOString().slice(0, 10);
+    }
+}
+function isFreebieLive(f) {
+    return !f.expires || f.expires >= etTodayStr();
+}
+function showFreebiesIntro(show) {
+    let el = document.getElementById('freebiesIntro');
+    if (!el) {
+        if (!show) return;
+        el = document.createElement('div');
+        el.id = 'freebiesIntro';
+        el.className = 'freebies-intro';
+        el.textContent = 'Free offers from stores and apps — no purchase needed unless the offer says so. Offers change fast; we check them often.';
+        dealGrid.parentNode.insertBefore(el, dealGrid);
+    }
+    el.style.display = show ? '' : 'none';
+}
+function createFreebieCard(f) {
+    const article = document.createElement('article');
+    article.className = 'deal-card freebie-card';
+    const when = f.expires
+        ? 'Ends ' + new Date(f.expires + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        : 'Ongoing';
+    article.innerHTML = `
+        ${f.image ? `<div class="card-image"><img src="${f.image}" alt="${f.title}" loading="lazy"><span class="free-badge">FREE</span></div>` : ''}
+        <div class="card-content">
+            ${f.image ? '' : '<span class="free-badge free-badge-inline">FREE</span>'}
+            <div class="card-meta">
+                <span class="card-source">${f.store}</span>
+                <span class="card-category">Free Stuff</span>
+            </div>
+            <h3 class="card-title">${f.title}</h3>
+            ${f.description ? `<p class="card-desc">${f.description}</p>` : ''}
+            ${f.howTo ? `<p class="freebie-howto"><strong>How to get it:</strong> ${f.howTo}</p>` : ''}
+            <div class="freebie-when">${when}</div>
+            <a href="${f.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width freebie-btn">Get This Freebie</a>
+        </div>`;
+    return article;
+}
+function renderFreebies() {
+    showFreebiesIntro(true);
+    renderPagination(0);
+    const list = (typeof freebies !== 'undefined' && Array.isArray(freebies)) ? freebies.filter(isFreebieLive) : [];
+    if (!list.length) {
+        dealGrid.innerHTML = '<div class="no-results">No freebies right now — check back soon.</div>';
+        return;
+    }
+    list.forEach(f => dealGrid.appendChild(createFreebieCard(f)));
+}
+
+// ── Saved view ──────────────────────────────────────────────────
+// The visitor's bookmarked deals (nav/sidebar category 'saved').
+// A save whose deal is still live renders as the deal's normal card
+// (fresh data); a save whose deal has left the feed renders from
+// the snapshot captured at save time, tagged "No longer live" —
+// the saved price and picture show as they were, and the outbound
+// link still goes to the store page (with the affiliate tag).
+function createSavedSnapshotCard(save) {
+    const article = document.createElement('article');
+    article.className = 'deal-card saved-gone-card';
+    const savedDate = save.ts ? new Date(save.ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+    article.innerHTML = `
+        <div class="card-image">
+            ${save.image ? `<img src="${save.image}" alt="${save.title}" loading="lazy">` : ''}
+            <span class="gone-badge">NO LONGER LIVE</span>
+        </div>
+        <div class="card-content">
+            <div class="card-meta">
+                <span class="card-source">${getStoreName(save.url)}</span>
+                <span class="card-category">Saved deal</span>
+            </div>
+            <h3 class="card-title">${save.title}</h3>
+            <div class="card-price">
+                $${save.price}
+                ${savedDate ? `<span class="card-date">Saved ${savedDate}</span>` : ''}
+            </div>
+            <p class="dead-note">This deal is no longer on the site — the button below still goes to the store page you saved.</p>
+            <a href="${getAffiliateUrl(save.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" data-deal-id="${save.id}" style="margin-bottom:1rem;">View at Store</a>
+            <div class="vote-container" style="border-top:none; padding-top:0;">
+                <button class="vote-btn save-btn saved" data-save-id="${save.id}" aria-pressed="true" aria-label="Remove from saved deals" title="Saved — tap to remove">
+                    ${SAVE_BOOKMARK_SVG}
+                    <span class="save-label">Saved</span>
+                </button>
+            </div>
+        </div>`;
+    article.querySelector('.save-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleSave(save); });
+    return article;
+}
+function renderSaved() {
+    showFreebiesIntro(false);
+    renderPagination(0);
+    if (!mySaves.length) {
+        dealGrid.innerHTML = '<div class="no-results">No saved deals yet — tap the bookmark on any deal to keep it here.</div>';
+        return;
+    }
+    // Newest save first.
+    mySaves.slice().reverse().forEach(save => {
+        const live = deals.find(d => d.id === save.id && !isDealExpired(d));
+        dealGrid.appendChild(live ? createDealCard(live) : createSavedSnapshotCard(save));
+    });
+}
+
 function renderDeals() {
     dealGrid.innerHTML = '';
+    if (currentCategory === 'freebies') { renderFreebies(); return; }
+    if (currentCategory === 'saved') { renderSaved(); return; }
+    showFreebiesIntro(false);
     let filtered = deals.filter(deal => {
         const inMyFeed    = window.CC_FEED && CC_FEED.mode() === 'mine';
         const matchCat    = inMyFeed || currentCategory === 'all' || deal.category === currentCategory;
@@ -824,6 +1048,10 @@ function createDealCard(deal) {
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
                     <span>Share</span>
                 </button>
+                <button class="vote-btn save-btn ${hasSave(deal.id) ? 'saved' : ''}" data-save-id="${deal.id}" aria-pressed="${hasSave(deal.id) ? 'true' : 'false'}" aria-label="Save this deal" title="Save this deal">
+                    ${SAVE_BOOKMARK_SVG}
+                    <span class="save-label">${hasSave(deal.id) ? 'Saved' : 'Save'}</span>
+                </button>
             </div>
         </div>`;
 
@@ -835,6 +1063,7 @@ function createDealCard(deal) {
     article.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
     article.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
     article.querySelector('.share-btn').addEventListener('click', (e) => { e.stopPropagation(); openShareMenu(deal); });
+    article.querySelector('.save-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleSave(deal); });
     return article;
 }
 
@@ -977,12 +1206,22 @@ function openModal(deal) {
         bindCommentActions();
         cl.scrollTop = toBottom ? cl.scrollHeight : st;
     };
-    const ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
-    const ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
-    const ccGenName = (window.CC_AUTH && CC_AUTH.fallbackName) ? CC_AUTH.fallbackName() : '';
-    const ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || ccGenName || 'Member') : null;
+    // The signed-in user is read LIVE, not frozen at open time: Firebase
+    // delivers the session asynchronously, so a member who opens a deal
+    // before auth lands would otherwise keep the signed-out snapshot
+    // ("Sign in to comment", no Reply buttons) for the whole visit even
+    // though they are signed in. paintCommentForm() below re-reads this
+    // whenever auth.js reports a sign-in change (CC_ON_AUTH_CHANGED).
+    let ccUser = null, ccProfileName = '', ccGenName = '', ccDisplayName = null;
+    const refreshCcUser = () => {
+        ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
+        ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
+        ccGenName = (window.CC_AUTH && CC_AUTH.fallbackName) ? CC_AUTH.fallbackName() : '';
+        ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || ccGenName || 'Member') : null;
+    };
+    refreshCcUser();
     const cmtInfo = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
-    const commentFormHTML = ccUser ? `
+    const buildCommentFormHTML = () => ccUser ? `
                         <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong> <button type="button" id="commentNameInfo" class="cmt-info-btn" aria-label="About your comment name">${cmtInfo}<span class="cmt-tip" role="tooltip">You can ${ccProfileName ? 'change' : 'set'} your comment name — tap your profile circle at the top right of the page.</span></button></p>
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
                         <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>
@@ -1005,6 +1244,7 @@ function openModal(deal) {
             </div>
             <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
             <button type="button" class="btn share-modal-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px; margin-right:0.35rem;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Share</span></button>
+            <button type="button" class="btn save-modal-btn ${hasSave(deal.id) ? 'saved' : ''}" data-save-id="${deal.id}" aria-pressed="${hasSave(deal.id) ? 'true' : 'false'}"><span style="vertical-align:-3px; margin-right:0.35rem; display:inline-block;">${SAVE_BOOKMARK_SVG}</span><span class="save-label">${hasSave(deal.id) ? 'Saved' : 'Save'}</span></button>
         </div>
         <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
         ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
@@ -1022,8 +1262,8 @@ function openModal(deal) {
         <div class="comments-section">
                     <h3 style="font-size:1.05rem; margin-bottom:0.75rem;">Comments</h3>
                     <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${buildCommentsHTML()}</div>
-                    <div>
-                        ${commentFormHTML}
+                    <div id="commentFormWrap">
+                        ${buildCommentFormHTML()}
                     </div>
         </div>`;
 
@@ -1033,6 +1273,8 @@ function openModal(deal) {
     modalBody.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
     const modalShareBtn = modalBody.querySelector('.share-modal-btn');
     if (modalShareBtn) modalShareBtn.addEventListener('click', (e) => { e.stopPropagation(); openShareMenu(deal); });
+    const modalSaveBtn = modalBody.querySelector('.save-modal-btn');
+    if (modalSaveBtn) modalSaveBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleSave(deal); });
 
     const modalCode = modalBody.querySelector('.deal-code');
     if (modalCode) {
@@ -1040,6 +1282,10 @@ function openModal(deal) {
         modalCode.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyDealCode(modalCode, deal.code); } });
     }
 
+    // The composer's buttons are bound through a helper so the
+    // auth-change repaint (paintCommentForm) can rebind them after
+    // swapping the composer's HTML.
+    const bindCommentForm = () => {
     const nameInfoBtn = document.getElementById('commentNameInfo');
     if (nameInfoBtn) {
         // Hover shows the tooltip on desktop (CSS); a tap toggles it for touch.
@@ -1110,6 +1356,8 @@ function openModal(deal) {
             if (b) b.click();
         });
     }
+    };
+    bindCommentForm();
 
     // Own-comment actions: pencil edits in place, trash deletes. Bound
     // through a helper so the list-only re-renders (optimistic posting)
@@ -1209,6 +1457,25 @@ function openModal(deal) {
     });
     };
     bindCommentActions();
+
+    // Track which face the composer currently shows so a sign-in change
+    // can swap it (and the Reply buttons, which follow the same state)
+    // without wiping text the member may have typed.
+    let ccFormSignedIn = !!ccUser;
+    const paintCommentForm = () => {
+        refreshCcUser();
+        if (!!ccUser === ccFormSignedIn) return;
+        ccFormSignedIn = !!ccUser;
+        const wrap = document.getElementById('commentFormWrap');
+        if (wrap) { wrap.innerHTML = buildCommentFormHTML(); bindCommentForm(); }
+        renderCommentsList(false);
+    };
+    // auth.js calls this hook on every sign-in change (same pattern as
+    // CC_PAINT_GW_STATE): when auth lands after this deal was opened,
+    // the comments area catches up with the signed-in header.
+    window.CC_ON_AUTH_CHANGED = () => {
+        if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') paintCommentForm();
+    };
 
     // Stored comments: fetch the saved thread for this deal and swap it in
     // (the server is the source of truth once it answers). Skipped on the
