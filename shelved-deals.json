@@ -190,5 +190,73 @@
     "shelvedAt": "2026-11-13",
     "shelvedReason": "Coupon gone — no coupon on the page and live base price $99.99 is at the $99.99 list price (posted deal price was $69.99 with the $30 clip coupon)",
     "lastSeenPrice": 99.99
+  },
+  {
+    "id": 1029,
+    "title": "23andMe Health + Ancestry Service DNA Test Kit For $75 From Amazon",
+    "category": "general",
+    "fc": "General",
+    "price": 75,
+    "originalPrice": 199,
+    "discount": 62,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/01123729/product-B01G7PYQTM.jpg",
+    "url": "https://www.amazon.com/dp/B01G7PYQTM?tag=commoncents0050-20",
+    "description": "23andMe's Health + Ancestry kit covers your ancestry breakdown plus health reports like carrier status and wellness traits. At $75, way under its $199 list, these kits rarely drop this low outside Prime events.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-03T04:34:05Z",
+    "source": "dansdeals",
+    "aud": "all",
+    "shelvedAt": "2026-11-15",
+    "shelvedReason": "Price rose to $229 — no longer a discount",
+    "lastSeenPrice": 229
+  },
+  {
+    "id": 1035,
+    "title": "Gold Bond Friction Defense Stick For Just $1.85-$2.48 From Amazon",
+    "category": "beauty",
+    "fc": "Beauty",
+    "price": 1.85,
+    "originalPrice": 6.28,
+    "discount": 71,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/02220255/product-B007VC9DKI.jpg",
+    "url": "https://www.amazon.com/dp/B007VC9DKI?tag=commoncents0050-20",
+    "description": "A friction-defense stick that stops chafing before it starts — a runner and summer staple.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-13T16:30:40.930Z",
+    "source": "dansdeals",
+    "dealNote": "Clip the $3.49 coupon on the Amazon product page and check out with Subscribe & Save to get this price.",
+    "aud": "all",
+    "shelvedAt": "2026-11-15",
+    "shelvedReason": "Coupon gone — price back at list $6.28",
+    "lastSeenPrice": 6.28
+  },
+  {
+    "id": 1047,
+    "title": "Under Armour Girls’ Hooded Parka Puffer Jacket For $45.58 Shipped From Amazon",
+    "category": "clothing",
+    "fc": "Clothing",
+    "price": 45.58,
+    "originalPrice": 75.97,
+    "discount": 40,
+    "image": "https://m.media-amazon.com/images/I/71pzjEMwIOL._AC_SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B0FKHX4DPH?tag=commoncents0050-20",
+    "description": "Under Armour’s hooded puffer for girls — warm, water-resistant, and built for cold winter days. A name-brand winter coat at 40% off list.",
+    "dealNote": "Clip the $30.39 coupon on the Amazon product page to get this price — without the coupon, it’s $75.97.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-11T16:28:23Z",
+    "source": "dansdeals",
+    "aud": "all",
+    "shelvedAt": "2026-11-15",
+    "shelvedReason": "Coupon gone — price back at list $94.97",
+    "lastSeenPrice": 94.97
   }
 ]
