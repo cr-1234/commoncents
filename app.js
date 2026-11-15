@@ -342,7 +342,7 @@ function setupEventListeners() {
                                     .catch(() => { vBtn.disabled = false; vBtn.textContent = 'Send verification email'; });
                             });
                         } else if (res === 'conncap' && errEl0) {
-                            errEl0.textContent = 'This internet connection already has 5 entries this week \u2014 that\u2019s the maximum.';
+                            errEl0.textContent = 'Your household has reached this week\u2019s entry limit.';
                             errEl0.style.display = 'block';
                         } else if (res === 'signin' && errEl0) {
                             errEl0.textContent = 'Please sign in to enter the giveaway.';
