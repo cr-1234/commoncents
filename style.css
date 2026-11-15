@@ -365,7 +365,12 @@ body:not(.dark-mode) .glass {
 body.dark-mode .giveaway-sidebar-btn { color: #000; }
 
 /* ── Giveaway Coming-Soon Teaser (sidebar + modal) ─────────── */
-.gw-soon-icon { font-size: 2rem; margin-bottom: 0.35rem; }
+/* Branded gift mark (SVG symbol #gwGiftMark in index.html): sidebar
+   teaser 44px, modal teaser 54px, modal header chip 30px. */
+.gw-soon-icon { margin-bottom: 0.35rem; }
+.gw-gift-mark { display: block; margin: 0 auto; width: 44px; height: 44px; }
+.giveaway-soon-block .gw-gift-mark { width: 54px; height: 54px; }
+.giveaway-header-bar .gw-gift-mark { width: 30px; height: 30px; margin: 0 0.5rem 0 0; }
 .gw-soon-pill {
     display: inline-block; background: #EDE5F8; color: var(--highlight);
     border-radius: 999px; padding: 0.3rem 0.85rem; margin: 0.1rem 0 0.55rem;
@@ -374,6 +379,18 @@ body.dark-mode .giveaway-sidebar-btn { color: #000; }
 .gw-soon-line { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0.35rem 0 0.6rem; }
 .gw-soon-ready { font-weight: 800; color: var(--highlight); margin-top: 0.55rem; }
 .giveaway-soon-block { text-align: center; padding: 0.5rem 0 0.25rem; }
+/* Launch-waitlist email capture inside the teasers (2026-11-14). */
+.gw-waitlist-form { margin-top: 0.35rem; }
+.gw-waitlist-input { margin-bottom: 0.55rem; }
+.gw-waitlist-err { color: #dc2626; font-size: 0.78rem; line-height: 1.45; margin: -0.15rem 0 0.5rem; }
+.gw-soon-promise { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-top: 0.5rem; }
+.gw-waitlist-done { font-weight: 700; color: var(--highlight); font-size: 0.88rem; line-height: 1.55; margin-top: 0.55rem; }
+.gw-soon-alt { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.55; margin-top: 0.65rem; }
+.gw-soon-alt-btn {
+    background: none; border: none; padding: 0; font: inherit;
+    color: var(--highlight); font-weight: 700; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 2px;
+}
 
 /* ── Giveaway Nav Link ──────────────────────────────────────── */
 .giveaway-nav-link {
