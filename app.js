@@ -239,6 +239,55 @@ function updateEntryCount() {
         : 'Top prize reached — good luck on Sunday!';
 }
 
+// Category completeness (owner, 2026-11-15): the nav lists are
+// static HTML, so a category the collector files deals under but
+// the lists never named — General is the live case (the hand
+// warmers) — had NO tap target anywhere: not the sidebar, not the
+// strip, not the phone menu panel, and the owner asked where the
+// section went. Before the wiring below captures the lists, add a
+// link for every category the live deals actually carry that a list
+// is missing, in the picker's order, just before Free Stuff. The
+// sidebar's count pass then paints its count like any other row,
+// and a category with no live deals simply never gets a link.
+(function ensureCategoryLinks() {
+    try {
+        const order = ['tech', 'tools', 'household', 'groceries', 'kids', 'beauty', 'clothing', 'pets', 'general'];
+        const present = {};
+        const label = {};
+        (typeof deals !== 'undefined' ? deals : []).forEach(d => {
+            if (!d || d.dead || !d.category) return;
+            present[d.category] = true;
+            if (!label[d.category]) label[d.category] = d.fc || d.category;
+        });
+        const cats = Object.keys(present).sort((a, b) => {
+            const ia = order.indexOf(a), ib = order.indexOf(b);
+            return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+        });
+        if (!cats.length) return;
+        const lists = [
+            { sel: '.main-nav', li: false },
+            { sel: '.category-list', li: true },
+            { sel: '.mobile-nav-list', li: true }
+        ];
+        cats.forEach(cat => {
+            lists.forEach(L => {
+                const host = document.querySelector(L.sel);
+                if (!host || host.querySelector('a[data-category="' + cat + '"]')) return;
+                const a = document.createElement('a');
+                a.href = '#';
+                a.dataset.category = cat;
+                a.textContent = label[cat];
+                let node = a;
+                if (L.li) { node = document.createElement('li'); node.appendChild(a); }
+                const anchor = host.querySelector('a[data-category="freebies"]');
+                const anchorNode = anchor ? (L.li ? anchor.closest('li') : anchor) : null;
+                if (anchorNode) host.insertBefore(node, anchorNode);
+                else host.appendChild(node);
+            });
+        });
+    } catch (e) {}
+})();
+
 // DOM Elements
 const dealGrid      = document.getElementById('dealGrid');
 const searchInput   = document.getElementById('searchInput');
@@ -1814,8 +1863,16 @@ function openModal(deal) {
     }
     const skipLoadOnce = !!deal._skipLoadOnce;
     delete deal._skipLoadOnce;
+    // Picture gallery (owner, 2026-11-15): a deal with extra clean
+    // product shots gets a swipeable banner — main picture first,
+    // dots underneath showing position. One picture renders exactly
+    // the banner it always has, no dots.
+    const galleryPics = [deal.image].concat(Array.isArray(deal.gallery) ? deal.gallery.filter(u => u && u !== deal.image) : []);
+    const mediaHtml = galleryPics.length > 1
+        ? `<div class="modal-media-banner modal-gallery"><div class="modal-gallery-track">${galleryPics.map(u => `<img src="${u}" alt="${deal.title}">`).join('')}</div></div><div class="modal-gallery-dots">${galleryPics.map((u, i) => `<span class="modal-gallery-dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>`
+        : `<div class="modal-media-banner"><img src="${deal.image}" alt="${deal.title}"></div>`;
     modalBody.innerHTML = `
-        <div class="modal-media-banner"><img src="${deal.image}" alt="${deal.title}"></div>
+        ${mediaHtml}
         <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${getStoreName(deal.url)} &middot; ${deal.category}${deal.sponsored ? ' &middot; <span style="color:var(--highlight); font-weight:700;">Sponsored</span>' : ''}</div>
         <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
         <div class="modal-buy-row">
@@ -1850,6 +1907,16 @@ function openModal(deal) {
         </div>`;
 
     modal.style.display = 'flex';
+
+    // Gallery dots follow the swipe/scroll position.
+    const galTrack = modalBody.querySelector('.modal-gallery-track');
+    if (galTrack) {
+        const galDots = modalBody.querySelectorAll('.modal-gallery-dot');
+        galTrack.addEventListener('scroll', () => {
+            const i = Math.max(0, Math.min(galDots.length - 1, Math.round(galTrack.scrollLeft / galTrack.clientWidth)));
+            galDots.forEach((d, j) => d.classList.toggle('active', j === i));
+        }, { passive: true });
+    }
 
     modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
     modalBody.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));

@@ -891,7 +891,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
        its grid .saved-view and every rule here steps aside for it. */
     .deal-grid { gap: 0.6rem; }
     .deal-grid:not(.saved-view) .deal-card { flex-direction: row; }
-    .deal-grid:not(.saved-view) .card-image { flex: 0 0 104px; width: 104px; height: auto; }
+    /* The thumbnail box is FIXED at 104x104 (owner's video,
+       2026-11-15): with height:auto a tall thin picture (a water
+       bottle) stretched its whole row to card height. The img rule
+       above already fits the picture inside with object-fit:contain
+       on white, so every row is now the same height whatever shape
+       the picture is — portrait, landscape or square. */
+    .deal-grid:not(.saved-view) .card-image { flex: 0 0 104px; width: 104px; height: 104px; }
     .deal-grid:not(.saved-view) .card-image img { padding: 0.35rem; }
     .deal-grid:not(.saved-view) .card-content { padding: 0.6rem 0.75rem 0.65rem 0.3rem; min-width: 0; }
     .deal-grid:not(.saved-view) .card-meta { margin-bottom: 0.25rem; }
@@ -921,8 +927,6 @@ body.dark-mode .amazon-browse-btn { color: #000; }
        .nav-link rules below stay for the strip markup, which remains
        in the page (desktop hides it too, as it always has). */
     .main-nav { display: none; }
-    .hamburger-btn { display: inline-flex; }
-    .cc-gw-btn { display: inline-flex; }
     .auth-row { gap: 0.35rem; }
     .nav-link {
         color: var(--text-secondary); font-weight: 500; font-size: 0.88rem;
@@ -1091,6 +1095,17 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     align-items: center; justify-content: center;
 }
 .cc-gw-btn .gw-gift-mark { width: 30px; height: 30px; margin: 0; filter: drop-shadow(0 3px 8px rgba(91,45,142,0.18)); }
+/* The phone show-rules for the two header buttons MUST live after
+   their base rules above: both pairs are single-class selectors, so
+   at equal specificity the later rule in the file wins. These rules
+   used to sit in the max-width:900px block far above, and the base
+   display:none quietly overrode them — the hamburger and the
+   giveaway icon never appeared at ANY width (owner's phone test,
+   2026-11-15). Keep this block below the base rules. */
+@media (max-width: 900px) {
+    .hamburger-btn { display: inline-flex; }
+    .cc-gw-btn { display: inline-flex; }
+}
 /* The panel drops from the sticky header's bottom edge, full width,
    one clean card: big tappable rows for the feed destinations, then
    the page links in two quiet columns. */
@@ -1336,6 +1351,26 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     margin-bottom: 1.25rem; overflow: hidden;
 }
 .modal-media-banner img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 1rem; }
+/* Deal-window picture gallery (owner, 2026-11-15 — clean product
+   shots only): when a deal carries extra pictures, the banner holds
+   a swipeable track, main picture first, with position dots under
+   it (the SlickDeals pattern). A deal with one picture keeps the
+   plain banner above, no dots. Cards and list rows never gallery —
+   they keep the single main picture. */
+.modal-media-banner.modal-gallery { display: block; }
+.modal-gallery-track {
+    display: flex; height: 100%; overflow-x: auto;
+    scroll-snap-type: x mandatory; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.modal-gallery-track::-webkit-scrollbar { display: none; }
+.modal-media-banner .modal-gallery-track img {
+    flex: 0 0 100%; width: 100%; height: 100%; max-width: none;
+    object-fit: contain; scroll-snap-align: center;
+}
+.modal-gallery-dots { display: flex; justify-content: center; gap: 6px; margin: -0.6rem 0 1rem; }
+.modal-gallery-dot { width: 7px; height: 7px; border-radius: 50%; background: #D9CCEE; transition: background 0.15s; }
+.modal-gallery-dot.active { background: var(--highlight); }
 .deal-note strong { color: var(--highlight); }
 .deal-note-tag {
     display: inline-flex; align-items: center; flex: none;
@@ -1436,5 +1471,24 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    text and pill), so the wrapper only spaces it and the image itself
    takes the old panel's radius/border. */
 .house-ad { margin-top: 1.25rem; }
-.house-ad a { display: block; }
-.house-ad img { width: 100%; height: auto; display: block; border-radius: 16px; border: 1px solid rgba(91,45,142,0.16); }
+/* Gifting Butler sister card (owner, 2026-11-15): a real HTML card,
+   not one baked picture — the WORDS carry it now. A modest logo
+   lockup (small calligraphy G + the name), the headline and one
+   line set as text, and the Browse gifts button; plum family
+   styling, crisp at every size, on the rail and the phone strip
+   alike (same element both places). */
+.house-ad-card {
+    display: block; text-decoration: none; background: #F7F3FC;
+    border: 1px solid rgba(91,45,142,0.16); border-radius: 16px;
+    padding: 1rem 1.1rem 1.1rem;
+}
+.house-ad-lockup { display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.55rem; }
+.house-ad-lockup img { height: 34px; width: auto; display: block; }
+.house-ad-name { font-family: Georgia, 'Times New Roman', serif; font-size: 1.22rem; font-weight: 700; color: var(--highlight); line-height: 1.1; }
+.house-ad-headline { display: block; font-size: 1.02rem; font-weight: 600; color: var(--text-primary); line-height: 1.35; margin-bottom: 0.3rem; }
+.house-ad-line { display: block; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.8rem; }
+.house-ad-btn {
+    display: inline-block; background: var(--highlight); color: #fff;
+    font-size: 0.9rem; font-weight: 600; padding: 0.5rem 1rem; border-radius: 9999px;
+}
+.house-ad-card:hover .house-ad-btn { background: #4A2573; }
