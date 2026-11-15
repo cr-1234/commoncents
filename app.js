@@ -54,9 +54,9 @@ const SPREADSHEET_CSV_URL = '';
 // entrants). Bonus entries add chances only — they never move the prize.
 function calculatePrize(count) {
     if (count >= 10000) return '$100';
-    if (count >= 5000)  return '$75';
-    if (count >= 1000)  return '$50';
-    if (count >= 250)   return '$25';
+    if (count >= 5000)  return '$60';
+    if (count >= 1000)  return '$30';
+    if (count >= 250)   return '$15';
     if (count >= 100)   return '$10';
     return '$5';
 }
@@ -73,7 +73,7 @@ function updateEntryCount() {
     if (countEl) countEl.textContent = count;
     if (prizeEl) prizeEl.textContent = prize;
     if (tiers.length) {
-        const map = { '$5': 0, '$10': 1, '$25': 2, '$50': 3, '$75': 4, '$100': 5 };
+        const map = { '$5': 0, '$10': 1, '$15': 2, '$30': 3, '$60': 4, '$100': 5 };
         tiers.forEach((t, i) => t.classList.toggle('active', i === map[prize]));
     }
     const side = document.getElementById('sidebarPrize');
@@ -81,7 +81,7 @@ function updateEntryCount() {
     // Progress toward the next prize tier + a plain-words "how many more" line.
     const fill = document.getElementById('prizeProgressFill');
     const next = document.getElementById('prizeNext');
-    const LADDER = [[0, '$5'], [100, '$10'], [250, '$25'], [1000, '$50'], [5000, '$75'], [10000, '$100']];
+    const LADDER = [[0, '$5'], [100, '$10'], [250, '$15'], [1000, '$30'], [5000, '$60'], [10000, '$100']];
     let cur = LADDER[0], nxt = null;
     for (let i = 0; i < LADDER.length; i++) {
         if (count >= LADDER[i][0]) { cur = LADDER[i]; nxt = LADDER[i + 1] || null; }
