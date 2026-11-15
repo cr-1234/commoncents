@@ -1144,7 +1144,7 @@ function openModal(deal) {
             ${!isReply && c.id && !c.pending && ccUser ? `<button type="button" class="cmt-reply-btn" data-cact="reply" data-idx="${idx}">Reply</button>` : ''}
         </div>`;
     const replyBoxHTML = (idx) => `
-        <div style="margin:0 0 1rem 1.4rem; padding-left:0.8rem; border-left:2px solid var(--plum-lt);">
+        <div id="commentReplyBox" style="margin:0 0 1rem 1.4rem; padding-left:0.8rem; border-left:2px solid var(--plum-lt);">
             <textarea id="commentReplyText" rows="2" placeholder="Write a reply..." style="width:100%; padding:0.5rem; margin-bottom:0.4rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
             <div style="display:flex; gap:0.4rem;">
                 <button type="button" class="btn btn-primary" data-cact="reply-post" data-idx="${idx}" style="font-size:0.8rem; padding:0.3rem 1rem;">Post reply</button>
@@ -1205,6 +1205,43 @@ function openModal(deal) {
         cl.innerHTML = buildCommentsHTML();
         bindCommentActions();
         cl.scrollTop = toBottom ? cl.scrollHeight : st;
+    };
+    // Bring the open reply box fully into view (owner request
+    // 2026-11-15): tapping Reply re-rendered the list at its previous
+    // scroll position, so the box often opened below the comments
+    // list's visible band — and even when the textarea showed, the
+    // Post reply / Cancel buttons under it stayed out of sight (the
+    // only button on screen was the composer's "Post Comment", which
+    // then scolded "Please write a comment first"). Same approach as
+    // revealPicker() in tailored-feed.js: let the re-render settle
+    // (double rAF), then compute the exact scrolls instead of relying
+    // on a bare scrollIntoView in the render frame. First scroll the
+    // comments list so the WHOLE box (input + buttons) sits inside
+    // its visible band; then, if the box still sits outside the
+    // viewport, scroll the modal overlay itself (it is the page-level
+    // scroller while open) to land it just inside the top.
+    const revealReplyBox = () => {
+        const go = () => {
+            const box = document.getElementById('commentReplyBox');
+            if (!box) return;
+            const cl = document.getElementById('commentsList');
+            if (cl) {
+                const br = box.getBoundingClientRect();
+                const lr = cl.getBoundingClientRect();
+                if (br.bottom > lr.bottom) cl.scrollTop += Math.ceil(br.bottom - lr.bottom) + 8;
+                else if (br.top < lr.top) cl.scrollTop += Math.floor(br.top - lr.top) - 8;
+            }
+            const modalEl = document.getElementById('dealModal');
+            if (modalEl) {
+                const br2 = box.getBoundingClientRect();
+                const vh = modalEl.clientHeight || window.innerHeight || 0;
+                if (vh && br2.bottom > vh) modalEl.scrollTop += Math.ceil(br2.bottom - vh) + 16;
+                else if (br2.top < 8 && br2.bottom > 0) modalEl.scrollTop += Math.floor(br2.top) - 70;
+            }
+        };
+        if (window.requestAnimationFrame) {
+            window.requestAnimationFrame(() => window.requestAnimationFrame(go));
+        } else { go(); }
     };
     // The signed-in user is read LIVE, not frozen at open time: Firebase
     // delivers the session asynchronously, so a member who opens a deal
@@ -1416,6 +1453,7 @@ function openModal(deal) {
                 renderCommentsList(false);
                 const rt = document.getElementById('commentReplyText');
                 if (rt) rt.focus();
+                revealReplyBox();
                 return;
             } else if (act === 'reply-cancel') {
                 delete deal._replyingIdx;
@@ -1447,6 +1485,7 @@ function openModal(deal) {
                         const rt2 = document.getElementById('commentReplyText');
                         if (rt2) rt2.value = v;
                         showCommentError('Couldn\u2019t post that reply \u2014 try again.');
+                        revealReplyBox();
                     }
                 });
                 return;
@@ -1476,6 +1515,7 @@ function openModal(deal) {
     window.CC_ON_AUTH_CHANGED = () => {
         if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') paintCommentForm();
     };
+    window.CC_REVEAL_REPLY_BOX = revealReplyBox;
 
     // Stored comments: fetch the saved thread for this deal and swap it in
     // (the server is the source of truth once it answers). Skipped on the
@@ -1485,7 +1525,16 @@ function openModal(deal) {
         CC_COMMENTS.load(myDealId).then(list => {
             if (!Array.isArray(list)) return;
             if (window._ccOpenDealId !== myDealId || modal.style.display === 'none') return;
-            deal.comments = list.map(c => ({ id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts), own: !!c.mine, parentId: c.parentId || '' }));
+            const mapped = list.map(c => ({ id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts), own: !!c.mine, parentId: c.parentId || '' }));
+            // Keep optimistic entries whose server call is still in
+            // flight (a member can post in the window before this load
+            // answers — the snapshot can predate their post). Swapping
+            // them out here would orphan the post: its confirm would
+            // find nothing to swap into and the comment would vanish
+            // from the thread until the next open. Entries the
+            // snapshot already contains are not duplicated.
+            const stillPending = deal.comments.filter(c => c.pending && !mapped.some(m => m.text === c.text && (m.parentId || '') === (c.parentId || '')));
+            deal.comments = mapped.concat(stillPending);
             deal._skipLoadOnce = true;
             openModal(deal);
         }).catch(() => { /* backend unreachable: keep whatever is shown */ });
