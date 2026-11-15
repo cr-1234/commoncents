@@ -676,6 +676,10 @@ function createDealCard(deal) {
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
                     <span>${voteCount(deal, 'down')}</span>
                 </button>
+                <button class="vote-btn share-btn" aria-label="Share this deal" title="Share">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+                    <span>Share</span>
+                </button>
             </div>
         </div>`;
 
@@ -686,6 +690,7 @@ function createDealCard(deal) {
 
     article.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
     article.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
+    article.querySelector('.share-btn').addEventListener('click', (e) => { e.stopPropagation(); openShareMenu(deal); });
     return article;
 }
 
@@ -855,6 +860,7 @@ function openModal(deal) {
                 ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
             <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
+            <button type="button" class="btn share-modal-btn">Share</button>
         </div>
         <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
         ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
@@ -881,6 +887,8 @@ function openModal(deal) {
 
     modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
     modalBody.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
+    const modalShareBtn = modalBody.querySelector('.share-modal-btn');
+    if (modalShareBtn) modalShareBtn.addEventListener('click', (e) => { e.stopPropagation(); openShareMenu(deal); });
 
     const modalCode = modalBody.querySelector('.deal-code');
     if (modalCode) {
@@ -1163,6 +1171,64 @@ function getAffiliateUrl(url) {
         }
         return url;
     } catch (e) { return url; }
+}
+
+// ── Share a deal (owner request 2026-11-14) ─────────────────────────────
+// Menu order matches Gifting Butler: WhatsApp, Email, Copy link,
+// Pinterest LAST, then More options (native share) when the device
+// offers it. The shared link is always the affiliate URL, so the
+// CommonCents tag rides along wherever the deal is forwarded.
+function closeShareMenu() {
+    const ov = document.getElementById('share-menu-ov');
+    if (ov) ov.remove();
+}
+
+function openShareMenu(deal) {
+    if (!deal) return;
+    closeShareMenu();
+    const url = getAffiliateUrl(deal.url);
+    const text = deal.title + ' \u2014 $' + deal.price + ' at CommonCents';
+    const enc = encodeURIComponent;
+    const ov = document.createElement('div');
+    ov.id = 'share-menu-ov';
+    ov.className = 'share-menu-ov';
+    ov.innerHTML = `
+        <div class="share-menu" role="dialog" aria-label="Share this deal">
+            <div class="share-menu-head"><strong>Share this deal</strong><button type="button" class="share-menu-close" aria-label="Close">&times;</button></div>
+            <a class="share-row" href="https://wa.me/?text=${enc(text + ' ' + url)}" target="_blank" rel="noopener"><span class="share-ico">\uD83D\uDCAC</span>Share on WhatsApp</a>
+            <a class="share-row" href="mailto:?subject=${enc(deal.title)}&body=${enc(text + '\n' + url)}"><span class="share-ico">\u2709\uFE0F</span>Share by Email</a>
+            <button type="button" class="share-row share-copy"><span class="share-ico">\uD83D\uDD17</span><span class="share-copy-label">Copy link</span></button>
+            <a class="share-row" href="https://pinterest.com/pin/create/button/?url=${enc(url)}&media=${enc(deal.image || '')}&description=${enc(text)}" target="_blank" rel="noopener"><span class="share-ico">\uD83D\uDCCC</span>Pin it on Pinterest</a>
+            ${navigator.share ? '<button type="button" class="share-row share-native"><span class="share-ico">\uD83D\uDCE4</span>More options</button>' : ''}
+        </div>`;
+    ov.addEventListener('click', (e) => { if (e.target === ov) closeShareMenu(); });
+    ov.querySelector('.share-menu-close').addEventListener('click', closeShareMenu);
+    ov.querySelector('.share-copy').addEventListener('click', () => {
+        const label = ov.querySelector('.share-copy-label');
+        const done = () => {
+            if (label) label.textContent = 'Link copied!';
+            setTimeout(closeShareMenu, 900);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(done);
+        } else {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+            } catch (e) {}
+            done();
+        }
+    });
+    const nativeBtn = ov.querySelector('.share-native');
+    if (nativeBtn) nativeBtn.addEventListener('click', () => {
+        try { navigator.share({ title: deal.title, text: text, url: url }).catch(() => {}); } catch (e) {}
+        closeShareMenu();
+    });
+    const onKey = (e) => { if (e.key === 'Escape') { closeShareMenu(); document.removeEventListener('keydown', onKey); } };
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(ov);
 }
 
 async function loadGoogleSheetDeals() {

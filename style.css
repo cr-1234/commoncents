@@ -511,6 +511,19 @@ body.dark-mode .view-deal-btn { color: #000; }
 @keyframes votePop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
 .vote-btn.pop { animation: votePop 0.35s ease; }
 
+/* ── Share (deal cards + detail modal) ──────────────────── */
+.share-btn { margin-left: auto; }
+.share-modal-btn { background: rgba(91,45,142,0.12); color: var(--highlight); }
+.share-modal-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(91,45,142,0.25); }
+.share-menu-ov { position: fixed; inset: 0; z-index: 1200; background: rgba(30,20,50,0.45); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.share-menu { background: var(--bg-card); border-radius: 1rem; box-shadow: 0 24px 64px rgba(0,0,0,0.25); padding: 0.6rem; min-width: 270px; max-width: 330px; width: 100%; }
+.share-menu-head { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0.6rem 0.6rem; }
+.share-menu-head strong { font-size: 0.95rem; color: var(--text-primary); }
+.share-menu-close { background: none; border: none; font-size: 1.1rem; line-height: 1; cursor: pointer; color: var(--text-secondary); }
+.share-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.72rem 0.9rem; border-radius: 0.7rem; text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.92rem; cursor: pointer; background: none; border: none; width: 100%; text-align: left; font-family: inherit; box-sizing: border-box; }
+.share-row:hover { background: rgba(91,45,142,0.10); }
+.share-ico { font-size: 1.2rem; width: 1.6rem; text-align: center; }
+
 /* ── Buttons ────────────────────────────────────────────────── */
 .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 999px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; text-align: center; }
 .btn-primary { background: linear-gradient(135deg, var(--highlight), var(--highlight-hover)); color: #fff; }
