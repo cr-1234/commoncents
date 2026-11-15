@@ -54,6 +54,7 @@
                 <br>&bull; <strong>Deals You've Opened:</strong> The deals you've clicked into, so their "NEW DEAL" mark goes away once you've seen them.
                 <br>&bull; <strong>Giveaway Tracking:</strong> The email you entered the weekly giveaway with, the week you entered, the latest entrant count, and which days you've visited this week, so your entry and any bonus entries are counted correctly.
                 <br>&bull; <strong>Sign-In Session:</strong> If you sign in, Firebase — the service that runs our accounts — keeps your sign-in session in local storage so you stay signed in between visits.
+                <br>&bull; <strong>Notification Hand-Off:</strong> If you tap a notification on a page that can't open the deal it points to, the deal's ID is held in session storage (key <strong>ccOpenNote</strong>) just long enough to open it when you arrive back on the home page. Session storage is erased automatically when you close the tab.
             </p>
 
             <h2 style="font-size: 1.4rem; color: var(--text-primary); margin-top: 2rem; margin-bottom: 1rem;">3. Affiliate Tracking Cookies</h2>

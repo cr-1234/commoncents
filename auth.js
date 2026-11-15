@@ -86,9 +86,11 @@
     }
 
     // ── Notifications (engagement plan, 2026-11-13) ──
-    // One inbox serves both sites. A red count badge sits on the
-    // avatar; the account menu lists the latest notes; opening the
-    // menu marks them read and clears the badge.
+    // One inbox serves both sites. The notes live behind the bell
+    // next to the avatar (owner, 2026-11-15 — like Gifting Butler;
+    // they used to sit inside the account menu). A red count badge
+    // rides the bell; opening the bell's panel marks the notes read
+    // and clears the badge.
     var notesCache = null;
     var notesUnread = 0;
     // Mute switch (owner request 2026-11-14): stored server-side on
@@ -109,27 +111,29 @@
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
     function paintNoteBadge() {
-        var av = document.getElementById('authEmail');
-        if (!av) return;
-        var b = av.querySelector('.cc-note-badge');
+        var bell = document.getElementById('notesBell');
+        if (!bell) return;
+        var b = bell.querySelector('.cc-note-badge');
         if (!currentUser || !notesUnread || notesMuted) { if (b) b.remove(); return; }
-        if (!b) { b = document.createElement('span'); b.className = 'cc-note-badge'; av.appendChild(b); }
+        if (!b) { b = document.createElement('span'); b.className = 'cc-note-badge'; bell.appendChild(b); }
         b.textContent = notesUnread > 9 ? '9+' : String(notesUnread);
     }
     function paintNotesList() {
-        var wrap = document.getElementById('authMenuNotes');
-        var list = document.getElementById('authMenuNotesList');
+        var wrap = document.getElementById('notesPanel');
+        var list = document.getElementById('notesPanelList');
         if (!wrap || !list) return;
-        var toggle = document.getElementById('authMenuNotesToggle');
+        var toggle = document.getElementById('notesPanelToggle');
         if (notesMuted) {
-            // Off state: the whole block collapses to ONE pill row,
-            // like the empty state — tapping it turns notes back on.
+            // Off state: the panel collapses to ONE pill row, like
+            // the empty state — tapping it turns notes back on. (The
+            // panel's own visibility belongs to the bell, so unlike
+            // the old in-menu block this painter never touches the
+            // wrap's display.)
             wrap.classList.add('is-empty');
             if (toggle) toggle.style.display = 'none';
-            list.innerHTML = '<button type="button" class="auth-menu-note auth-menu-notes-empty auth-menu-notes-off" id="authMenuNotesTurnOn">Notifications are off — Turn on</button>';
-            var onBtn = document.getElementById('authMenuNotesTurnOn');
+            list.innerHTML = '<button type="button" class="auth-menu-note auth-menu-notes-empty auth-menu-notes-off" id="notesPanelTurnOn">Notifications are off — Turn on</button>';
+            var onBtn = document.getElementById('notesPanelTurnOn');
             if (onBtn) onBtn.addEventListener('click', function () { setNotesMuted(false); });
-            wrap.style.display = '';
             return;
         }
         if (toggle) toggle.style.display = '';
@@ -142,7 +146,6 @@
             // messy); with real notes it expands into the list below.
             wrap.classList.add('is-empty');
             list.innerHTML = '<div class="auth-menu-note auth-menu-notes-empty">Notifications — nothing yet</div>';
-            wrap.style.display = '';
             return;
         }
         wrap.classList.remove('is-empty');
@@ -169,22 +172,32 @@
                 var n = (notesCache || [])[parseInt(btn.getAttribute('data-nidx'), 10)];
                 if (!n) return;
                 // A clicked note goes away (owner, 2026-11-15): the row
-                // leaves the menu at once and the dismissal fires in the
-                // background — navigation never waits on it. If the call
-                // fails the note simply comes back on the next load.
+                // leaves the panel at once and the dismissal fires in
+                // the background — navigation never waits on it. If the
+                // call fails the note simply comes back on the next load.
                 dismissNote(n);
                 if (n.site === 'gb') {
                     window.open('https://giftingbutler-74395.web.app', '_blank', 'noopener');
                     return;
                 }
-                var menu = document.getElementById('authMenu');
-                if (menu) menu.style.display = 'none';
+                var panel = document.getElementById('notesPanel');
+                if (panel) panel.style.display = 'none';
                 if (typeof window.CC_OPEN_DEAL_COMMENT === 'function') {
                     window.CC_OPEN_DEAL_COMMENT(n.refId, n.commentId || '');
+                } else if (n.refId) {
+                    // No deal machinery on this page (a subpage running
+                    // auth.js alone): stash the target and go home,
+                    // where app.js opens the item on arrival — never a
+                    // dead click.
+                    try {
+                        sessionStorage.setItem('ccOpenNote', JSON.stringify({
+                            refId: String(n.refId), commentId: n.commentId || ''
+                        }));
+                    } catch (e) { /* storage unavailable — still go home */ }
+                    window.location.href = 'index.html';
                 }
             });
         });
-        wrap.style.display = '';
     }
     function loadNotes(user) {
         if (!user) return;
@@ -212,7 +225,7 @@
     }
     // Dismiss ONE note for good (owner, 2026-11-15: "once you click
     // it, it just goes away — otherwise you'll have 500 replies stack
-    // up"). Optimistic: the note leaves the local list and the menu
+    // up"). Optimistic: the note leaves the local list and the panel
     // repaints immediately (falling back to the empty state when it
     // was the last one); the server delete follows in the background.
     function dismissNote(n) {
@@ -221,7 +234,7 @@
         // Repaint on the next tick, not mid-click: replacing the list
         // HTML during the tap would detach the clicked button, and the
         // document's outside-click closer would then read the tap as
-        // a click outside the menu and close it.
+        // a click outside the panel and close it.
         setTimeout(paintNotesList, 0);
         if (!currentUser) return;
         var user = currentUser;
@@ -322,6 +335,10 @@
         var inBtn = document.getElementById('signInBtn');
         var emailEl = document.getElementById('authEmail');
         if (!inBtn || !emailEl) return;
+        // The bell exists only for members (owner, 2026-11-15):
+        // signed-out visitors have no notifications, so no bell.
+        var bellEl = document.getElementById('notesBell');
+        if (bellEl) bellEl.style.display = currentUser ? '' : 'none';
         if (currentUser) {
             inBtn.style.display = 'none';
             emailEl.style.display = '';
@@ -353,9 +370,11 @@
             emailEl.classList.remove('as-avatar');
             var menuEl0 = document.getElementById('authMenu');
             if (menuEl0) menuEl0.style.display = 'none';
+            var panelEl0 = document.getElementById('notesPanel');
+            if (panelEl0) panelEl0.style.display = 'none';
         }
-        // paintHeader rebuilds the avatar's insides, which would wipe
-        // the notification badge — re-apply it after every repaint.
+        // Re-apply the unread badge after every repaint (it hangs on
+        // the bell now; paintHeader owns the bell's visibility).
         paintNoteBadge();
     }
 
@@ -387,6 +406,20 @@
         var nameEditor = document.getElementById('authMenuNameEditor');
         var nameCancel = document.getElementById('authMenuNameCancel');
         function closeMenu() { if (menu) menu.style.display = 'none'; }
+        // ── Notifications bell + panel (owner, 2026-11-15): the bell
+        // next to the avatar opens the notes panel; opening it does
+        // what opening the account menu used to do — paint the list
+        // and mark the notes read. Bell and menu never show at once.
+        var bellEl = document.getElementById('notesBell');
+        var panelEl = document.getElementById('notesPanel');
+        function closePanel() { if (panelEl) panelEl.style.display = 'none'; }
+        function openPanel() {
+            if (!panelEl || !currentUser) return;
+            closeMenu();
+            paintNotesList();
+            markNotesRead();
+            panelEl.style.display = '';
+        }
         // The comment-name setting lives behind a closed row ("Comment
         // name: X" + Change): the editor opens only when asked and
         // collapses back after a save or a Cancel. Every fresh menu open
@@ -465,19 +498,27 @@
             }
             var svCount = document.getElementById('authMenuSavedCount');
             if (svCount) svCount.textContent = (window.CC_SAVES && CC_SAVES.get().length) ? String(CC_SAVES.get().length) : '';
-            paintNotesList();
-            markNotesRead();
             menu.style.display = '';
         }
         if (avatarEl) avatarEl.addEventListener('click', function (e) {
             e.stopPropagation();
             if (!currentUser) return;
+            closePanel();
             if (menu && menu.style.display !== 'none') closeMenu(); else openMenu();
+        });
+        if (bellEl) bellEl.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (!currentUser) return;
+            if (panelEl && panelEl.style.display !== 'none') closePanel(); else openPanel();
         });
         document.addEventListener('click', function (e) {
             if (menu && menu.style.display !== 'none' && !e.target.closest('.auth-area')) closeMenu();
         });
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+        document.addEventListener('click', function (e) {
+            if (panelEl && panelEl.style.display !== 'none'
+                && !e.target.closest('#notesPanel') && !e.target.closest('#notesBell')) closePanel();
+        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeMenu(); closePanel(); } });
         var menuCloseBtn = document.getElementById('authMenuClose');
         if (menuCloseBtn) menuCloseBtn.addEventListener('click', function (e) { e.stopPropagation(); closeMenu(); });
         if (nameSave) nameSave.addEventListener('click', function () {
@@ -553,7 +594,7 @@
         // Restore (Account Guard): two-tap, like Gifting Butler's —
         // first tap arms the row, second pulls the backup snapshot and
         // applies votes + picks + comment name from it.
-        var notesToggleBtn = document.getElementById('authMenuNotesToggle');
+        var notesToggleBtn = document.getElementById('notesPanelToggle');
         if (notesToggleBtn) notesToggleBtn.addEventListener('click', function () { setNotesMuted(true); });
         var restoreBtn = document.getElementById('authMenuRestore');
         var restoreMsg = document.getElementById('authMenuRestoreMsg');
