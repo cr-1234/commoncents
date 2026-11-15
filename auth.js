@@ -392,8 +392,10 @@
         // collapses back after a save or a Cancel. Every fresh menu open
         // starts from the closed row.
         function shownCommentName() {
+            // Picked username, else the generated name — the account
+            // display name is never shown as a comment name (2026-11-15).
             var gen = (!profileUsername && window.CC_AUTH.fallbackName) ? window.CC_AUTH.fallbackName() : '';
-            return profileUsername || (currentUser && currentUser.displayName) || gen || '';
+            return profileUsername || gen || '';
         }
         function paintNameRow() {
             if (!nameLabel) return;
@@ -633,17 +635,21 @@
         noteSavesChanged: noteSavesChanged,
         username: function () { return profileUsername; },
         submissionBonus: function () { return profileSubBonus; },
-        // Deterministic friendly default name from the account id — so a
-        // member who never picks a comment name still shows as SOMEONE
-        // distinct (never a generic "Member"), and the same account gets
-        // the same name on every device without anything being saved.
+        // Deterministic generated username from the account id, in the
+        // Word+Word+Number style (owner, 2026-11-15 — like SlickDeals'
+        // OrangeWriter104): a member who never picks a comment name
+        // posts under this generated name — NEVER under their account
+        // display name — and the same account gets the same generated
+        // name on every device and session without anything being
+        // saved. The number runs 10–999. MUST match ccFallbackName in
+        // the backend's cc-comments.js exactly (same lists, same hash).
         fallbackName: function () {
             if (!currentUser || !currentUser.uid) return '';
             var ADJ = ['Ace', 'Pro', 'Keen', 'Wise', 'Bold', 'Swift', 'Smart', 'Prime'];
             var NOUN = ['Saver', 'Scout', 'Seeker', 'Hunter', 'Finder', 'Buyer'];
             var h = 0, uid = String(currentUser.uid);
             for (var i = 0; i < uid.length; i++) h = ((h * 31) + uid.charCodeAt(i)) >>> 0;
-            return ADJ[h % ADJ.length] + NOUN[(h >>> 4) % NOUN.length] + (10 + (h % 90));
+            return ADJ[h % ADJ.length] + NOUN[(h >>> 4) % NOUN.length] + (10 + (h % 990));
         },
         setUsername: function (name) {
             if (!currentUser) return Promise.reject(new Error('not signed in'));

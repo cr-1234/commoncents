@@ -292,6 +292,17 @@ function setupEventListeners() {
     searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') handleSearch();
     });
+    // Live search (owner, 2026-11-15): results filter AS YOU TYPE —
+    // no Enter, no button press needed — the way Gifting Butler's
+    // search already feels. A short debounce keeps a fast typist
+    // from re-rendering on every keystroke; the matching itself is
+    // handleSearch's, unchanged. Clearing the box empties the
+    // query, which restores the current view exactly as it was.
+    let searchDebounce = null;
+    searchInput.addEventListener('input', () => {
+        if (searchDebounce) clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(handleSearch, 150);
+    });
 
     // Category navigation (giveaway link is excluded via :not selector above)
     [...navLinks, ...categoryLinks].forEach(link => {
@@ -1489,7 +1500,11 @@ function ccSetupComments(record, threadKey, skipLoadOnce, reopen) {
         ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
         ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
         ccGenName = (window.CC_AUTH && CC_AUTH.fallbackName) ? CC_AUTH.fallbackName() : '';
-        ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || ccGenName || 'Member') : null;
+        // Comment-name chain (owner, 2026-11-15): the picked username,
+        // else the generated Word+Word+Number name. The account's own
+        // display name is NEVER a comment name — a Google account named
+        // "Commoncents" must not post as "Commoncents".
+        ccDisplayName = ccUser ? (ccProfileName || ccGenName || 'Member') : null;
     };
     refreshCcUser();
     const cmtInfo = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
@@ -1563,7 +1578,7 @@ function ccSetupComments(record, threadKey, skipLoadOnce, reopen) {
                 });
                 return;
             }
-            const liveName = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser.displayName || (typeof CC_AUTH.fallbackName === 'function' ? CC_AUTH.fallbackName() : '') || 'Member';
+            const liveName = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || (typeof CC_AUTH.fallbackName === 'function' ? CC_AUTH.fallbackName() : '') || 'Member';
             // Chronological order: the first comment stays on top, new ones go last.
             // own:true gives the poster pencil/trash controls on their comment.
             record.comments.push({ user: escHtml(liveName).slice(0, 40), text: escHtml(textVal), time: 'Just now', own: true });
@@ -1655,7 +1670,7 @@ function ccSetupComments(record, threadKey, skipLoadOnce, reopen) {
                 if (!parent || !parent.id || !v || !window.CC_COMMENTS) return;
                 const liveUser2 = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
                 if (!liveUser2) return;
-                const liveName2 = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser2.displayName || (typeof CC_AUTH.fallbackName === 'function' ? CC_AUTH.fallbackName() : '') || 'Member';
+                const liveName2 = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || (typeof CC_AUTH.fallbackName === 'function' ? CC_AUTH.fallbackName() : '') || 'Member';
                 const opt = { id: null, user: escHtml(liveName2).slice(0, 40), text: escHtml(v), time: 'Just now', own: true, pending: true, parentId: parent.id };
                 record.comments.push(opt);
                 delete record._replyingIdx;
