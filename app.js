@@ -766,12 +766,15 @@ function isDealExpired(deal) {
 }
 
 // ── Free Stuff view ─────────────────────────────────────────────────
-// Freebies (freebies-data.js) are their own surface: they render ONLY
-// in the Free Stuff view (nav/sidebar category 'freebies'), never in
-// All Deals, My Feed, or search results. They are not affiliate deals —
-// their buttons link straight to the brand's official page (no
-// getAffiliateUrl, no click/view counting). Expired entries hide
-// automatically; the comparison date is today in Eastern Time.
+// Freebies (freebies-data.js) are their own surface: they render in
+// the Free Stuff view (nav/sidebar category 'freebies') — and, since
+// 2026-11-15, in My Feed for visitors who picked the picker's Free
+// Stuff chip (renderDeals appends them there; see feedFreebies below).
+// They never render in All Deals or search results. They are not
+// affiliate deals — their buttons link straight to the brand's
+// official page (no getAffiliateUrl, no click/view counting). Expired
+// entries hide automatically; the comparison date is today in
+// Eastern Time.
 function etTodayStr() {
     try {
         return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
@@ -884,6 +887,15 @@ function renderDeals() {
     if (currentCategory === 'freebies') { renderFreebies(); return; }
     if (currentCategory === 'saved') { renderSaved(); return; }
     showFreebiesIntro(false);
+    // My Feed + the Free Stuff pick (owner, 2026-11-15): the live
+    // freebies ride along at the end of page 1, after the deals. They
+    // are not deals — no sorting, no pagination math, no audience
+    // filter, no search filtering; the pick alone decides.
+    const feedFreebies = (window.CC_FEED && CC_FEED.mode() === 'mine'
+        && typeof CC_FEED.getInterests === 'function'
+        && CC_FEED.getInterests().indexOf('freebies') !== -1
+        && typeof freebies !== 'undefined' && Array.isArray(freebies))
+        ? freebies.filter(isFreebieLive) : [];
     let filtered = deals.filter(deal => {
         const inMyFeed    = window.CC_FEED && CC_FEED.mode() === 'mine';
         const matchCat    = inMyFeed || currentCategory === 'all' || deal.category === currentCategory;
@@ -926,6 +938,13 @@ function renderDeals() {
     if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
 
     if (filtered.length === 0) {
+        // A Free-Stuff-only feed is not empty when freebies exist:
+        // show them instead of the no-results message.
+        if (feedFreebies.length) {
+            feedFreebies.forEach(f => dealGrid.appendChild(createFreebieCard(f)));
+            renderPagination(0);
+            return;
+        }
         dealGrid.innerHTML = '<div class="no-results">No deals found matching your criteria.</div>';
         renderPagination(0);
         return;
@@ -933,6 +952,9 @@ function renderDeals() {
     const pageStart = (currentPage - 1) * DEALS_PER_PAGE;
     filtered.slice(pageStart, pageStart + DEALS_PER_PAGE)
         .forEach(deal => dealGrid.appendChild(createDealCard(deal)));
+    if (currentPage === 1) {
+        feedFreebies.forEach(f => dealGrid.appendChild(createFreebieCard(f)));
+    }
     renderPagination(totalPages);
 }
 

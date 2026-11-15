@@ -43,6 +43,14 @@
         { key: 'beauty',   label: 'Health & Beauty',    cats: ['beauty'],    kw: ['skincare', 'makeup', 'shampoo', 'beauty', 'serum', 'lotion', 'toothbrush', 'vitamin', 'melatonin', 'supplement'] },
         { key: 'clothing', label: 'Clothing & Shoes',   cats: ['clothing'],  kw: ['shoes', 'sneakers', 'jacket', 'boots', 'hoodie', 'jeans', 'nike', 'adidas', 'sweater'] },
         { key: 'pets',     label: 'Pets',               cats: ['pets'],      kw: ['dog', 'cat', 'pet', 'litter', 'puppy', 'kitten', 'aquarium'] },
+        // Free Stuff is a pick too (owner, 2026-11-15): it matches NO
+        // deals — deliberately no cats/kw, so dealInterests() never tags
+        // a deal with it. The pick instead tells app.js renderDeals to
+        // append the live freebies (freebies-data.js) to My Feed, and
+        // matchCount() adds them so the counts stay truthful. The key
+        // rides ccInterests like every other pick; the server allow-list
+        // (CC_INTEREST_KEYS) carries it too.
+        { key: 'freebies', label: 'Free Stuff',         cats: [],            kw: [] },
         // General is pickable too (user ruling, 2026-11-10): deals the
         // collector files as General matched NO interest, so they could
         // never appear in any My Feed — even for a visitor who picked
@@ -229,15 +237,34 @@
         }).length;
     }
 
+    // Live freebies, by the same ET-date expiry rule app.js renders
+    // them by (!expires, or expires >= today in Eastern Time).
+    function liveFreebieCount() {
+        if (typeof freebies === 'undefined' || !Array.isArray(freebies)) return 0;
+        var today;
+        try {
+            today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+        } catch (e) {
+            today = new Date().toISOString().slice(0, 10);
+        }
+        return freebies.filter(function (f) { return !f.expires || f.expires >= today; }).length;
+    }
+
     function matchCount() {
         if (typeof deals === 'undefined') return 0;
         var mine = getInterests();
-        return deals.filter(function (d) {
+        var n = deals.filter(function (d) {
             if (isExpired(d)) return false;
             if (d.sponsored === true) return true;
             var di = dealInterests(d);
             return mine.some(function (k) { return di[k]; });
         }).length;
+        // The Free Stuff pick brings the freebies themselves into the
+        // feed (renderDeals appends them), so they count here too —
+        // otherwise a Free-Stuff-only feed would report "0 for you"
+        // while showing every freebie.
+        if (mine.indexOf('freebies') !== -1) n += liveFreebieCount();
+        return n;
     }
 
     // Consulted by app.js renderDeals()/createDealCard() and auth.js.
