@@ -528,6 +528,9 @@ function openSubmitDealModal() {
 
 function handleSearch() {
     searchQuery = searchInput.value;
+    // Freebies never appear in search results: searching from the Free
+    // Stuff view goes back to All Deals and searches the deals.
+    if (currentCategory === 'freebies') { setCategory('all'); return; }
     renderDeals();
 }
 
@@ -565,6 +568,7 @@ function paintCategoryCounts() {
     categoryLinks.forEach(link => {
         const cat = link.dataset.category;
         if (!cat) return; // the "My Feed" row — painted by tailored-feed.js
+        if (cat === 'freebies') return; // Free Stuff row: no deal count, never hidden
         const n = cat === 'all' ? total : (tally[cat] || 0);
         const li = link.closest('li');
         let badge = link.querySelector('.cat-count');
@@ -597,8 +601,72 @@ function isDealExpired(deal) {
     return deal.dead === true;
 }
 
+// ── Free Stuff view ─────────────────────────────────────────────────
+// Freebies (freebies-data.js) are their own surface: they render ONLY
+// in the Free Stuff view (nav/sidebar category 'freebies'), never in
+// All Deals, My Feed, or search results. They are not affiliate deals —
+// their buttons link straight to the brand's official page (no
+// getAffiliateUrl, no click/view counting). Expired entries hide
+// automatically; the comparison date is today in Eastern Time.
+function etTodayStr() {
+    try {
+        return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    } catch (e) {
+        return new Date().toISOString().slice(0, 10);
+    }
+}
+function isFreebieLive(f) {
+    return !f.expires || f.expires >= etTodayStr();
+}
+function showFreebiesIntro(show) {
+    let el = document.getElementById('freebiesIntro');
+    if (!el) {
+        if (!show) return;
+        el = document.createElement('div');
+        el.id = 'freebiesIntro';
+        el.className = 'freebies-intro';
+        el.textContent = 'Free offers from stores and apps — no purchase needed unless the offer says so. Offers change fast; we check them often.';
+        dealGrid.parentNode.insertBefore(el, dealGrid);
+    }
+    el.style.display = show ? '' : 'none';
+}
+function createFreebieCard(f) {
+    const article = document.createElement('article');
+    article.className = 'deal-card freebie-card';
+    const when = f.expires
+        ? 'Ends ' + new Date(f.expires + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        : 'Ongoing';
+    article.innerHTML = `
+        ${f.image ? `<div class="card-image"><img src="${f.image}" alt="${f.title}" loading="lazy"><span class="free-badge">FREE</span></div>` : ''}
+        <div class="card-content">
+            ${f.image ? '' : '<span class="free-badge free-badge-inline">FREE</span>'}
+            <div class="card-meta">
+                <span class="card-source">${f.store}</span>
+                <span class="card-category">Free Stuff</span>
+            </div>
+            <h3 class="card-title">${f.title}</h3>
+            ${f.description ? `<p class="card-desc">${f.description}</p>` : ''}
+            ${f.howTo ? `<p class="freebie-howto"><strong>How to get it:</strong> ${f.howTo}</p>` : ''}
+            <div class="freebie-when">${when}</div>
+            <a href="${f.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width freebie-btn">Get This Freebie</a>
+        </div>`;
+    return article;
+}
+function renderFreebies() {
+    showFreebiesIntro(true);
+    renderPagination(0);
+    const list = (typeof freebies !== 'undefined' && Array.isArray(freebies)) ? freebies.filter(isFreebieLive) : [];
+    if (!list.length) {
+        dealGrid.innerHTML = '<div class="no-results">No freebies right now — check back soon.</div>';
+        return;
+    }
+    list.forEach(f => dealGrid.appendChild(createFreebieCard(f)));
+}
+
 function renderDeals() {
     dealGrid.innerHTML = '';
+    if (currentCategory === 'freebies') { renderFreebies(); return; }
+    showFreebiesIntro(false);
     let filtered = deals.filter(deal => {
         const inMyFeed    = window.CC_FEED && CC_FEED.mode() === 'mine';
         const matchCat    = inMyFeed || currentCategory === 'all' || deal.category === currentCategory;

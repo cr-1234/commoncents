@@ -854,6 +854,26 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     background: var(--gold-gradient); color: #ffffff;
     border-color: transparent; font-weight: 700;
 }
+/* ── Free Stuff ────────────────────────────────────────────────── */
+.freebies-intro {
+    background: #EDE5F8; border: 1px solid var(--border-color);
+    border-radius: var(--border-radius); color: var(--text-primary);
+    padding: 0.8rem 1rem; margin-bottom: 1.25rem; font-size: 0.92rem;
+}
+.free-badge {
+    position: absolute; top: 10px; left: 10px; z-index: 2;
+    background: var(--highlight); color: #ffffff;
+    font-size: 13px; font-weight: 800; letter-spacing: 0.06em;
+    padding: 0.35rem 0.8rem; border-radius: 999px;
+}
+.free-badge-inline { position: static; display: inline-block; margin-bottom: 0.55rem; }
+.freebie-howto { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45; }
+.freebie-when {
+    font-size: 0.78rem; font-weight: 700; color: var(--highlight);
+    text-transform: uppercase; letter-spacing: 0.05em; margin: 0.35rem 0 0.65rem;
+}
+.freebie-btn { margin-bottom: 0.25rem; }
+
 .audience-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.7rem; }
 .audience-label { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
 .feed-status { color: var(--text-secondary); font-size: 0.83rem; margin: 0.65rem 0 0.2rem; }
