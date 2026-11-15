@@ -299,6 +299,42 @@ body:not(.dark-mode) .glass {
     padding-right: 2px;
 }
 .sidebar::-webkit-scrollbar { display: none; }
+/* ── Sidebar scroll hint ──────────────────────────────────────
+   The sidebar scrolls internally with its scrollbar hidden, so
+   nothing tells the visitor more sits below (owner, 2026-11-15).
+   The wrap is a zero-height sticky strip at the end of the
+   sidebar's content: while the sidebar is scrolled up it pins the
+   pill to the visible bottom edge; at the very bottom it rests in
+   place and app.js has already faded the pill out. Only the pill
+   itself takes clicks (the wrap never blocks the content under
+   it). Desktop only in effect — the sidebar is display:none on
+   phones, which takes the pill with it. */
+.sidebar-scroll-hint-wrap {
+    position: sticky; bottom: 0.6rem; height: 0; z-index: 6;
+    pointer-events: none;
+}
+.sidebar-scroll-hint {
+    position: absolute; bottom: 0; left: 50%;
+    transform: translate(-50%, 6px);
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    background: var(--highlight); color: #fff;
+    border: none; cursor: pointer; pointer-events: none;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.02em;
+    padding: 0.42rem 0.8rem; border-radius: 999px;
+    box-shadow: 0 6px 18px rgba(91,45,142,0.35);
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+}
+.sidebar-scroll-hint.show {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transform: translate(-50%, 0);
+}
+.sidebar-scroll-hint:hover { background: #4A2473; }
+.sidebar-scroll-hint svg { flex: none; animation: sidebarHintBob 1.8s ease-in-out infinite; }
+@keyframes sidebarHintBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(2px); }
+}
 .sidebar-widget {
     margin-bottom: 2rem; background: #F9F6FD;
     border: 1px solid rgba(91,45,142,0.09); border-radius: 16px; padding: 1.1rem 1.1rem 1.2rem;

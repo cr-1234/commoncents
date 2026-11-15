@@ -185,6 +185,20 @@
                     <button type="button" class="feed-slim-btn" id="feedWidgetChange">Build your feed</button>
                 </div>
             </div>
+            <!-- Scroll hint (owner, 2026-11-15): the sidebar scrolls
+                 on its own with its scrollbar hidden, so at the top
+                 there is no sign that the giveaway's Notify Me button
+                 and Your Feed continue below. This pill floats at the
+                 sidebar's bottom edge (sticky wrap, CSS in style.css)
+                 only while more content sits below; app.js
+                 (CC_SIDEBAR_HINT) shows/hides it, and clicking it
+                 scrolls the sidebar down by about a screen. -->
+            <div class="sidebar-scroll-hint-wrap">
+                <button type="button" class="sidebar-scroll-hint" id="sidebarScrollHint" aria-label="More below — scroll down in this sidebar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <span>More below</span>
+                </button>
+            </div>
         </aside>
 
         <main class="feed-section">

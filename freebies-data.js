@@ -10,13 +10,21 @@
 // must be re-verified against the brand's official page before it is
 // trusted, and expired entries (expires < today) hide automatically.
 //
-// Entry shape: { id, title, store, image (optional — omit when there
-// is no clean product picture; the card renders fine without one),
-// description (original wording only), url (the brand's official
-// offer/rewards page), expires ('YYYY-MM-DD' or null for ongoing),
-// howTo (short, original), votes: { up, down } (base tallies the
-// site's thumbs start from — plain numbers, 0 for a new entry;
-// entries without the field are read as 0) }.
+// Entry shape: { id, title, store, image (REQUIRED — owner rule,
+// 2026-11-15: no freebie is added without a clean picture of the
+// item itself, self-hosted in img/; if no clean picture can be
+// gotten, the freebie is not added at all), description (original
+// wording only), url (the brand's official offer/rewards page),
+// expires ('YYYY-MM-DD' or null for ongoing), howTo (short,
+// original), votes: { up, down } (base tallies the site's thumbs
+// start from — plain numbers, 0 for a new entry; entries without
+// the field are read as 0) }.
+//
+// ORDER: freebies display newest first, like deals (owner,
+// 2026-11-15). Records carry no timestamp — ids are issued in
+// arrival order, so the site sorts by id, highest first. A new
+// entry MUST take the next id above the current maximum, or it
+// will not appear first.
 //
 // Added 2026-11-15: Lowe's Holiday Trolley Car workshop (verified
 // against Lowe's own Oct 8, 2026 holiday press release) and the Good
@@ -85,6 +93,7 @@ const freebies = [
         id: 6,
         title: "Free Holiday Trolley Car Kids Workshop At Lowe's",
         store: "Lowe's",
+        image: "img/freebie-lowes-trolley.jpg",
         description: "Lowe's free monthly kids workshop turns festive in December: little builders assemble and decorate a classic holiday trolley car, with all supplies included, and take their finished trolley home.",
         url: "https://www.lowes.com/diy-projects-and-ideas/workshops",
         expires: "2026-12-12",
@@ -95,6 +104,7 @@ const freebies = [
         id: 7,
         title: "Free 2027 Wall Calendar From Good News Radio",
         store: "Good News Radio",
+        image: "img/freebie-calendar.jpg",
         description: "Good News Radio is mailing out a free 2027 wall calendar to anyone who asks — a simple request form, no purchase, while supplies last.",
         url: "https://www.goodnewsgreatmusic.org/calendarrequest",
         expires: null,
