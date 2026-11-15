@@ -41,6 +41,10 @@ try {
 function saveMySaves() {
     try { localStorage.setItem('ccMySaves', JSON.stringify(mySaves)); } catch (e) {}
     if (window.CC_AUTH && CC_AUTH.noteSavesChanged) { try { CC_AUTH.noteSavesChanged(mySaves); } catch (e) {} }
+    // Every saves mutation funnels through here (toggle, sign-in
+    // merge, Restore) — repaint the sidebar counts so the Saved
+    // row's number tracks the list with no reload (owner, 2026-11-15).
+    if (typeof paintCategoryCounts === 'function') { try { paintCategoryCounts(); } catch (e) {} }
 }
 function hasSave(id) { return mySaves.some(s => s.id === id); }
 function paintSaveButtons(id) {
@@ -692,7 +696,10 @@ function setCategory(category) {
 // category with none is hidden entirely. Computed from the deals
 // array at page load — never hard-coded — so newly posted deals
 // update the counts on the next load with no code change. The top
-// nav intentionally gets no counts.
+// nav intentionally gets no counts. Free Stuff and Saved carry
+// counts too (owner, 2026-11-15): live freebies / this device's
+// saves — those two rows are permanent, so their badge shows the
+// number even at 0 instead of the row hiding.
 function paintCategoryCounts() {
     const tally = {};
     let total = 0;
@@ -701,14 +708,34 @@ function paintCategoryCounts() {
         total++;
         tally[d.category] = (tally[d.category] || 0) + 1;
     });
+    // Free Stuff count: live freebies only, by the same ET-date
+    // expiry rule the Free Stuff view itself renders by.
+    let freeCount = 0;
+    try {
+        if (typeof freebies !== 'undefined' && Array.isArray(freebies)) freeCount = freebies.filter(isFreebieLive).length;
+    } catch (e) {}
+    // Saved count: this device's saved deals.
+    let savedCount = 0;
+    try {
+        if (window.CC_SAVES && typeof window.CC_SAVES.get === 'function') savedCount = window.CC_SAVES.get().length;
+        else { const rawSaved = JSON.parse(localStorage.getItem('ccMySaves') || '[]'); if (Array.isArray(rawSaved)) savedCount = rawSaved.length; }
+    } catch (e) {}
     categoryLinks.forEach(link => {
         const cat = link.dataset.category;
         if (!cat) return; // the "My Feed" row — painted by tailored-feed.js
-        if (cat === 'freebies') return; // Free Stuff row: no deal count, never hidden
-        if (cat === 'saved') return; // Saved row: a personal list, no deal count, never hidden
-        const n = cat === 'all' ? total : (tally[cat] || 0);
         const li = link.closest('li');
         let badge = link.querySelector('.cat-count');
+        if (cat === 'freebies' || cat === 'saved') {
+            if (li) li.style.display = '';
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'cat-count';
+                link.appendChild(badge);
+            }
+            badge.textContent = cat === 'freebies' ? freeCount : savedCount;
+            return;
+        }
+        const n = cat === 'all' ? total : (tally[cat] || 0);
         if (cat !== 'all' && n === 0) {
             if (li) li.style.display = 'none';
             if (badge) badge.remove();
