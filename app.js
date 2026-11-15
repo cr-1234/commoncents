@@ -1307,15 +1307,16 @@ function renderPagination(totalPages) {
 
 // The in-feed sister-site ad: the same restored Gifting Butler
 // house picture the rail carries (img/gb-house-ad.png, same link,
-// same alt text), rendered as one card among the deal cards and
-// labelled "Our sister site" so it never masquerades as a deal.
-// Deliberately NOT a .deal-card — no modal, no votes, no counts;
-// the picture itself is the link, exactly like the rail ad.
+// same alt text), rendered as one card among the deal cards. The
+// "Our sister site" label it launched with was removed at the
+// owner's word (2026-11-15: "i dont want our sister site") — the
+// card is now the picture alone. Deliberately NOT a .deal-card —
+// no modal, no votes, no counts; the picture itself is the link,
+// exactly like the rail ad.
 function createFeedAdCard() {
     const article = document.createElement('article');
     article.className = 'feed-ad-card';
     article.innerHTML = `
-        <span class="feed-ad-label">Our sister site</span>
         <a class="feed-ad-link" href="https://giftingbutler-74395.web.app" target="_blank" rel="noopener noreferrer"><img src="img/gb-house-ad.png" alt="Gifting Butler — looking for a gift, not just a deal?" loading="lazy"></a>`;
     return article;
 }

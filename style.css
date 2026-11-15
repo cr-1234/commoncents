@@ -1483,11 +1483,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    into the grid on page 1 of the browse views, after the 6th deal;
    it is not a deal and never enters any count. It borrows the deal
    cards' shell (white, radius, border, same hover lift) so it sits
-   naturally among them, with a small "Our sister site" label on top
-   so it never masquerades as a deal. It is deliberately NOT a
-   .deal-card, so the phone list-row rules step aside for it: at
-   phone widths the grid is a single column and this stays a
-   full-width card block between the rows, never a compact row. */
+   naturally among them. The "Our sister site" label it launched
+   with was removed at the owner's word (2026-11-15: "i dont want
+   our sister site") — the card is now the picture alone. It is
+   deliberately NOT a .deal-card, so the phone list-row rules step
+   aside for it: at phone widths the grid is a single column and
+   this stays a full-width card block between the rows, never a
+   compact row. */
 .feed-ad-card {
     background-color: var(--bg-card);
     border-radius: var(--border-radius); overflow: hidden;
@@ -1498,10 +1500,6 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .feed-ad-card:hover {
     box-shadow: 0 8px 24px rgba(91,45,142,0.16), 0 0 0 1px var(--highlight);
     border-color: var(--highlight);
-}
-.feed-ad-label {
-    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em;
-    color: var(--highlight); font-weight: 700; padding: 0.65rem 1rem 0.5rem;
 }
 .feed-ad-link { display: block; }
 .feed-ad-link img { width: 100%; height: auto; display: block; }
