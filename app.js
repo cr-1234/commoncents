@@ -762,14 +762,18 @@ function setCategory(category) {
 }
 
 // Sidebar category counts: each Categories row shows how many LIVE
-// deals it holds right now ("All Deals" shows the total), and a
-// category with none is hidden entirely. Computed from the deals
-// array at page load — never hard-coded — so newly posted deals
-// update the counts on the next load with no code change. The top
-// nav intentionally gets no counts. Free Stuff and Saved carry
-// counts too (owner, 2026-11-15): live freebies / this device's
-// saves — those two rows are permanent, so their badge shows the
-// number even at 0 instead of the row hiding.
+// deals it holds right now, and a category with none is hidden
+// entirely. Computed from the deals array at page load — never
+// hard-coded — so newly posted deals update the counts on the next
+// load with no code change. The top nav intentionally gets no
+// counts. Free Stuff and Saved carry counts too (owner, 2026-11-15):
+// live freebies / this device's saves — those two rows are permanent,
+// so their badge shows the number even at 0 instead of the row
+// hiding. The "All Deals" total counts live deals PLUS the live
+// freebies (owner rule, 2026-11-15: the numbers must match what you
+// see — freebies render inside All Deals, so they are in its count;
+// category rows stay deals-only because freebies belong to no
+// category).
 function paintCategoryCounts() {
     const tally = {};
     let total = 0;
@@ -805,7 +809,7 @@ function paintCategoryCounts() {
             badge.textContent = cat === 'freebies' ? freeCount : savedCount;
             return;
         }
-        const n = cat === 'all' ? total : (tally[cat] || 0);
+        const n = cat === 'all' ? total + freeCount : (tally[cat] || 0);
         if (cat !== 'all' && n === 0) {
             if (li) li.style.display = 'none';
             if (badge) badge.remove();

@@ -335,8 +335,8 @@
     // The "My Feed" rows in the Categories lists (sidebar + top nav,
     // marked data-myfeed). They exist only while the visitor has picks:
     // no picks, no row anywhere. The sidebar row also carries the
-    // .cat-count badge with the number of live deals matching the
-    // picks — matchCount(), the same matching the My Feed view itself
+    // .cat-count badge with the number matching the picks —
+    // matchCount(), the same matching the My Feed view itself
     // uses — shown even when that number is 0. Active painting agrees
     // with the view on screen: in My Feed the rows are active and the
     // category links are not; browsing, the selected category is.
@@ -377,13 +377,18 @@
     function paintAll() {
         if (!els.picker) return;
         var mine = getInterests();
+        // When the Free Stuff pick is on, matchCount() includes the
+        // live freebies — so the wording must say so (owner rule,
+        // 2026-11-15: the numbers must match what you see, and the
+        // label must match the number).
+        var fbUnit = (mine.indexOf('freebies') !== -1 && liveFreebieCount() > 0) ? ' & freebies' : '';
         els.picker.classList.toggle('slim', !expanded);
         // Sidebar "Your Feed" widget text + buttons
         if (els.widgetText) {
             if (mode === 'mine' && mine.length) {
                 var n = matchCount();
                 els.widgetText.textContent = mine.map(labelFor).join(' + ')
-                    + ' — ' + n + ' deal' + (n === 1 ? '' : 's') + ' for you';
+                    + ' — ' + n + ' deal' + (n === 1 ? '' : 's') + fbUnit + ' for you';
             } else if (mine.length) {
                 els.widgetText.textContent = 'Browsing everything — your picks are saved.';
             } else {
@@ -397,7 +402,7 @@
             if (mode === 'mine' && mine.length) {
                 var c = matchCount();
                 els.status.textContent = 'Your feed: ' + mine.map(labelFor).join(' + ')
-                    + ' — ' + c + ' deal' + (c === 1 ? '' : 's')
+                    + ' — ' + c + ' deal' + (c === 1 ? '' : 's') + fbUnit
                     + '. Tap "Done" to tuck this picker away.';
             } else if (mine.length) {
                 els.status.textContent = 'Browsing by category. Your interests are saved — use "My Feed" in the Categories list to jump back.';
