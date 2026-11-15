@@ -54,10 +54,8 @@ const SPREADSHEET_CSV_URL = '';
 // entrants). Bonus entries add chances only — they never move the prize.
 function calculatePrize(count) {
     if (count >= 10000) return '$100';
-    if (count >= 5000)  return '$60';
     if (count >= 1000)  return '$30';
     if (count >= 250)   return '$15';
-    if (count >= 100)   return '$10';
     return '$5';
 }
 
@@ -73,7 +71,7 @@ function updateEntryCount() {
     if (countEl) countEl.textContent = count;
     if (prizeEl) prizeEl.textContent = prize;
     if (tiers.length) {
-        const map = { '$5': 0, '$10': 1, '$15': 2, '$30': 3, '$60': 4, '$100': 5 };
+        const map = { '$5': 0, '$15': 1, '$30': 2, '$100': 3 };
         tiers.forEach((t, i) => t.classList.toggle('active', i === map[prize]));
     }
     const side = document.getElementById('sidebarPrize');
@@ -81,7 +79,7 @@ function updateEntryCount() {
     // Progress toward the next prize tier + a plain-words "how many more" line.
     const fill = document.getElementById('prizeProgressFill');
     const next = document.getElementById('prizeNext');
-    const LADDER = [[0, '$5'], [100, '$10'], [250, '$15'], [1000, '$30'], [5000, '$60'], [10000, '$100']];
+    const LADDER = [[0, '$5'], [250, '$15'], [1000, '$30'], [10000, '$100']];
     let cur = LADDER[0], nxt = null;
     for (let i = 0; i < LADDER.length; i++) {
         if (count >= LADDER[i][0]) { cur = LADDER[i]; nxt = LADDER[i + 1] || null; }
@@ -941,7 +939,7 @@ function openModal(deal) {
                 ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
             <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
-            <button type="button" class="btn share-modal-btn">Share</button>
+            <button type="button" class="btn share-modal-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px; margin-right:0.35rem;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Share</span></button>
         </div>
         <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
         ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
@@ -1255,7 +1253,7 @@ function getAffiliateUrl(url) {
 }
 
 // ── Share a deal (owner request 2026-11-14) ─────────────────────────────
-// Menu order matches Gifting Butler: WhatsApp, Email, Copy link,
+// Menu order matches Gifting Butler: WhatsApp, Copy link, Email,
 // Pinterest LAST, then More options (native share) when the device
 // offers it. The shared link is always the affiliate URL, so the
 // CommonCents tag rides along wherever the deal is forwarded.
@@ -1277,10 +1275,10 @@ function openShareMenu(deal) {
         <div class="share-menu" role="dialog" aria-label="Share this deal">
             <div class="share-menu-head"><strong>Share this deal</strong><button type="button" class="share-menu-close" aria-label="Close">&times;</button></div>
             <a class="share-row" href="https://wa.me/?text=${enc(text + ' ' + url)}" target="_blank" rel="noopener"><span class="share-ico">\uD83D\uDCAC</span>Share on WhatsApp</a>
-            <a class="share-row" href="mailto:?subject=${enc(deal.title)}&body=${enc(text + '\n' + url)}"><span class="share-ico">\u2709\uFE0F</span>Share by Email</a>
             <button type="button" class="share-row share-copy"><span class="share-ico">\uD83D\uDD17</span><span class="share-copy-label">Copy link</span></button>
+            <a class="share-row" href="mailto:?subject=${enc(deal.title)}&body=${enc(text + '\n' + url)}"><span class="share-ico">\u2709\uFE0F</span>Share by Email</a>
             <a class="share-row" href="https://pinterest.com/pin/create/button/?url=${enc(url)}&media=${enc(deal.image || '')}&description=${enc(text)}" target="_blank" rel="noopener"><span class="share-ico">\uD83D\uDCCC</span>Pin it on Pinterest</a>
-            ${navigator.share ? '<button type="button" class="share-row share-native"><span class="share-ico">\uD83D\uDCE4</span>More options</button>' : ''}
+            ${navigator.share ? '<button type="button" class="share-row share-native"><span class="share-ico">\u2022\u2022\u2022</span>More options</button>' : ''}
         </div>`;
     ov.addEventListener('click', (e) => { if (e.target === ov) closeShareMenu(); });
     ov.querySelector('.share-menu-close').addEventListener('click', closeShareMenu);
