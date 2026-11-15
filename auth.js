@@ -168,6 +168,11 @@
             btn.addEventListener('click', function () {
                 var n = (notesCache || [])[parseInt(btn.getAttribute('data-nidx'), 10)];
                 if (!n) return;
+                // A clicked note goes away (owner, 2026-11-15): the row
+                // leaves the menu at once and the dismissal fires in the
+                // background — navigation never waits on it. If the call
+                // fails the note simply comes back on the next load.
+                dismissNote(n);
                 if (n.site === 'gb') {
                     window.open('https://giftingbutler-74395.web.app', '_blank', 'noopener');
                     return;
@@ -204,6 +209,25 @@
         user.getIdToken().then(function (token) {
             return postFn('setNotificationsMuted', { muted: notesMuted }, token);
         }).catch(function () { /* the switch re-syncs on next sign-in */ });
+    }
+    // Dismiss ONE note for good (owner, 2026-11-15: "once you click
+    // it, it just goes away — otherwise you'll have 500 replies stack
+    // up"). Optimistic: the note leaves the local list and the menu
+    // repaints immediately (falling back to the empty state when it
+    // was the last one); the server delete follows in the background.
+    function dismissNote(n) {
+        if (!n || !n.id) return;
+        if (notesCache) notesCache = notesCache.filter(function (x) { return x.id !== n.id; });
+        // Repaint on the next tick, not mid-click: replacing the list
+        // HTML during the tap would detach the clicked button, and the
+        // document's outside-click closer would then read the tap as
+        // a click outside the menu and close it.
+        setTimeout(paintNotesList, 0);
+        if (!currentUser) return;
+        var user = currentUser;
+        user.getIdToken().then(function (token) {
+            return postFn('dismissNotification', { id: n.id }, token);
+        }).catch(function () { /* the note may reappear next visit */ });
     }
     function markNotesRead() {
         if (!currentUser || !notesUnread) return;
