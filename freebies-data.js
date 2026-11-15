@@ -14,7 +14,9 @@
 // is no clean product picture; the card renders fine without one),
 // description (original wording only), url (the brand's official
 // offer/rewards page), expires ('YYYY-MM-DD' or null for ongoing),
-// howTo (short, original) }.
+// howTo (short, original), votes: { up, down } (base tallies the
+// site's thumbs start from — plain numbers, 0 for a new entry;
+// entries without the field are read as 0) }.
 const freebies = [
     {
         id: 1,
@@ -24,6 +26,7 @@ const freebies = [
         description: "Starbucks Rewards members get a free handcrafted drink on their birthday — or swap it for a food item or a bottled drink instead. It is the program's easiest freebie, but only if you set it up ahead of time.",
         url: "https://www.starbucks.com/rewards",
         expires: null,
+        votes: { up: 0, down: 0 },
         howTo: "Join Starbucks Rewards free at least 7 days before your birthday, add your birthday to your account, and make at least one Star-earning purchase before your birthday each year. The reward lands in your account on the day itself."
     },
     {
@@ -34,6 +37,7 @@ const freebies = [
         description: "MyPanera members get a free bakery treat for their birthday — a bagel, cookie, brownie, muffin, scone or pastry — with no purchase required.",
         url: "https://www.panerabread.com/en-us/mypanera/points.html",
         expires: null,
+        votes: { up: 0, down: 0 },
         howTo: "Join MyPanera free and add your birthday (month and day) to your account. The reward loads around your birthday and stays valid for 7 days — just select it when you order."
     },
     {
@@ -44,6 +48,7 @@ const freebies = [
         description: "Krispy Kreme Rewards members get a free sweet treat on their birthday — on top of the free doughnut that comes just for joining.",
         url: "https://www.krispykreme.com/rewards",
         expires: null,
+        votes: { up: 0, down: 0 },
         howTo: "Join Krispy Kreme Rewards free in the app or online and add your birthday to your profile, so your birthday treat can be added to your account when the day comes."
     },
     {
@@ -54,6 +59,7 @@ const freebies = [
         description: "The Baskin-Robbins Birthday Club sends members a free scoop for their birthday. It is separate from the regular rewards program, free to join, and open to anyone 13 or older.",
         url: "https://www.baskinrobbins.com/en/faqs",
         expires: null,
+        votes: { up: 0, down: 0 },
         howTo: "Create a free Baskin-Robbins account in the BR App or online and complete your profile to join the Birthday Club — members get their free-scoop birthday reward every year."
     },
     {
@@ -64,6 +70,7 @@ const freebies = [
         description: "Denny's Rewards members get a free Everyday Value Slam breakfast as their birthday reward — the birthday freebie regulars have loved for years, now inside the new rewards program.",
         url: "https://www.dennys.com/rewards",
         expires: null,
+        votes: { up: 0, down: 0 },
         howTo: "Join Denny's Rewards free and add your birthday to your account; the free Everyday Value Slam birthday reward is added for members to use around their birthday."
     }
 ];
