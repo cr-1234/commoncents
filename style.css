@@ -1006,7 +1006,11 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     color: #fff; font-weight: 800; font-size: 0.9rem;
     display: inline-flex; align-items: center; justify-content: center;
     box-shadow: 0 3px 10px rgba(91,45,142,0.35);
-    overflow: hidden;
+    /* Visible, not hidden (owner, 2026-11-15): the notification badge
+       hangs off the circle's rim, and overflow:hidden clipped it to an
+       unreadable red sliver inside the circle. The photo clips itself
+       (border-radius on the img), so the container no longer needs to. */
+    overflow: visible;
 }
 .auth-email.as-avatar { cursor: pointer; position: relative; }
 /* Menu hint v3 (owner, 2026-11-12): v1 (white notch on the photo)
@@ -1019,7 +1023,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 /* Notification badge on the avatar + the list inside the account
    menu (engagement plan, 2026-11-13). Red badge = the standard
    "you have something new" signal; it clears when the menu opens. */
-.cc-note-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; border-radius: 999px; background: #dc2626; color: #fff; font-size: .66rem; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #fff; z-index: 4; }
+.cc-note-badge { position: absolute; top: -7px; right: -7px; min-width: 22px; height: 22px; border-radius: 999px; background: #dc2626; color: #fff; font-size: .74rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center; padding: 0 5px; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.28); z-index: 4; }
 .auth-menu-notes { border-top: 1px solid var(--border-color); margin-top: 0; padding-top: .5rem; }
 .auth-menu-notes.is-empty { border-top: none; padding-top: 0; }
 .auth-menu-notes.is-empty .auth-menu-notes-head { display: none; }
@@ -1033,6 +1037,21 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .auth-menu-notes-toggle { width: 100%; margin: 0 0 .3rem; }
 .auth-menu-note.auth-menu-notes-off { display: block; width: 100%; text-align: left; border: none; cursor: pointer; font-family: inherit; }
 .auth-menu-note.auth-menu-notes-off:hover { background: #E2D5F5; }
+/* Clickable notifications (owner, 2026-11-15): a note is a button —
+   tapping it closes the menu and opens the deal (and the comment)
+   it points at. */
+.auth-menu-note.an-click { display: block; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border-color); cursor: pointer; font-family: inherit; }
+.auth-menu-note.an-click:hover { background: #EDE5F8; }
+.auth-menu-note.an-click:last-child { border-bottom: none; }
+/* The comment a notification pointed at flashes plum once it has
+   been scrolled into view, so the eye lands on it. */
+.cmt-row { border-radius: 8px; }
+.cmt-row.cmt-flash { animation: cmtFlash 2.4s ease-out; }
+@keyframes cmtFlash { 0%, 55% { background-color: #EDE5F8; } 100% { background-color: transparent; } }
+/* Plain spoken note for a tap that can't open anything (a deal that
+   is no longer live and was never saved). */
+.cc-toast { position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%) translateY(1rem); background: #5B2D8E; color: #fff; font-size: 0.9rem; font-weight: 600; padding: 0.65rem 1.2rem; border-radius: 999px; box-shadow: 0 10px 30px rgba(40,20,70,0.35); opacity: 0; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease; z-index: 3000; max-width: 92vw; text-align: center; }
+.cc-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .cmt-reply-btn { background: none; border: none; color: var(--highlight); font-weight: 600; font-size: .82rem; cursor: pointer; padding: .2rem 0 0; font-family: inherit; }
 .auth-email.as-avatar::before {
     content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);

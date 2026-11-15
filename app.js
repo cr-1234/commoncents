@@ -1149,7 +1149,7 @@ function openModal(deal) {
     const cmtPencil = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
     const cmtTrash = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
     const oneCommentHTML = (c, idx, isReply) => `
-        <div ${c.pending ? 'data-pending="1" ' : ''}style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);${c.pending ? ' opacity:0.6;' : ''}${isReply ? ' margin-left:1.4rem; padding-left:0.8rem; border-left:2px solid var(--plum-lt);' : ''}">
+        <div class="cmt-row" data-cid="${c.id || ''}" ${c.pending ? 'data-pending="1" ' : ''}style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);${c.pending ? ' opacity:0.6;' : ''}${isReply ? ' margin-left:1.4rem; padding-left:0.8rem; border-left:2px solid var(--plum-lt);' : ''}">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
                 <strong style="color:var(--text-primary);">${c.user}</strong>
                 <span style="display:inline-flex; align-items:center;">
@@ -1539,6 +1539,35 @@ function openModal(deal) {
     };
     window.CC_REVEAL_REPLY_BOX = revealReplyBox;
 
+    // Notification click-through (owner, 2026-11-15): when this open
+    // came from tapping a notification, deal._focusCid names the
+    // comment to land on ("I should be able to click over here to go
+    // to that comment"). Attempt on every render while the flag is
+    // set — the thread load below re-opens the modal with the
+    // authoritative list — and the load's settle does one final
+    // attempt, then clears the flag so a later manual open of this
+    // deal doesn't scroll-hunt for the comment again.
+    const focusCommentNow = () => {
+        if (!deal._focusCid) return false;
+        const cl = document.getElementById('commentsList');
+        if (!cl) return false;
+        const el = cl.querySelector('[data-cid="' + deal._focusCid + '"]');
+        if (!el) return false;
+        const er = el.getBoundingClientRect();
+        const lr = cl.getBoundingClientRect();
+        if (er.bottom > lr.bottom) cl.scrollTop += Math.ceil(er.bottom - lr.bottom) + 8;
+        else if (er.top < lr.top) cl.scrollTop += Math.floor(er.top - lr.top) - 8;
+        el.classList.remove('cmt-flash');
+        void el.offsetWidth; // restart the flash if it was already running
+        el.classList.add('cmt-flash');
+        return true;
+    };
+    if (deal._focusCid) {
+        if (window.requestAnimationFrame) {
+            window.requestAnimationFrame(() => window.requestAnimationFrame(focusCommentNow));
+        } else { focusCommentNow(); }
+    }
+
     // Stored comments: fetch the saved thread for this deal and swap it in
     // (the server is the source of truth once it answers). Skipped on the
     // re-renders that post / edit / delete trigger themselves.
@@ -1559,10 +1588,61 @@ function openModal(deal) {
             deal.comments = mapped.concat(stillPending);
             deal._skipLoadOnce = true;
             openModal(deal);
-        }).catch(() => { /* backend unreachable: keep whatever is shown */ });
+            // The thread is authoritative now: one last focus attempt
+            // (this closure reads the live DOM, so it lands on the
+            // fresh render), then the click-through is spent.
+            if (deal._focusCid) {
+                const settleFocus = focusCommentNow;
+                setTimeout(() => { try { settleFocus(); } catch (e) {} delete deal._focusCid; }, 450);
+            }
+        }).catch(() => { delete deal._focusCid; /* backend unreachable: keep whatever is shown */ });
     }
 }
 
+
+// ── Notification click-through (owner, 2026-11-15) ─────────────
+// Tapping a notification in the account menu lands HERE: open the
+// deal it points at and, for a reply note, scroll its thread to the
+// comment and flash it. A deal that has left the feed still opens
+// when the visitor saved it (the Saved view's snapshot data — its
+// comment thread still loads from the backend by deal id); a deal
+// that is simply gone gets a plain spoken note, never a dead click.
+function ccToast(msg) {
+    let t = document.getElementById('ccToast');
+    if (!t) {
+        t = document.createElement('div');
+        t.id = 'ccToast';
+        t.className = 'cc-toast';
+        document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._ccHide);
+    t._ccHide = setTimeout(() => t.classList.remove('show'), 3400);
+}
+window.CC_TOAST = ccToast;
+
+window.CC_OPEN_DEAL_COMMENT = function (dealId, commentId) {
+    const want = String(dealId == null ? '' : dealId);
+    if (!want) return false;
+    let deal = deals.find(d => String(d.id) === want);
+    if (!deal) {
+        const save = mySaves.find(s => String(s.id) === want);
+        if (save) {
+            deal = {
+                id: save.id, title: save.title, price: save.price,
+                image: save.image || '', url: save.url || '',
+                category: 'Saved deal',
+                description: 'This deal is no longer live on the site — this is the copy you saved. Its comments are the original thread.',
+                votes: {}, comments: []
+            };
+        }
+    }
+    if (!deal) { ccToast('That deal is no longer live.'); return false; }
+    if (commentId) deal._focusCid = String(commentId);
+    openModal(deal);
+    return true;
+};
 
 function getStoreName(url) {
     if (!url) return '';
