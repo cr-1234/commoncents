@@ -522,6 +522,20 @@ body.dark-mode .view-deal-btn { color: #000; }
 @keyframes votePop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
 .vote-btn.pop { animation: votePop 0.35s ease; }
 
+/* ── Save deals (bookmark on cards + detail modal) ──────── */
+.save-btn.saved { color: var(--highlight); background: rgba(91,45,142,0.12); }
+.save-btn.saved svg { fill: currentColor; }
+.save-modal-btn { background: rgba(91,45,142,0.12); color: var(--highlight); }
+.save-modal-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(91,45,142,0.25); }
+.save-modal-btn.saved { background: var(--highlight); color: #fff; }
+.save-modal-btn.saved svg { fill: currentColor; }
+.gone-badge {
+    position: absolute; top: 10px; left: 10px; z-index: 2;
+    background: #6b7280; color: #fff;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+    padding: 0.25rem 0.55rem; border-radius: 999px;
+}
+
 /* ── Share (deal cards + detail modal) ──────────────────── */
 .share-btn { margin-left: auto; }
 .share-modal-btn { background: rgba(91,45,142,0.12); color: var(--highlight); }
