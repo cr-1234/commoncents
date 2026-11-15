@@ -18,6 +18,11 @@
 //                                    false = the front-end shows a
 //                                    "coming soon" teaser, no form),
 //                                    lastWinner:{masked,prize}|null}
+//   POST ccJoinWaitlist    {email} → join the launch waitlist behind
+//                                    the coming-soon teaser's email
+//                                    capture ("we'll email you as soon
+//                                    as the giveaway is on"); one doc
+//                                    per canonical email, idempotent.
 //
 // Rules implemented here (mirroring the backend):
 //   - 1 base entry per email per week.
@@ -141,6 +146,17 @@
         refreshCount().then(function () { cb(state.lastWinner || null); });
     }
 
+    // Launch waitlist (coming-soon teaser email capture): resolves
+    // 'joined' for a new signup, 'already' when the canonical email
+    // is already on the list; rejects on transport/server errors so
+    // the form can show its gentle failure line.
+    function joinWaitlist(email) {
+        return postFn('ccJoinWaitlist', { email: email }).then(function (res) {
+            if (!res || !res.ok) throw new Error('waitlist_failed');
+            return res.already ? 'already' : 'joined';
+        });
+    }
+
     window.CC_GW = {
         ready: function () { return typeof fetch === 'function'; },
         weekKey: weekKey,
@@ -156,7 +172,8 @@
         enter: enter,
         recordVisit: recordVisit,
         refreshCount: refreshCount,
-        lastWinner: lastWinner
+        lastWinner: lastWinner,
+        joinWaitlist: joinWaitlist
     };
 
     // Every page load: count today's visit for known entrants (bonus

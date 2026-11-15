@@ -305,14 +305,51 @@ function setupEventListeners() {
     // active — CC_GW.isActive(), driven by ccGiveawayStatus.active (the
     // site_settings/cc_giveaway doc that also gates the draw) — the
     // sidebar box and the modal show a teaser instead of the entry
-    // form: no form, no enter button, just the promise plus a nudge to
-    // create an account so you're ready the moment it opens. When the
-    // giveaway is active, everything behaves exactly as before.
+    // form: the branded gift mark plus a launch-waitlist email capture
+    // ("We'll email you as soon as the giveaway is on" — ccJoinWaitlist
+    // on the backend), with account creation demoted to one quiet
+    // secondary line. When the giveaway is active, everything behaves
+    // exactly as before.
     function gwIsActive() {
         // If the backend bridge is missing entirely, keep the old
         // behaviour (entry form) rather than a dead teaser.
         if (!window.CC_GW || typeof CC_GW.isActive !== 'function') return true;
         return CC_GW.isActive();
+    }
+
+    // One coming-soon teaser's moving parts (sidebar + modal share the
+    // shape): the waitlist form swaps to a "You're on the list ✓" line
+    // once this device has joined (ccGwWaitlistEmail); signed-in
+    // visitors get their account email prefilled and lose the
+    // create-account line (they already have one).
+    const GW_TEASERS = [
+        { form: 'sidebarGwWaitlistForm', email: 'sidebarGwWaitlistEmail', err: 'sidebarGwWaitlistErr', btn: 'sidebarGwWaitlistBtn', done: 'sidebarGwWaitlistDone', alt: 'sidebarGwAccountLine' },
+        { form: 'modalGwWaitlistForm', email: 'modalGwWaitlistEmail', err: 'modalGwWaitlistErr', btn: 'modalGwWaitlistBtn', done: 'modalGwWaitlistDone', alt: 'modalGwAccountLine' }
+    ];
+    function gwJoinedEmail() {
+        try { return localStorage.getItem('ccGwWaitlistEmail') || ''; } catch (e) { return ''; }
+    }
+    function paintGwTeaser(ids, signedIn) {
+        const form = document.getElementById(ids.form);
+        const done = document.getElementById(ids.done);
+        const alt = document.getElementById(ids.alt);
+        const input = document.getElementById(ids.email);
+        const joined = gwJoinedEmail();
+        if (joined) {
+            if (form) form.style.display = 'none';
+            if (done) {
+                done.textContent = "You're on the list ✓ — we'll email you at " + joined + ' when it launches.';
+                done.style.display = '';
+            }
+        } else {
+            if (form) form.style.display = '';
+            if (done) done.style.display = 'none';
+            if (input && signedIn && window.CC_AUTH && CC_AUTH.email) {
+                const acct = CC_AUTH.email();
+                if (acct && !input.value) input.value = acct;
+            }
+        }
+        if (alt) alt.style.display = signedIn ? 'none' : '';
     }
 
     function paintGiveawayState() {
@@ -324,12 +361,7 @@ function setupEventListeners() {
         if (sAct && sSoon) {
             sAct.style.display = active ? '' : 'none';
             sSoon.style.display = active ? 'none' : '';
-            const sBtn = document.getElementById('sidebarGwSignin');
-            const sLine = document.getElementById('sidebarGwAccountLine');
-            const sReady = document.getElementById('sidebarGwReady');
-            if (sBtn) sBtn.style.display = signedIn ? 'none' : '';
-            if (sLine) sLine.style.display = signedIn ? 'none' : '';
-            if (sReady) sReady.style.display = signedIn ? '' : 'none';
+            if (!active) paintGwTeaser(GW_TEASERS[0], signedIn);
         }
         // Modal: the teaser replaces the prize block + form + success.
         const soon = document.getElementById('giveawayComingSoon');
@@ -339,12 +371,7 @@ function setupEventListeners() {
         const sub = document.getElementById('giveawaySubtitle');
         if (soon) {
             soon.style.display = active ? 'none' : '';
-            const mBtn = document.getElementById('modalGwSignin');
-            const mLine = document.getElementById('modalGwAccountLine');
-            const mReady = document.getElementById('modalGwReady');
-            if (mBtn) mBtn.style.display = signedIn ? 'none' : '';
-            if (mLine) mLine.style.display = signedIn ? 'none' : '';
-            if (mReady) mReady.style.display = signedIn ? '' : 'none';
+            if (!active) paintGwTeaser(GW_TEASERS[1], signedIn);
         }
         if (!active) {
             if (prizeBlock) prizeBlock.style.display = 'none';
@@ -453,6 +480,40 @@ function setupEventListeners() {
             giveawayModal.style.display = 'none';
             const signInBtn = document.getElementById('signInBtn');
             if (signInBtn) signInBtn.click();
+        });
+    });
+
+    // Coming-soon waitlist forms (sidebar + modal): validate gently,
+    // join via CC_GW.joinWaitlist, then both teasers swap to the
+    // "You're on the list ✓" state (paintGiveawayState repaints).
+    const GW_WAITLIST_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    GW_TEASERS.forEach((ids) => {
+        const form = document.getElementById(ids.form);
+        if (!form) return;
+        form.addEventListener('submit', (ev) => {
+            ev.preventDefault();
+            const input = document.getElementById(ids.email);
+            const err = document.getElementById(ids.err);
+            const btn = document.getElementById(ids.btn);
+            const em = input ? input.value.trim() : '';
+            if (!GW_WAITLIST_RE.test(em)) {
+                if (err) { err.textContent = 'Please enter a valid email address.'; err.style.display = ''; }
+                return;
+            }
+            if (err) err.style.display = 'none';
+            if (!window.CC_GW || typeof CC_GW.joinWaitlist !== 'function') {
+                if (err) { err.textContent = "Couldn't save right now — please try again in a bit."; err.style.display = ''; }
+                return;
+            }
+            if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+            CC_GW.joinWaitlist(em).then(() => {
+                try { localStorage.setItem('ccGwWaitlistEmail', em); } catch (e) {}
+                if (btn) { btn.disabled = false; btn.textContent = 'Notify Me'; }
+                paintGiveawayState();
+            }).catch(() => {
+                if (btn) { btn.disabled = false; btn.textContent = 'Notify Me'; }
+                if (err) { err.textContent = "Couldn't save right now — please try again in a bit."; err.style.display = ''; }
+            });
         });
     });
     paintGiveawayState();

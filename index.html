@@ -54,6 +54,25 @@
       <feTurbulence type="fractalNoise" baseFrequency="0.025 0.03" numOctaves="2" seed="12" result="noise"/>
       <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
+    <!-- Branded giveaway gift mark (owner, 2026-11-14): a plum gift box
+         drawn in the site's own palette — plum gradient box, light-plum
+         ribbon cross and bow, soft light-plum backdrop. Replaces the
+         generic gold/red gift emoji everywhere the giveaway appears.
+         Use with: <svg class="gw-gift-mark"><use href="#gwGiftMark"></use></svg> -->
+    <linearGradient id="gwGiftGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#5B2D8E"/>
+    </linearGradient>
+    <symbol id="gwGiftMark" viewBox="0 0 48 48">
+      <rect x="2" y="2" width="44" height="44" rx="13" fill="#EDE5F8"/>
+      <rect x="11.5" y="22.5" width="25" height="17" rx="2.5" fill="url(#gwGiftGrad)"/>
+      <rect x="11.5" y="29" width="25" height="4" fill="#EDE5F8"/>
+      <rect x="9" y="15.5" width="30" height="7" rx="2.5" fill="#7C3AED"/>
+      <rect x="22" y="15.5" width="4" height="24" fill="#EDE5F8"/>
+      <path d="M23.4 14.2 C18.2 6.8 10.2 7.2 11.2 12.4 C12 16.2 19.4 16.6 23.4 14.2 Z" fill="#C9A8F0"/>
+      <path d="M24.6 14.2 C29.8 6.8 37.8 7.2 36.8 12.4 C36 16.2 28.6 16.6 24.6 14.2 Z" fill="#C9A8F0"/>
+      <circle cx="24" cy="15" r="2" fill="#5B2D8E"/>
+    </symbol>
   </defs>
 </svg>
     <header class="site-header">
@@ -146,13 +165,18 @@
                     <button class="btn giveaway-sidebar-btn full-width" id="openGiveawaySidebar">Enter the Giveaway</button>
                 </div>
                 <div id="sidebarGwSoon" style="display:none;">
-                    <div class="gw-soon-icon">🎁</div>
+                    <div class="gw-soon-icon"><svg class="gw-gift-mark" aria-hidden="true"><use href="#gwGiftMark"></use></svg></div>
                     <h3 class="giveaway-sidebar-title">Weekly Giveaway</h3>
                     <span class="gw-soon-pill">COMING SOON</span>
                     <p class="gw-soon-line">Win up to $100 every week — our weekly gift card giveaway launches soon.</p>
-                    <p class="gw-soon-line" id="sidebarGwAccountLine">Create a free account now so you're ready to enter the moment it opens.</p>
-                    <button class="btn giveaway-sidebar-btn full-width" id="sidebarGwSignin">Create Free Account</button>
-                    <p class="gw-soon-ready" id="sidebarGwReady" style="display:none;">You're ready ✓</p>
+                    <form class="gw-waitlist-form" id="sidebarGwWaitlistForm" novalidate>
+                        <input type="email" class="giveaway-input gw-waitlist-input" id="sidebarGwWaitlistEmail" placeholder="your@email.com" autocomplete="email" aria-label="Email address for the giveaway launch note">
+                        <p class="gw-waitlist-err" id="sidebarGwWaitlistErr" style="display:none;"></p>
+                        <button type="submit" class="btn giveaway-sidebar-btn full-width" id="sidebarGwWaitlistBtn">Notify Me</button>
+                        <p class="gw-soon-promise">We'll email you as soon as the giveaway is on.</p>
+                    </form>
+                    <p class="gw-waitlist-done" id="sidebarGwWaitlistDone" style="display:none;"></p>
+                    <p class="gw-soon-alt" id="sidebarGwAccountLine">Or <button type="button" class="gw-soon-alt-btn" id="sidebarGwSignin">create a free account</button> so you're ready to enter on day one.</p>
                 </div>
             </div>
             <div class="sidebar-widget feed-widget">
@@ -226,6 +250,7 @@
             <span class="close-modal" id="closeGiveaway">&times;</span>
 
             <div class="giveaway-header-bar">
+                <svg class="gw-gift-mark gw-gift-mark-sm" aria-hidden="true"><use href="#gwGiftMark"></use></svg>
                 <span class="giveaway-badge-tag">WEEKLY GIVEAWAY</span>
             </div>
 
@@ -251,12 +276,17 @@
                 </div>
 
                 <div id="giveawayComingSoon" class="giveaway-soon-block" style="display:none;">
-                    <div class="gw-soon-icon">🎁</div>
+                    <div class="gw-soon-icon"><svg class="gw-gift-mark" aria-hidden="true"><use href="#gwGiftMark"></use></svg></div>
                     <span class="gw-soon-pill">COMING SOON</span>
                     <p class="gw-soon-line">Win up to $100 every week — our weekly gift card giveaway launches soon.</p>
-                    <p class="gw-soon-line" id="modalGwAccountLine">Create a free account now so you're ready to enter the moment it opens.</p>
-                    <button class="giveaway-submit-btn" id="modalGwSignin">Create Free Account</button>
-                    <p class="gw-soon-ready" id="modalGwReady" style="display:none;">You're ready ✓</p>
+                    <form class="gw-waitlist-form" id="modalGwWaitlistForm" novalidate>
+                        <input type="email" class="giveaway-input gw-waitlist-input" id="modalGwWaitlistEmail" placeholder="your@email.com" autocomplete="email" aria-label="Email address for the giveaway launch note">
+                        <p class="gw-waitlist-err" id="modalGwWaitlistErr" style="display:none;"></p>
+                        <button type="submit" class="giveaway-submit-btn" id="modalGwWaitlistBtn">Notify Me</button>
+                        <p class="gw-soon-promise">We'll email you as soon as the giveaway is on.</p>
+                    </form>
+                    <p class="gw-waitlist-done" id="modalGwWaitlistDone" style="display:none;"></p>
+                    <p class="gw-soon-alt" id="modalGwAccountLine">Or <button type="button" class="gw-soon-alt-btn" id="modalGwSignin">create a free account</button> so you're ready to enter on day one.</p>
                 </div>
 
                 <div id="giveawayForm" class="giveaway-form-block">
