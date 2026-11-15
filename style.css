@@ -1065,7 +1065,9 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 /* Notifications bell (owner, 2026-11-15 — like Gifting Butler's):
    a soft plum circle next to the avatar, plum bell glyph, the red
    unread badge hanging off its rim (the .cc-note-badge rule below —
-   it rode the avatar until today). */
+   it rode the avatar until today). On phones the circle goes away
+   (see the max-width:900px block below): just the bare bell glyph
+   with its badge, SlickDeals-style. */
 .cc-bell {
     position: relative; width: 32px; height: 32px; border-radius: 50%;
     background: #EDE5F8; color: var(--highlight); border: none; cursor: pointer;
@@ -1075,10 +1077,10 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .cc-bell:hover { background: #E1D1F8; }
 .cc-bell svg { display: block; }
 /* Phone header pieces (owner, 2026-11-15 — SlickDeals-style): the
-   hamburger, the giveaway icon and the menu panel live in the DOM at
-   every width, but only phones ever show them — the two buttons stay
-   display:none above 900px and the panel is pinned shut there
-   outright, so the desktop header is exactly what it was. */
+   hamburger and the menu panel live in the DOM at every width, but
+   only phones ever show them — the button stays display:none above
+   900px and the panel is pinned shut there outright, so the desktop
+   header is exactly what it was. */
 .hamburger-btn {
     display: none; width: 36px; height: 36px; flex: 0 0 auto;
     border: none; border-radius: 50%; background: #EDE5F8; color: var(--highlight);
@@ -1087,24 +1089,26 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 }
 .hamburger-btn:hover { background: #E1D1F8; }
 .hamburger-btn svg { display: block; }
-/* The giveaway icon is the site's own gift mark (it carries its own
-   light-plum backdrop), so the button itself is bare. */
-.cc-gw-btn {
-    display: none; width: 34px; height: 34px; flex: none;
-    background: none; border: none; cursor: pointer; padding: 0;
-    align-items: center; justify-content: center;
-}
-.cc-gw-btn .gw-gift-mark { width: 30px; height: 30px; margin: 0; filter: drop-shadow(0 3px 8px rgba(91,45,142,0.18)); }
-/* The phone show-rules for the two header buttons MUST live after
-   their base rules above: both pairs are single-class selectors, so
-   at equal specificity the later rule in the file wins. These rules
-   used to sit in the max-width:900px block far above, and the base
-   display:none quietly overrode them — the hamburger and the
-   giveaway icon never appeared at ANY width (owner's phone test,
-   2026-11-15). Keep this block below the base rules. */
+/* The phone rules for the header MUST live after the base rules
+   above: the selectors are single-class, so at equal specificity
+   the later rule in the file wins. The show-rules used to sit in
+   the max-width:900px block far above, and the base display:none
+   quietly overrode them — the hamburger never appeared at ANY
+   width (owner's phone test, 2026-11-15). Keep this block below
+   the base rules. Inside it, the header slims down the way the
+   owner asked after seeing both previews (2026-11-15): the
+   hamburger is BARE plum lines (no circle, no disc, no shadow —
+   SlickDeals just shows the lines), the bell is a bare glyph with
+   its badge, the giveaway gift icon is gone from the top row
+   entirely (it lives in the menu panel and the sidebar now), and
+   the header itself goes flat white — no tinted glass band, no
+   blur, no shadow, so the top stops reading as one big box. */
 @media (max-width: 900px) {
-    .hamburger-btn { display: inline-flex; }
-    .cc-gw-btn { display: inline-flex; }
+    .hamburger-btn { display: inline-flex; background: none; border-radius: 0; box-shadow: none; }
+    .hamburger-btn:hover { background: none; }
+    .cc-bell { background: none; box-shadow: none; }
+    .cc-bell:hover { background: none; }
+    .site-header { background-color: #ffffff; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
 }
 /* The panel drops from the sticky header's bottom edge, full width,
    one clean card: big tappable rows for the feed destinations, then
@@ -1125,6 +1129,9 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     color: var(--text-primary); font-weight: 600; font-size: 0.98rem; text-decoration: none;
 }
 .mobile-nav-list a.active { background: #EDE5F8; color: var(--highlight); }
+/* The panel's Weekly Giveaway row carries the gift mark inline,
+   sized to the row (the base .gw-gift-mark is a big centred mark). */
+.mobile-nav-list a .gw-gift-mark { width: 26px; height: 26px; margin: 0 0.6rem 0 0; }
 .mobile-nav-pages {
     display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem 0.5rem;
     border-top: 1px solid var(--border-color); margin-top: 0.45rem; padding-top: 0.45rem;

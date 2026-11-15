@@ -413,7 +413,7 @@ function setupEventListeners() {
     const giveawayModal     = document.getElementById('giveawayModal');
     const openGiveaway      = document.getElementById('openGiveaway');
     const openGiveawaySide  = document.getElementById('openGiveawaySidebar');
-    const openGiveawayHead  = document.getElementById('openGiveawayHeader');
+    const openGiveawayPanel = document.getElementById('openGiveawayPanel');
     const closeGiveaway     = document.getElementById('closeGiveaway');
     const giveawaySubmitBtn = document.getElementById('giveawaySubmitBtn');
 
@@ -604,9 +604,9 @@ function setupEventListeners() {
         giveawayModal.style.display = 'flex';
     }
 
-    if (openGiveaway)     openGiveaway.addEventListener('click', openGiveawayModal);
-    if (openGiveawaySide) openGiveawaySide.addEventListener('click', openGiveawayModal);
-    if (openGiveawayHead) openGiveawayHead.addEventListener('click', openGiveawayModal);
+    if (openGiveaway)      openGiveaway.addEventListener('click', openGiveawayModal);
+    if (openGiveawaySide)  openGiveawaySide.addEventListener('click', openGiveawayModal);
+    if (openGiveawayPanel) openGiveawayPanel.addEventListener('click', openGiveawayModal);
 
     // Coming-soon CTAs (sidebar + modal): send the visitor to the
     // sign-in modal — the same path the signed-out entry button uses.
@@ -2333,10 +2333,11 @@ document.addEventListener('DOMContentLoaded', initApp);
 // ── Phone header: hamburger + menu panel ────────────────────────────────
 // Owner (2026-11-15, from his SlickDeals screenshot): on phones the
 // header + nav strip ate too much of the screen. The strip is gone
-// (style.css); the top row is now just the hamburger, the logo, and
-// the round icon buttons (giveaway, bell, avatar), and this panel —
-// holding My Feed, All Deals, the categories, Free Stuff, Saved and
-// the page links — is the menu the hamburger opens. Category taps
+// (style.css); the top row is now just the bare hamburger lines, the
+// logo, and the bell + avatar on the right, and this panel —
+// holding My Feed, All Deals, the categories, Free Stuff, Saved,
+// the Weekly Giveaway row and the page links — is the menu the
+// hamburger opens. Category taps
 // filter through the same setCategory wiring as the strip and the
 // sidebar (the panel's links are in app.js's navLinks); this block
 // only owns the panel's open/close. One header popover at a time:
@@ -2368,10 +2369,9 @@ document.addEventListener('DOMContentLoaded', initApp);
     panel.addEventListener('click', function (e) {
         if (e.target.closest('a')) close();
     });
-    // The giveaway icon opens its modal above everything; the panel
-    // should not still be hanging open underneath it.
-    var gwBtn = document.getElementById('openGiveawayHeader');
-    if (gwBtn) gwBtn.addEventListener('click', close);
+    // The panel's Weekly Giveaway row is a panel link like any
+    // other, so the tap-to-close handler above already tucks the
+    // panel away behind the giveaway modal it opens.
     document.addEventListener('click', function (e) {
         if (isOpen() && !e.target.closest('#mobileNavPanel') && !e.target.closest('#mobileMenuBtn')) close();
     });
