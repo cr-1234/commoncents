@@ -861,6 +861,16 @@ function etTodayStr() {
 function isFreebieLive(f) {
     return !f.expires || f.expires >= etTodayStr();
 }
+// Display order is newest first, like deals (owner, 2026-11-15:
+// "the new stuff go first"). Freebie records carry no timestamp —
+// ids are issued in arrival order, so newest = highest id first.
+// Every surface that lists freebies (Free Stuff view, the All Deals
+// and My Feed appends) goes through here; the Saved view keeps its
+// own newest-save-first order and does not use this.
+function liveFreebiesNewestFirst() {
+    if (typeof freebies === 'undefined' || !Array.isArray(freebies)) return [];
+    return freebies.filter(isFreebieLive).sort((a, b) => b.id - a.id);
+}
 function showFreebiesIntro(show) {
     let el = document.getElementById('freebiesIntro');
     if (!el) {
@@ -997,7 +1007,7 @@ function openFreebieModal(f) {
 function renderFreebies() {
     showFreebiesIntro(true);
     renderPagination(0);
-    const list = (typeof freebies !== 'undefined' && Array.isArray(freebies)) ? freebies.filter(isFreebieLive) : [];
+    const list = liveFreebiesNewestFirst();
     if (!list.length) {
         dealGrid.innerHTML = '<div class="no-results">No freebies right now — check back soon.</div>';
         return;
@@ -1075,16 +1085,15 @@ function renderDeals() {
     // two views (owner, 2026-11-15): My Feed when the visitor picked
     // the picker's Free Stuff chip, and All Deals for EVERY visitor
     // (browse mode, category 'all', no active search). They are not
-    // deals — no sorting, no pagination math, no audience filter;
-    // category views and search results never carry them.
+    // deals — no pagination math, no audience filter; category views
+    // and search results never carry them. Among themselves they
+    // keep the same newest-first order as everywhere else.
     const inMyFeedNow = !!(window.CC_FEED && CC_FEED.mode() === 'mine');
     const feedPickOn = inMyFeedNow
         && typeof CC_FEED.getInterests === 'function'
         && CC_FEED.getInterests().indexOf('freebies') !== -1;
     const inAllDeals = !inMyFeedNow && currentCategory === 'all' && !searchQuery;
-    const feedFreebies = ((feedPickOn || inAllDeals)
-        && typeof freebies !== 'undefined' && Array.isArray(freebies))
-        ? freebies.filter(isFreebieLive) : [];
+    const feedFreebies = (feedPickOn || inAllDeals) ? liveFreebiesNewestFirst() : [];
     let filtered = deals.filter(deal => {
         const inMyFeed    = window.CC_FEED && CC_FEED.mode() === 'mine';
         const matchCat    = inMyFeed || currentCategory === 'all' || deal.category === currentCategory;
@@ -2161,4 +2170,54 @@ document.addEventListener('DOMContentLoaded', initApp);
     window.addEventListener('load', check);
     setTimeout(check, 1500);
     setTimeout(check, 4000);
+})();
+
+// ── Sidebar scroll hint ─────────────────────────────────────────────────
+// WHAT SCROLLS: the sidebar itself — .sidebar is position:sticky with
+// max-height: calc(100vh - 7rem) and overflow-y: auto, and its
+// scrollbar is hidden (scrollbar-width: none). So a visitor at the
+// top sees Categories and part of the Weekly Giveaway box with no
+// sign that the Notify Me button and Your Feed sit further down
+// (owner, 2026-11-15). The "More below" pill (index.html, styled in
+// style.css) floats at the sidebar's bottom edge only while more
+// content sits below the visible part; it fades away at the bottom,
+// and clicking it scrolls the sidebar down by about a screen.
+(function () {
+    var sidebar = document.querySelector('.sidebar');
+    var btn = document.getElementById('sidebarScrollHint');
+    if (!sidebar || !btn) return;
+    // Pure decision, kept separate for the harness: more-below means
+    // at least ~24px of content still hidden under the fold.
+    function shouldShow(m) {
+        return (m.scrollHeight - m.clientHeight - m.scrollTop) > 24;
+    }
+    var shown = null;
+    function update() {
+        var show = shouldShow(sidebar);
+        if (show === shown) return; // no DOM write when nothing changed
+        shown = show;
+        btn.classList.toggle('show', show);
+    }
+    btn.addEventListener('click', function () {
+        var step = Math.round(sidebar.clientHeight * 0.85);
+        try {
+            sidebar.scrollBy({ top: step, behavior: 'smooth' });
+        } catch (e) {
+            sidebar.scrollTop += step;
+        }
+    });
+    sidebar.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    // The sidebar's height changes without any scrolling when the
+    // giveaway state paints or the My Feed row appears — re-check on
+    // mutation. update() writes nothing when the answer is unchanged,
+    // so the observer cannot loop on its own class toggle.
+    if (window.MutationObserver) {
+        new MutationObserver(update).observe(sidebar, {
+            childList: true, subtree: true, attributes: true,
+            attributeFilter: ['style', 'class']
+        });
+    }
+    window.CC_SIDEBAR_HINT = { shouldShow: shouldShow, update: update };
+    update();
 })();
