@@ -135,9 +135,20 @@
             </div>
             <div class="sidebar-widget giveaway-sidebar-widget">
                 <div class="giveaway-sidebar-badge">WEEKLY GIVEAWAY</div>
-                <h3 class="giveaway-sidebar-title">Win an Amazon<br>Gift Card</h3>
-                <p class="giveaway-sidebar-prize" id="sidebarPrize">Prize starts at $5 · grows with entries</p>
-                <button class="btn giveaway-sidebar-btn full-width" id="openGiveawaySidebar">Enter the Giveaway</button>
+                <div id="sidebarGwActive">
+                    <h3 class="giveaway-sidebar-title">Win an Amazon<br>Gift Card</h3>
+                    <p class="giveaway-sidebar-prize" id="sidebarPrize">Prize starts at $5 · grows with entries</p>
+                    <button class="btn giveaway-sidebar-btn full-width" id="openGiveawaySidebar">Enter the Giveaway</button>
+                </div>
+                <div id="sidebarGwSoon" style="display:none;">
+                    <div class="gw-soon-icon">🎁</div>
+                    <h3 class="giveaway-sidebar-title">Weekly Giveaway</h3>
+                    <span class="gw-soon-pill">COMING SOON</span>
+                    <p class="gw-soon-line">Win up to $100 every week — our weekly gift card giveaway launches soon.</p>
+                    <p class="gw-soon-line" id="sidebarGwAccountLine">Create a free account now so you're ready to enter the moment it opens.</p>
+                    <button class="btn giveaway-sidebar-btn full-width" id="sidebarGwSignin">Create Free Account</button>
+                    <p class="gw-soon-ready" id="sidebarGwReady" style="display:none;">You're ready ✓</p>
+                </div>
             </div>
             <div class="sidebar-widget feed-widget">
                 <h3>Your Feed</h3>
@@ -211,7 +222,7 @@
 
             <div class="giveaway-body">
                 <h2 class="giveaway-title">Gift Card Giveaway</h2>
-                <p class="giveaway-subtitle">One winner drawn every Sunday. Enter each week for a new chance to win!</p>
+                <p class="giveaway-subtitle" id="giveawaySubtitle">One winner drawn every Sunday. Enter each week for a new chance to win!</p>
                 <p class="giveaway-legal" id="lastWinner" style="display:none;"></p>
 
                 <div class="giveaway-prize-block">
@@ -230,6 +241,15 @@
                     </div>
                     <div class="prize-progress"><div class="prize-progress-fill" id="prizeProgressFill"></div></div>
                     <p class="prize-next" id="prizeNext"></p>
+                </div>
+
+                <div id="giveawayComingSoon" class="giveaway-soon-block" style="display:none;">
+                    <div class="gw-soon-icon">🎁</div>
+                    <span class="gw-soon-pill">COMING SOON</span>
+                    <p class="gw-soon-line">Win up to $100 every week — our weekly gift card giveaway launches soon.</p>
+                    <p class="gw-soon-line" id="modalGwAccountLine">Create a free account now so you're ready to enter the moment it opens.</p>
+                    <button class="giveaway-submit-btn" id="modalGwSignin">Create Free Account</button>
+                    <p class="gw-soon-ready" id="modalGwReady" style="display:none;">You're ready ✓</p>
                 </div>
 
                 <div id="giveawayForm" class="giveaway-form-block">

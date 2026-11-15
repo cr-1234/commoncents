@@ -363,7 +363,11 @@
                 var gwLabel = document.getElementById('authMenuGiveawayLabel');
                 var gwCount = document.getElementById('authMenuGiveawayCount');
                 var gw = window.CC_GW;
-                if (gw && gw.isEntered && gw.isEntered()) {
+                if (gw && gw.isActive && !gw.isActive()) {
+                    // Giveaway not launched yet — coming-soon state.
+                    if (gwLabel) gwLabel.textContent = 'Giveaway: coming soon';
+                    if (gwCount) gwCount.textContent = '';
+                } else if (gw && gw.isEntered && gw.isEntered()) {
                     var n = 1 + (gw.bonus ? gw.bonus() : 0);
                     if (gwLabel) gwLabel.textContent = 'Giveaway: you\u2019re in this week';
                     if (gwCount) gwCount.textContent = n + (n === 1 ? ' entry' : ' entries');
@@ -562,6 +566,9 @@
             currentUser = user || null;
             if (!currentUser) profileUsername = '';
             paintHeader();
+            // The giveaway teaser swaps its account CTA for a "ready"
+            // note on sign-in (and back on sign-out).
+            if (typeof window.CC_PAINT_GW_STATE === 'function') window.CC_PAINT_GW_STATE();
             if (currentUser) {
                 // The giveaway treats the account email as "your email"
                 // everywhere (entry state, visit-day bonuses).

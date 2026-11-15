@@ -14,6 +14,9 @@
 //   POST ccRecordVisit     {email} → record today's visit; returns
 //                                    {visitDays, bonus} for the week
 //   POST ccGiveawayStatus  {}      → {count (PEOPLE entered), prize,
+//                                    active (site_settings/cc_giveaway —
+//                                    false = the front-end shows a
+//                                    "coming soon" teaser, no form),
 //                                    lastWinner:{masked,prize}|null}
 //
 // Rules implemented here (mirroring the backend):
@@ -78,7 +81,7 @@
     function visitCount() { return visitState().days; }
     function bonus() { return visitState().bonus; }
 
-    var state = { count: null, lastWinner: undefined };
+    var state = { count: null, lastWinner: undefined, active: lsGet('ccGiveawayActive') === '1' };
     var cached = lsGet('ccGiveawayCount');
     if (cached !== null) state.count = parseInt(cached, 10) || 0;
 
@@ -86,9 +89,12 @@
         return postFn('ccGiveawayStatus', {}).then(function (res) {
             if (res && res.ok) {
                 state.count = res.count;
+                state.active = !!res.active;
                 state.lastWinner = res.lastWinner || null;
                 lsSet('ccGiveawayCount', String(res.count));
+                lsSet('ccGiveawayActive', state.active ? '1' : '0');
                 if (typeof window.updateEntryCount === 'function') window.updateEntryCount();
+                if (typeof window.CC_PAINT_GW_STATE === 'function') window.CC_PAINT_GW_STATE();
             }
         }).catch(function () { /* keep the last known count */ });
     }
@@ -143,6 +149,7 @@
             return !!getEmail() && lsGet('ccGiveawayEnteredWeek') === weekKey();
         },
         count: function () { return state.count; },
+        isActive: function () { return !!state.active; },
         visitDays: visitDays,
         visitCount: visitCount,
         bonus: bonus,

@@ -364,6 +364,17 @@ body:not(.dark-mode) .glass {
 .giveaway-sidebar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(91,45,142,0.4); }
 body.dark-mode .giveaway-sidebar-btn { color: #000; }
 
+/* ── Giveaway Coming-Soon Teaser (sidebar + modal) ─────────── */
+.gw-soon-icon { font-size: 2rem; margin-bottom: 0.35rem; }
+.gw-soon-pill {
+    display: inline-block; background: #EDE5F8; color: var(--highlight);
+    border-radius: 999px; padding: 0.3rem 0.85rem; margin: 0.1rem 0 0.55rem;
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.09em;
+}
+.gw-soon-line { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0.35rem 0 0.6rem; }
+.gw-soon-ready { font-weight: 800; color: var(--highlight); margin-top: 0.55rem; }
+.giveaway-soon-block { text-align: center; padding: 0.5rem 0 0.25rem; }
+
 /* ── Giveaway Nav Link ──────────────────────────────────────── */
 .giveaway-nav-link {
     background: linear-gradient(135deg, var(--highlight), var(--highlight-hover));

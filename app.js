@@ -228,6 +228,69 @@ function setupEventListeners() {
     }
     window.CC_PAINT_SUB_BONUS = paintSubBonus;
 
+    // Coming-soon state (owner, 2026-11-14): while the giveaway is NOT
+    // active — CC_GW.isActive(), driven by ccGiveawayStatus.active (the
+    // site_settings/cc_giveaway doc that also gates the draw) — the
+    // sidebar box and the modal show a teaser instead of the entry
+    // form: no form, no enter button, just the promise plus a nudge to
+    // create an account so you're ready the moment it opens. When the
+    // giveaway is active, everything behaves exactly as before.
+    function gwIsActive() {
+        // If the backend bridge is missing entirely, keep the old
+        // behaviour (entry form) rather than a dead teaser.
+        if (!window.CC_GW || typeof CC_GW.isActive !== 'function') return true;
+        return CC_GW.isActive();
+    }
+
+    function paintGiveawayState() {
+        const active = gwIsActive();
+        const signedIn = !!(window.CC_AUTH && CC_AUTH.user && CC_AUTH.user());
+        // Sidebar box: swap the enter block for the teaser (and back).
+        const sAct = document.getElementById('sidebarGwActive');
+        const sSoon = document.getElementById('sidebarGwSoon');
+        if (sAct && sSoon) {
+            sAct.style.display = active ? '' : 'none';
+            sSoon.style.display = active ? 'none' : '';
+            const sBtn = document.getElementById('sidebarGwSignin');
+            const sLine = document.getElementById('sidebarGwAccountLine');
+            const sReady = document.getElementById('sidebarGwReady');
+            if (sBtn) sBtn.style.display = signedIn ? 'none' : '';
+            if (sLine) sLine.style.display = signedIn ? 'none' : '';
+            if (sReady) sReady.style.display = signedIn ? '' : 'none';
+        }
+        // Modal: the teaser replaces the prize block + form + success.
+        const soon = document.getElementById('giveawayComingSoon');
+        const prizeBlock = document.querySelector('.giveaway-prize-block');
+        const form = document.getElementById('giveawayForm');
+        const success = document.getElementById('giveawaySuccess');
+        const sub = document.getElementById('giveawaySubtitle');
+        if (soon) {
+            soon.style.display = active ? 'none' : '';
+            const mBtn = document.getElementById('modalGwSignin');
+            const mLine = document.getElementById('modalGwAccountLine');
+            const mReady = document.getElementById('modalGwReady');
+            if (mBtn) mBtn.style.display = signedIn ? 'none' : '';
+            if (mLine) mLine.style.display = signedIn ? 'none' : '';
+            if (mReady) mReady.style.display = signedIn ? '' : 'none';
+        }
+        if (!active) {
+            if (prizeBlock) prizeBlock.style.display = 'none';
+            if (form) form.style.display = 'none';
+            if (success) success.style.display = 'none';
+            if (sub) sub.textContent = 'Our weekly gift card giveaway launches soon.';
+        } else {
+            if (prizeBlock) prizeBlock.style.display = '';
+            if (sub) sub.textContent = 'One winner drawn every Sunday. Enter each week for a new chance to win!';
+            // Form/success visibility is owned by openGiveawayModal /
+            // showGwSuccess while active — only undo the coming-soon
+            // hide if the success state isn't what's showing.
+            if (form && success && form.style.display === 'none' && success.style.display !== 'block') {
+                form.style.display = 'block';
+            }
+        }
+    }
+    window.CC_PAINT_GW_STATE = paintGiveawayState;
+
     function showGwSuccess(already) {
         document.getElementById('giveawayForm').style.display    = 'none';
         document.getElementById('giveawaySuccess').style.display = 'block';
@@ -261,6 +324,12 @@ function setupEventListeners() {
     function openGiveawayModal(e) {
         if (e) e.preventDefault();
         updateEntryCount();
+        paintGiveawayState();
+        if (!gwIsActive()) {
+            // Coming soon: teaser only — no entry form to prepare.
+            giveawayModal.style.display = 'flex';
+            return;
+        }
         if (window.CC_GW) {
             CC_GW.refreshCount();
             CC_GW.lastWinner((w) => {
@@ -302,6 +371,18 @@ function setupEventListeners() {
 
     if (openGiveaway)     openGiveaway.addEventListener('click', openGiveawayModal);
     if (openGiveawaySide) openGiveawaySide.addEventListener('click', openGiveawayModal);
+
+    // Coming-soon CTAs (sidebar + modal): send the visitor to the
+    // sign-in modal — the same path the signed-out entry button uses.
+    ['sidebarGwSignin', 'modalGwSignin'].forEach((id) => {
+        const b = document.getElementById(id);
+        if (b) b.addEventListener('click', () => {
+            giveawayModal.style.display = 'none';
+            const signInBtn = document.getElementById('signInBtn');
+            if (signInBtn) signInBtn.click();
+        });
+    });
+    paintGiveawayState();
     if (closeGiveaway)    closeGiveaway.addEventListener('click', () => { giveawayModal.style.display = 'none'; });
     window.addEventListener('click', (e) => {
         if (e.target === giveawayModal) giveawayModal.style.display = 'none';
