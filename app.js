@@ -768,9 +768,11 @@ function isDealExpired(deal) {
 // ── Free Stuff view ─────────────────────────────────────────────────
 // Freebies (freebies-data.js) are their own surface: they render in
 // the Free Stuff view (nav/sidebar category 'freebies') — and, since
-// 2026-11-15, in My Feed for visitors who picked the picker's Free
-// Stuff chip (renderDeals appends them there; see feedFreebies below).
-// They never render in All Deals or search results. They are not
+// 2026-11-15, they ride along at the end of page 1 in My Feed for
+// visitors who picked the picker's Free Stuff chip, and in All Deals
+// for every visitor (renderDeals appends them in both; see
+// feedFreebies below). They never render in category views or search
+// results. They are not
 // affiliate deals — their buttons link straight to the brand's
 // official page (no getAffiliateUrl, no click/view counting). Expired
 // entries hide automatically; the comparison date is today in
@@ -887,13 +889,18 @@ function renderDeals() {
     if (currentCategory === 'freebies') { renderFreebies(); return; }
     if (currentCategory === 'saved') { renderSaved(); return; }
     showFreebiesIntro(false);
-    // My Feed + the Free Stuff pick (owner, 2026-11-15): the live
-    // freebies ride along at the end of page 1, after the deals. They
-    // are not deals — no sorting, no pagination math, no audience
-    // filter, no search filtering; the pick alone decides.
-    const feedFreebies = (window.CC_FEED && CC_FEED.mode() === 'mine'
+    // Freebies ride along at the end of page 1, after the deals, in
+    // two views (owner, 2026-11-15): My Feed when the visitor picked
+    // the picker's Free Stuff chip, and All Deals for EVERY visitor
+    // (browse mode, category 'all', no active search). They are not
+    // deals — no sorting, no pagination math, no audience filter;
+    // category views and search results never carry them.
+    const inMyFeedNow = !!(window.CC_FEED && CC_FEED.mode() === 'mine');
+    const feedPickOn = inMyFeedNow
         && typeof CC_FEED.getInterests === 'function'
-        && CC_FEED.getInterests().indexOf('freebies') !== -1
+        && CC_FEED.getInterests().indexOf('freebies') !== -1;
+    const inAllDeals = !inMyFeedNow && currentCategory === 'all' && !searchQuery;
+    const feedFreebies = ((feedPickOn || inAllDeals)
         && typeof freebies !== 'undefined' && Array.isArray(freebies))
         ? freebies.filter(isFreebieLive) : [];
     let filtered = deals.filter(deal => {
