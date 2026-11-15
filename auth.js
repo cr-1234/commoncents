@@ -146,15 +146,39 @@
             return;
         }
         wrap.classList.remove('is-empty');
-        list.innerHTML = notesCache.slice(0, 8).map(function (n) {
+        list.innerHTML = notesCache.slice(0, 8).map(function (n, i) {
             var site = n.site === 'gb' ? 'Gifting Butler' : 'CommonCents';
             var what = n.type === 'reply'
                 ? '<strong>' + escNote(n.fromName || 'Someone') + '</strong> replied to your comment'
                 : '<strong>Your submission is live</strong>';
             var txt = n.text ? ' <span class="an-text">&ldquo;' + escNote(n.text) + '&rdquo;</span>' : '';
             var when = n.ts ? ' <span class="an-when">&middot; ' + noteWhen(n.ts) + '</span>' : '';
-            return '<div class="auth-menu-note"><span class="an-site">' + site + '</span> ' + what + txt + when + '</div>';
+            var inner = '<span class="an-site">' + site + '</span> ' + what + txt + when;
+            // Click-through (owner, 2026-11-15): a note that points at
+            // something is a button. A CommonCents note opens its deal
+            // (and scrolls to its comment) right here; a Gifting
+            // Butler note opens that site, where its own inbox does
+            // the same job.
+            if (n.site === 'gb' || n.refId) {
+                return '<button type="button" class="auth-menu-note an-click" data-nidx="' + i + '">' + inner + '</button>';
+            }
+            return '<div class="auth-menu-note">' + inner + '</div>';
         }).join('');
+        list.querySelectorAll('.an-click').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var n = (notesCache || [])[parseInt(btn.getAttribute('data-nidx'), 10)];
+                if (!n) return;
+                if (n.site === 'gb') {
+                    window.open('https://giftingbutler-74395.web.app', '_blank', 'noopener');
+                    return;
+                }
+                var menu = document.getElementById('authMenu');
+                if (menu) menu.style.display = 'none';
+                if (typeof window.CC_OPEN_DEAL_COMMENT === 'function') {
+                    window.CC_OPEN_DEAL_COMMENT(n.refId, n.commentId || '');
+                }
+            });
+        });
         wrap.style.display = '';
     }
     function loadNotes(user) {
