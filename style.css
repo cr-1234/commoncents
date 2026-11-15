@@ -1474,28 +1474,31 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    the giveaway count badge above is NOT styled like it. */
 .auth-menu-change-chip { background: #fff; border: 1px solid rgba(91,45,142,0.35); color: #5B2D8E; border-radius: 999px; padding: 0.12rem 0.6rem; font-weight: 600; font-size: 0.75rem; }
 .auth-menu-link:hover .auth-menu-change-chip { background: #EDE5F8; border-color: rgba(91,45,142,0.55); }
-/* The house ad is a picture now (the image carries its own panel,
-   text and pill), so the wrapper only spaces it and the image itself
-   takes the old panel's radius/border. */
 .house-ad { margin-top: 1.25rem; }
-/* Gifting Butler sister card (owner, 2026-11-15): a real HTML card,
-   not one baked picture — the WORDS carry it now. A modest logo
-   lockup (small calligraphy G + the name), the headline and one
-   line set as text, and the Browse gifts button; plum family
-   styling, crisp at every size, on the rail and the phone strip
-   alike (same element both places). */
-.house-ad-card {
-    display: block; text-decoration: none; background: #F7F3FC;
-    border: 1px solid rgba(91,45,142,0.16); border-radius: 16px;
-    padding: 1rem 1.1rem 1.1rem;
+.house-ad a { display: block; }
+.house-ad img { width: 100%; height: auto; display: block; border-radius: 16px; border: 1px solid rgba(91,45,142,0.16); }
+
+/* Phone header, second slimming pass (owner, 2026-11-15 — his
+   screenshot of the already-slimmed header with the logo block
+   underlined: "also too much"). The bulk he was pointing at: the
+   logo was TWO lines — COMMONCENTS with MAKING EVERY CENT COUNT
+   under it — so the top row stood tall and text-heavy next to
+   SlickDeals/Dan's, who show just the name on one line. On phones
+   the tagline line goes away (the tagline stays in the footer and
+   everywhere else it lives), the mark and title drop a notch, and
+   the header's vertical padding, row gap and search offset shrink
+   so the whole top block (header row + search row) sits visibly
+   slimmer. This block lives at the END of the file on purpose:
+   the base .logo-mark-img rule above sits far below the earlier
+   phone blocks and quietly outranked their 32px (the same
+   later-rule-wins lesson as the hamburger cascade bug), so these
+   rules must come last to win at phone widths. Desktop is
+   untouched: nothing here applies above 900px. */
+@media (max-width: 900px) {
+    .logo-tagline { display: none; }
+    .logo-mark-img { height: 28px; }
+    .logo-title { font-size: 0.95rem; }
+    .site-header { padding: 0.55rem 0; }
+    .header-content { row-gap: 0.35rem; }
+    .search-bar { margin: 0.2rem auto 0; }
 }
-.house-ad-lockup { display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.55rem; }
-.house-ad-lockup img { height: 34px; width: auto; display: block; }
-.house-ad-name { font-family: Georgia, 'Times New Roman', serif; font-size: 1.22rem; font-weight: 700; color: var(--highlight); line-height: 1.1; }
-.house-ad-headline { display: block; font-size: 1.02rem; font-weight: 600; color: var(--text-primary); line-height: 1.35; margin-bottom: 0.3rem; }
-.house-ad-line { display: block; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.8rem; }
-.house-ad-btn {
-    display: inline-block; background: var(--highlight); color: #fff;
-    font-size: 0.9rem; font-weight: 600; padding: 0.5rem 1rem; border-radius: 9999px;
-}
-.house-ad-card:hover .house-ad-btn { background: #4A2573; }
