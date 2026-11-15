@@ -943,11 +943,17 @@ function createSavedFreebieCard(save) { return buildFreebieCard(save, save); }
 // content — picture banner, store line, title, full description, the
 // "How to get it" box, the Ongoing/Ends line, and the Get This
 // Freebie button (the brand URL verbatim, new tab). No price, no
-// coupon elements, and NO comments — comments stay deals-only. This
+// coupon elements. Comments included (owner, 2026-11-15): the same
+// members-only thread as a deal's, wired through ccSetupComments
+// under the namespaced thread key 'f' + id — freebie ids collide
+// with deal ids, so the two thread spaces never mix. This still
 // deliberately does not go through openModal: no ccView is counted
-// for a freebie, ever.
+// for a freebie, ever (comments are a separate system and opening
+// this modal fires none).
 function openFreebieModal(f) {
-    window._ccOpenDealId = null; // keep the deal-comment machinery out
+    window._ccOpenDealId = null; // no deal thread is open; ccSetupComments sets the thread key below
+    const skipLoadOnce = !!f._skipLoadOnce;
+    delete f._skipLoadOnce;
     const key = freebieVoteKey(f);
     const isSaved = hasFreebieSave(f.id);
     modalBody.innerHTML = `
@@ -971,6 +977,11 @@ function openFreebieModal(f) {
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
                 <span>${freebieVoteCount(f, 'down')}</span>
             </button>
+        </div>
+        <div class="comments-section">
+                    <h3 style="font-size:1.05rem; margin-bottom:0.75rem;">Comments</h3>
+                    <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;"></div>
+                    <div id="commentFormWrap"></div>
         </div>`;
     modal.style.display = 'flex';
     modalBody.querySelector('.upvote-btn').addEventListener('click', (e) => handleFreebieVote(e, f, 'up'));
@@ -979,6 +990,7 @@ function openFreebieModal(f) {
     if (fbShareBtn) fbShareBtn.addEventListener('click', (e) => { e.stopPropagation(); openShareMenu(f, true); });
     const fbSaveBtn = modalBody.querySelector('.save-modal-btn');
     if (fbSaveBtn) fbSaveBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFreebieSave(f); });
+    ccSetupComments(f, key, skipLoadOnce, () => openFreebieModal(f));
 }
 function renderFreebies() {
     showFreebiesIntro(true);
@@ -1318,32 +1330,22 @@ function handleFreebieVote(e, f, type) {
 
 
 
-function openModal(deal) {
-    if (!deal.comments) deal.comments = [];
-    window._ccOpenDealId = deal.id;
-    // Count the view (owner request 2026-11-12): opening the deal
-    // window is interest even when the visitor never taps through to
-    // the store. Fire-and-forget to ccView; never blocks the window.
-    try {
-        fetch(CC_VIEW_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ dealId: String(deal.id) }),
-            keepalive: true
-        }).catch(function () {});
-    } catch (e) {}
-    // Opening a deal counts as seeing it: clear its NEW DEAL badge
-    // from the card right away, and persist the seen mark (CC_FEED owns
-    // it) so the badge doesn't come back on later loads either.
-    if (window.CC_FEED && CC_FEED.markSeen) {
-        try { CC_FEED.markSeen(deal); } catch (e) {}
-        const anyBtn = document.querySelector('#dealGrid .deal-card [data-id="' + deal.id + '"]');
-        const openCard = anyBtn ? anyBtn.closest('.deal-card') : null;
-        const openBadge = openCard ? openCard.querySelector('.new-badge') : null;
-        if (openBadge) openBadge.remove();
-    }
-    const skipLoadOnce = !!deal._skipLoadOnce;
-    delete deal._skipLoadOnce;
+// ── Comments for whichever record the modal is showing ────────
+// One machinery serves both modals (extracted from openModal,
+// 2026-11-15, when freebies gained the same comments as deals):
+// `record` is the object whose .comments thread is on screen (a
+// deal, or a freebie), `threadKey` is the key the backend thread
+// is stored under — String(deal.id) for a deal, 'f' + freebie id
+// for a freebie, because freebie ids are small numbers that
+// collide with deal ids — and `reopen` re-renders the owning
+// modal (openModal / openFreebieModal) for the edit/delete/load
+// re-render paths. window._ccThreadKey is the single 'current
+// thread' marker every async guard checks, so a post or load that
+// settles after the visitor switched records can never paint (or
+// post) into the other record's thread.
+function ccSetupComments(record, threadKey, skipLoadOnce, reopen) {
+    if (!record.comments) record.comments = [];
+    window._ccThreadKey = threadKey;
     // Standard solid icons (the Material shapes every site uses) — the thin
     // outline versions read as scratchy at small sizes (user's complaint).
     const cmtPencil = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
@@ -1357,7 +1359,7 @@ function openModal(deal) {
                     ${c.own && !c.pending ? `<span class="cmt-actions"><button type="button" class="cmt-act-btn" data-cact="edit" data-idx="${idx}" title="Edit comment" aria-label="Edit comment">${cmtPencil}</button><button type="button" class="cmt-act-btn del" data-cact="del" data-idx="${idx}" title="Delete comment" aria-label="Delete comment">${cmtTrash}</button></span>` : ''}
                 </span>
             </div>
-            ${deal._editingIdx === idx ? `
+            ${record._editingIdx === idx ? `
                 <textarea id="commentEditText" rows="2" style="width:100%; padding:0.5rem; margin-bottom:0.4rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;">${c.text}</textarea>
                 <div style="display:flex; gap:0.4rem;">
                     <button type="button" class="btn btn-primary" data-cact="save" data-idx="${idx}" style="font-size:0.8rem; padding:0.3rem 1rem;">Save</button>
@@ -1379,17 +1381,17 @@ function openModal(deal) {
     // stays chronological; indices still address the flat array.
     const buildCommentsHTML = () => {
         const ids = {};
-        deal.comments.forEach(c => { if (c.id) ids[c.id] = true; });
+        record.comments.forEach(c => { if (c.id) ids[c.id] = true; });
         const consumed = {};
         let html = '';
-        deal.comments.forEach((c, idx) => {
+        record.comments.forEach((c, idx) => {
             if (consumed[idx]) return;
             if (c.parentId && ids[c.parentId]) return; // rendered under its parent
             html += oneCommentHTML(c, idx, false);
-            deal.comments.forEach((r, ridx) => {
+            record.comments.forEach((r, ridx) => {
                 if (r.parentId && r.parentId === c.id && ridx !== idx) { html += oneCommentHTML(r, ridx, true); consumed[ridx] = true; }
             });
-            if (deal._replyingIdx === idx) html += replyBoxHTML(idx);
+            if (record._replyingIdx === idx) html += replyBoxHTML(idx);
         });
         return html;
     };
@@ -1491,56 +1493,10 @@ function openModal(deal) {
                             <button type="button" id="commentSignInBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Sign in to comment</button>
                         </div>`;
 
-    modalBody.innerHTML = `
-        <div class="modal-media-banner"><img src="${deal.image}" alt="${deal.title}"></div>
-        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${getStoreName(deal.url)} &middot; ${deal.category}${deal.sponsored ? ' &middot; <span style="color:var(--highlight); font-weight:700;">Sponsored</span>' : ''}</div>
-        <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
-        <div class="modal-buy-row">
-            <div class="card-price" style="font-size:2rem;">
-                $${deal.price}
-                ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
-                ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
-            </div>
-            <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
-            <button type="button" class="btn share-modal-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px; margin-right:0.35rem;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Share</span></button>
-            <button type="button" class="btn save-modal-btn ${hasSave(deal.id) ? 'saved' : ''}" data-save-id="${deal.id}" aria-pressed="${hasSave(deal.id) ? 'true' : 'false'}"><span style="vertical-align:-3px; margin-right:0.35rem; display:inline-block;">${SAVE_BOOKMARK_SVG}</span><span class="save-label">${hasSave(deal.id) ? 'Saved' : 'Save'}</span></button>
-        </div>
-        <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
-        ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
-        ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
-        <div class="vote-container" style="margin-bottom:0.25rem;">
-            <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                <span>${voteCount(deal, 'up')}</span>
-            </button>
-            <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-                <span>${voteCount(deal, 'down')}</span>
-            </button>
-        </div>
-        <div class="comments-section">
-                    <h3 style="font-size:1.05rem; margin-bottom:0.75rem;">Comments</h3>
-                    <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${buildCommentsHTML()}</div>
-                    <div id="commentFormWrap">
-                        ${buildCommentFormHTML()}
-                    </div>
-        </div>`;
-
-    modal.style.display = 'flex';
-
-    modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
-    modalBody.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
-    const modalShareBtn = modalBody.querySelector('.share-modal-btn');
-    if (modalShareBtn) modalShareBtn.addEventListener('click', (e) => { e.stopPropagation(); openShareMenu(deal); });
-    const modalSaveBtn = modalBody.querySelector('.save-modal-btn');
-    if (modalSaveBtn) modalSaveBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleSave(deal); });
-
-    const modalCode = modalBody.querySelector('.deal-code');
-    if (modalCode) {
-        modalCode.addEventListener('click', () => copyDealCode(modalCode, deal.code));
-        modalCode.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyDealCode(modalCode, deal.code); } });
-    }
-
+    const listEl0 = document.getElementById('commentsList');
+    if (listEl0) listEl0.innerHTML = buildCommentsHTML();
+    const formWrap0 = document.getElementById('commentFormWrap');
+    if (formWrap0) formWrap0.innerHTML = buildCommentFormHTML();
     // The composer's buttons are bound through a helper so the
     // auth-change repaint (paintCommentForm) can rebind them after
     // swapping the composer's HTML.
@@ -1575,19 +1531,19 @@ function openModal(deal) {
                 const errEl0 = document.getElementById('commentError');
                 if (errEl0) errEl0.style.display = 'none';
                 const optimistic = { id: null, user: escHtml(ccDisplayName || 'Member').slice(0, 40), text: escHtml(textVal), time: 'Just now', own: true, pending: true, parentId: '' };
-                deal.comments.push(optimistic);
+                record.comments.push(optimistic);
                 const ta0 = document.getElementById('commentText');
                 if (ta0) ta0.value = '';
                 renderCommentsList(true);
-                CC_COMMENTS.post(deal.id, textVal).then(c => {
+                CC_COMMENTS.post(threadKey, textVal).then(c => {
                     if (!c) throw new Error('empty');
-                    const i = deal.comments.indexOf(optimistic);
-                    if (i !== -1) deal.comments.splice(i, 1, { id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts) || 'Just now', own: true, parentId: c.parentId || '' });
-                    if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') renderCommentsList(false);
+                    const i = record.comments.indexOf(optimistic);
+                    if (i !== -1) record.comments.splice(i, 1, { id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts) || 'Just now', own: true, parentId: c.parentId || '' });
+                    if (window._ccThreadKey === threadKey && modal.style.display !== 'none') renderCommentsList(false);
                 }).catch(() => {
-                    const i = deal.comments.indexOf(optimistic);
-                    if (i !== -1) deal.comments.splice(i, 1);
-                    if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') {
+                    const i = record.comments.indexOf(optimistic);
+                    if (i !== -1) record.comments.splice(i, 1);
+                    if (window._ccThreadKey === threadKey && modal.style.display !== 'none') {
                         renderCommentsList(false);
                         const ta1 = document.getElementById('commentText');
                         if (ta1) ta1.value = textVal;
@@ -1599,9 +1555,9 @@ function openModal(deal) {
             const liveName = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser.displayName || (typeof CC_AUTH.fallbackName === 'function' ? CC_AUTH.fallbackName() : '') || 'Member';
             // Chronological order: the first comment stays on top, new ones go last.
             // own:true gives the poster pencil/trash controls on their comment.
-            deal.comments.push({ user: escHtml(liveName).slice(0, 40), text: escHtml(textVal), time: 'Just now', own: true });
-            deal._skipLoadOnce = true;
-            openModal(deal);
+            record.comments.push({ user: escHtml(liveName).slice(0, 40), text: escHtml(textVal), time: 'Just now', own: true });
+            record._skipLoadOnce = true;
+            reopen();
             const cl = document.getElementById('commentsList');
             if (cl) cl.scrollTop = cl.scrollHeight;
         });
@@ -1629,60 +1585,60 @@ function openModal(deal) {
             const cl0 = document.getElementById('commentsList');
             const st = cl0 ? cl0.scrollTop : 0;
             if (act === 'edit') {
-                deal._editingIdx = idx;
-                deal._skipLoadOnce = true;
-                openModal(deal);
+                record._editingIdx = idx;
+                record._skipLoadOnce = true;
+                reopen();
             } else if (act === 'cancel') {
-                delete deal._editingIdx;
-                deal._skipLoadOnce = true;
-                openModal(deal);
+                delete record._editingIdx;
+                record._skipLoadOnce = true;
+                reopen();
             } else if (act === 'del') {
-                const c = deal.comments[idx];
+                const c = record.comments[idx];
                 if (c && c.id && window.CC_COMMENTS) {
                     CC_COMMENTS.remove(c.id).then(() => {
-                        const i2 = deal.comments.indexOf(c);
-                        if (i2 !== -1) deal.comments.splice(i2, 1);
-                        delete deal._editingIdx;
-                        deal._skipLoadOnce = true;
-                        openModal(deal);
+                        const i2 = record.comments.indexOf(c);
+                        if (i2 !== -1) record.comments.splice(i2, 1);
+                        delete record._editingIdx;
+                        record._skipLoadOnce = true;
+                        reopen();
                     }).catch(() => showCommentError('Could not delete that comment — try again.'));
                     return;
                 }
-                deal.comments.splice(idx, 1);
-                delete deal._editingIdx;
-                deal._skipLoadOnce = true;
-                openModal(deal);
+                record.comments.splice(idx, 1);
+                delete record._editingIdx;
+                record._skipLoadOnce = true;
+                reopen();
             } else if (act === 'save') {
                 const ta = document.getElementById('commentEditText');
                 const v = ta ? ta.value.trim() : '';
-                if (!v || !deal.comments[idx]) return;
-                const c = deal.comments[idx];
+                if (!v || !record.comments[idx]) return;
+                const c = record.comments[idx];
                 if (c.id && window.CC_COMMENTS) {
                     CC_COMMENTS.edit(c.id, v).then(saved => {
                         c.text = escHtml(saved && saved.text ? saved.text : v);
-                        delete deal._editingIdx;
-                        deal._skipLoadOnce = true;
-                        openModal(deal);
+                        delete record._editingIdx;
+                        record._skipLoadOnce = true;
+                        reopen();
                     }).catch(() => showCommentError('Could not save that edit — try again.'));
                     return;
                 }
                 c.text = escHtml(v);
-                delete deal._editingIdx;
-                deal._skipLoadOnce = true;
-                openModal(deal);
+                delete record._editingIdx;
+                record._skipLoadOnce = true;
+                reopen();
             } else if (act === 'reply') {
-                deal._replyingIdx = idx;
+                record._replyingIdx = idx;
                 renderCommentsList(false);
                 const rt = document.getElementById('commentReplyText');
                 if (rt) rt.focus();
                 revealReplyBox();
                 return;
             } else if (act === 'reply-cancel') {
-                delete deal._replyingIdx;
+                delete record._replyingIdx;
                 renderCommentsList(false);
                 return;
             } else if (act === 'reply-post') {
-                const parent = deal.comments[idx];
+                const parent = record.comments[idx];
                 const rta = document.getElementById('commentReplyText');
                 const v = rta ? rta.value.trim() : '';
                 if (!parent || !parent.id || !v || !window.CC_COMMENTS) return;
@@ -1690,19 +1646,19 @@ function openModal(deal) {
                 if (!liveUser2) return;
                 const liveName2 = (typeof CC_AUTH.username === 'function' && CC_AUTH.username()) || liveUser2.displayName || (typeof CC_AUTH.fallbackName === 'function' ? CC_AUTH.fallbackName() : '') || 'Member';
                 const opt = { id: null, user: escHtml(liveName2).slice(0, 40), text: escHtml(v), time: 'Just now', own: true, pending: true, parentId: parent.id };
-                deal.comments.push(opt);
-                delete deal._replyingIdx;
+                record.comments.push(opt);
+                delete record._replyingIdx;
                 renderCommentsList(false);
-                CC_COMMENTS.post(deal.id, v, parent.id).then(c => {
+                CC_COMMENTS.post(threadKey, v, parent.id).then(c => {
                     if (!c) throw new Error('empty');
-                    const i = deal.comments.indexOf(opt);
-                    if (i !== -1) deal.comments.splice(i, 1, { id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts) || 'Just now', own: true, parentId: c.parentId || parent.id });
-                    if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') renderCommentsList(false);
+                    const i = record.comments.indexOf(opt);
+                    if (i !== -1) record.comments.splice(i, 1, { id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts) || 'Just now', own: true, parentId: c.parentId || parent.id });
+                    if (window._ccThreadKey === threadKey && modal.style.display !== 'none') renderCommentsList(false);
                 }).catch(() => {
-                    const i = deal.comments.indexOf(opt);
-                    if (i !== -1) deal.comments.splice(i, 1);
-                    if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') {
-                        deal._replyingIdx = idx;
+                    const i = record.comments.indexOf(opt);
+                    if (i !== -1) record.comments.splice(i, 1);
+                    if (window._ccThreadKey === threadKey && modal.style.display !== 'none') {
+                        record._replyingIdx = idx;
                         renderCommentsList(false);
                         const rt2 = document.getElementById('commentReplyText');
                         if (rt2) rt2.value = v;
@@ -1735,12 +1691,12 @@ function openModal(deal) {
     // CC_PAINT_GW_STATE): when auth lands after this deal was opened,
     // the comments area catches up with the signed-in header.
     window.CC_ON_AUTH_CHANGED = () => {
-        if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') paintCommentForm();
+        if (window._ccThreadKey === threadKey && modal.style.display !== 'none') paintCommentForm();
     };
     window.CC_REVEAL_REPLY_BOX = revealReplyBox;
 
     // Notification click-through (owner, 2026-11-15): when this open
-    // came from tapping a notification, deal._focusCid names the
+    // came from tapping a notification, record._focusCid names the
     // comment to land on ("I should be able to click over here to go
     // to that comment"). Attempt on every render while the flag is
     // set — the thread load below re-opens the modal with the
@@ -1748,10 +1704,10 @@ function openModal(deal) {
     // attempt, then clears the flag so a later manual open of this
     // deal doesn't scroll-hunt for the comment again.
     const focusCommentNow = () => {
-        if (!deal._focusCid) return false;
+        if (!record._focusCid) return false;
         const cl = document.getElementById('commentsList');
         if (!cl) return false;
-        const el = cl.querySelector('[data-cid="' + deal._focusCid + '"]');
+        const el = cl.querySelector('[data-cid="' + record._focusCid + '"]');
         if (!el) return false;
         const er = el.getBoundingClientRect();
         const lr = cl.getBoundingClientRect();
@@ -1762,7 +1718,7 @@ function openModal(deal) {
         el.classList.add('cmt-flash');
         return true;
     };
-    if (deal._focusCid) {
+    if (record._focusCid) {
         if (window.requestAnimationFrame) {
             window.requestAnimationFrame(() => window.requestAnimationFrame(focusCommentNow));
         } else { focusCommentNow(); }
@@ -1772,10 +1728,10 @@ function openModal(deal) {
     // (the server is the source of truth once it answers). Skipped on the
     // re-renders that post / edit / delete trigger themselves.
     if (!skipLoadOnce && window.CC_COMMENTS) {
-        const myDealId = deal.id;
-        CC_COMMENTS.load(myDealId).then(list => {
+        const myKey = threadKey;
+        CC_COMMENTS.load(myKey).then(list => {
             if (!Array.isArray(list)) return;
-            if (window._ccOpenDealId !== myDealId || modal.style.display === 'none') return;
+            if (window._ccThreadKey !== myKey || modal.style.display === 'none') return;
             const mapped = list.map(c => ({ id: c.id, user: escHtml(c.user).slice(0, 40), text: escHtml(c.text), time: fmtCommentTime(c.ts), own: !!c.mine, parentId: c.parentId || '' }));
             // Keep optimistic entries whose server call is still in
             // flight (a member can post in the window before this load
@@ -1784,19 +1740,98 @@ function openModal(deal) {
             // find nothing to swap into and the comment would vanish
             // from the thread until the next open. Entries the
             // snapshot already contains are not duplicated.
-            const stillPending = deal.comments.filter(c => c.pending && !mapped.some(m => m.text === c.text && (m.parentId || '') === (c.parentId || '')));
-            deal.comments = mapped.concat(stillPending);
-            deal._skipLoadOnce = true;
-            openModal(deal);
+            const stillPending = record.comments.filter(c => c.pending && !mapped.some(m => m.text === c.text && (m.parentId || '') === (c.parentId || '')));
+            record.comments = mapped.concat(stillPending);
+            record._skipLoadOnce = true;
+            reopen();
             // The thread is authoritative now: one last focus attempt
             // (this closure reads the live DOM, so it lands on the
             // fresh render), then the click-through is spent.
-            if (deal._focusCid) {
+            if (record._focusCid) {
                 const settleFocus = focusCommentNow;
-                setTimeout(() => { try { settleFocus(); } catch (e) {} delete deal._focusCid; }, 450);
+                setTimeout(() => { try { settleFocus(); } catch (e) {} delete record._focusCid; }, 450);
             }
-        }).catch(() => { delete deal._focusCid; /* backend unreachable: keep whatever is shown */ });
+        }).catch(() => { delete record._focusCid; /* backend unreachable: keep whatever is shown */ });
     }
+}
+
+
+function openModal(deal) {
+    if (!deal.comments) deal.comments = [];
+    window._ccOpenDealId = deal.id;
+    // Count the view (owner request 2026-11-12): opening the deal
+    // window is interest even when the visitor never taps through to
+    // the store. Fire-and-forget to ccView; never blocks the window.
+    try {
+        fetch(CC_VIEW_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dealId: String(deal.id) }),
+            keepalive: true
+        }).catch(function () {});
+    } catch (e) {}
+    // Opening a deal counts as seeing it: clear its NEW DEAL badge
+    // from the card right away, and persist the seen mark (CC_FEED owns
+    // it) so the badge doesn't come back on later loads either.
+    if (window.CC_FEED && CC_FEED.markSeen) {
+        try { CC_FEED.markSeen(deal); } catch (e) {}
+        const anyBtn = document.querySelector('#dealGrid .deal-card [data-id="' + deal.id + '"]');
+        const openCard = anyBtn ? anyBtn.closest('.deal-card') : null;
+        const openBadge = openCard ? openCard.querySelector('.new-badge') : null;
+        if (openBadge) openBadge.remove();
+    }
+    const skipLoadOnce = !!deal._skipLoadOnce;
+    delete deal._skipLoadOnce;
+    modalBody.innerHTML = `
+        <div class="modal-media-banner"><img src="${deal.image}" alt="${deal.title}"></div>
+        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${getStoreName(deal.url)} &middot; ${deal.category}${deal.sponsored ? ' &middot; <span style="color:var(--highlight); font-weight:700;">Sponsored</span>' : ''}</div>
+        <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
+        <div class="modal-buy-row">
+            <div class="card-price" style="font-size:2rem;">
+                $${deal.price}
+                ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
+                ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
+            </div>
+            <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
+            <button type="button" class="btn share-modal-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px; margin-right:0.35rem;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Share</span></button>
+            <button type="button" class="btn save-modal-btn ${hasSave(deal.id) ? 'saved' : ''}" data-save-id="${deal.id}" aria-pressed="${hasSave(deal.id) ? 'true' : 'false'}"><span style="vertical-align:-3px; margin-right:0.35rem; display:inline-block;">${SAVE_BOOKMARK_SVG}</span><span class="save-label">${hasSave(deal.id) ? 'Saved' : 'Save'}</span></button>
+        </div>
+        <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
+        ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
+        ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
+        <div class="vote-container" style="margin-bottom:0.25rem;">
+            <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                <span>${voteCount(deal, 'up')}</span>
+            </button>
+            <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+                <span>${voteCount(deal, 'down')}</span>
+            </button>
+        </div>
+        <div class="comments-section">
+                    <h3 style="font-size:1.05rem; margin-bottom:0.75rem;">Comments</h3>
+                    <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;"></div>
+                    <div id="commentFormWrap"></div>
+        </div>`;
+
+    modal.style.display = 'flex';
+
+    modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
+    modalBody.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
+    const modalShareBtn = modalBody.querySelector('.share-modal-btn');
+    if (modalShareBtn) modalShareBtn.addEventListener('click', (e) => { e.stopPropagation(); openShareMenu(deal); });
+    const modalSaveBtn = modalBody.querySelector('.save-modal-btn');
+    if (modalSaveBtn) modalSaveBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleSave(deal); });
+
+    const modalCode = modalBody.querySelector('.deal-code');
+    if (modalCode) {
+        modalCode.addEventListener('click', () => copyDealCode(modalCode, deal.code));
+        modalCode.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyDealCode(modalCode, deal.code); } });
+    }
+
+    ccSetupComments(deal, String(deal.id), skipLoadOnce, () => openModal(deal));
+
 }
 
 
@@ -1825,6 +1860,25 @@ window.CC_TOAST = ccToast;
 window.CC_OPEN_DEAL_COMMENT = function (dealId, commentId) {
     const want = String(dealId == null ? '' : dealId);
     if (!want) return false;
+    // Freebie threads (owner, 2026-11-15): a reply note on a freebie
+    // carries the namespaced key 'f<id>' as its refId. Open the
+    // freebie modal on that thread — the live entry when there is
+    // one, else the visitor's saved snapshot (its thread still loads
+    // from the backend by the same key); a freebie that is simply
+    // gone gets the same plain spoken note as a gone deal, adapted.
+    if (/^f[0-9]+$/.test(want)) {
+        const fid = parseInt(want.slice(1), 10);
+        let f = (typeof freebies !== 'undefined' && Array.isArray(freebies))
+            ? freebies.find(x => x.id === fid && isFreebieLive(x)) : null;
+        if (!f) {
+            const save = mySaves.find(s => s.kind === 'freebie' && s.id === fid);
+            if (save) f = save;
+        }
+        if (!f) { ccToast('That freebie is no longer live.'); return false; }
+        if (commentId) f._focusCid = String(commentId);
+        openFreebieModal(f);
+        return true;
+    }
     let deal = deals.find(d => String(d.id) === want);
     if (!deal) {
         const save = mySaves.find(s => String(s.id) === want);
