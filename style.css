@@ -1132,6 +1132,52 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 /* The panel's Weekly Giveaway row carries the gift mark inline,
    sized to the row (the base .gw-gift-mark is a big centred mark). */
 .mobile-nav-list a .gw-gift-mark { width: 26px; height: 26px; margin: 0 0.6rem 0 0; }
+/* The second-design panel (owner, 2026-11-15) groups its rows:
+   .mobile-nav-rows lists (My Feed on top, the Giveaway row) share
+   the category list's row look without being the category list,
+   and the panel's own button rows (Sign in, Notifications,
+   Deals ▾) match them. Count pills ride at the right edge of a
+   row — the same plum pill the sidebar's .cat-count paints, here
+   for panel links and the Notifications row alike. */
+.mobile-nav-rows { list-style: none; margin: 0; padding: 0; }
+.mobile-nav-rows a {
+    display: flex; align-items: center; min-height: 48px;
+    padding: 0.5rem 0.9rem; border-radius: 12px;
+    color: var(--text-primary); font-weight: 600; font-size: 0.98rem; text-decoration: none;
+}
+.mobile-nav-rows a.active { background: #EDE5F8; color: var(--highlight); }
+.mobile-nav-rows a .gw-gift-mark { width: 26px; height: 26px; margin: 0 0.6rem 0 0; }
+.mnav-row {
+    display: flex; align-items: center; width: 100%; min-height: 48px;
+    padding: 0.5rem 0.9rem; border: none; background: none; border-radius: 12px;
+    color: var(--text-primary); font: inherit; font-weight: 600; font-size: 0.98rem;
+    cursor: pointer; text-align: left; box-sizing: border-box;
+}
+.mnav-row-label { flex: 1 1 auto; min-width: 0; }
+.mnav-count {
+    margin-left: auto; flex: none;
+    background: #EDE5F8; color: var(--highlight);
+    border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+    padding: 0.08rem 0.55rem; line-height: 1.5;
+}
+.mnav-count:empty { display: none; }
+.mobile-nav-panel a .cat-count {
+    margin-left: auto; flex: none;
+    background: #EDE5F8; color: var(--highlight);
+    border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+    padding: 0.08rem 0.55rem; line-height: 1.5;
+}
+.mnav-arrow { margin-left: auto; flex: none; color: var(--highlight); transition: transform 0.15s; }
+.mnav-deals-toggle[aria-expanded="true"] .mnav-arrow { transform: rotate(180deg); }
+.mnav-close {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; margin-left: auto;
+    border: none; border-radius: 50%; background: #EDE5F8; color: var(--highlight);
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; line-height: 1;
+}
+.mnav-close:hover { background: #E1D1F8; }
+.mnav-account { border-bottom: 1px solid var(--border-color); padding-bottom: 0.35rem; margin-bottom: 0.3rem; }
+.mnav-signout-slot { margin-top: 0.6rem; }
 .mobile-nav-pages {
     display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem 0.5rem;
     border-top: 1px solid var(--border-color); margin-top: 0.45rem; padding-top: 0.45rem;
@@ -1527,4 +1573,46 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .site-header { padding: 0.55rem 0; }
     .header-content { row-gap: 0.35rem; }
     .search-bar { margin: 0.2rem auto 0; }
+}
+
+/* Phone menu, second design (owner, 2026-11-15 — "everything looks
+   very messy on both sites... put everything in the three bars"):
+   the bell and the avatar LEAVE the top row — the whole auth area
+   is gone from the phone header — and the three lines move to the
+   RIGHT side of the row (the logo stays left; controls split
+   left/right "makes no sense"). The lines are the one menu now:
+   their badge carries the unread count the bell used to show.
+   The panel itself stops being a drop-down hanging off the sticky
+   header — that was the scroll bug: pinned to the header, its
+   bottom rows (Saved, Advertise, About) sat below the screen with
+   no way to reach them. It is now a full-height drawer opening
+   from the right with its OWN scroll, so every row is reachable.
+   The account menu and the notes panel move inside it on phones
+   (auth.js relocates the real elements), so in the drawer they
+   sit flat and static — no dropdown card, no shadow, no absolute
+   anchor. This block lives at the END of the file on purpose: the
+   base .mobile-nav-panel / .auth-menu / .notes-panel rules sit far
+   above, and these must win at phone widths (the same
+   later-rule-wins lesson as the hamburger cascade bug). Desktop is
+   untouched: nothing here applies above 900px, and the panel stays
+   pinned shut there outright. */
+@media (max-width: 900px) {
+    .auth-area { display: none; }
+    .hamburger-btn { order: 2; margin-left: auto; position: relative; }
+    .mobile-nav-panel {
+        position: fixed; top: 0; right: 0; left: auto;
+        width: min(330px, 88vw); height: 100%; height: 100dvh;
+        overflow-y: auto; overscroll-behavior: contain;
+        border-bottom: none; border-left: 1px solid var(--border-color);
+        box-shadow: -18px 0 40px rgba(40,20,70,0.18);
+        padding: 0.75rem 16px 1.25rem; z-index: 200;
+    }
+    .mobile-nav-panel .auth-menu,
+    .mobile-nav-panel .notes-panel {
+        position: static; width: auto; max-height: none;
+        background: transparent; border: none; border-radius: 0;
+        box-shadow: none; padding: 0.25rem 0 0.35rem;
+    }
+    .mobile-nav-panel .auth-menu-close { display: none; }
+    .mobile-nav-panel .auth-menu-email { padding-right: 0; }
 }

@@ -90,7 +90,10 @@
     // next to the avatar (owner, 2026-11-15 — like Gifting Butler;
     // they used to sit inside the account menu). A red count badge
     // rides the bell; opening the bell's panel marks the notes read
-    // and clears the badge.
+    // and clears the badge. On phones the bell leaves the top row:
+    // the badge rides the three-lines button instead, and the notes
+    // panel itself moves into the hamburger drawer (see the phone
+    // menu layout section below).
     var notesCache = null;
     var notesUnread = 0;
     // Mute switch (owner request 2026-11-14): stored server-side on
@@ -111,12 +114,35 @@
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
     function paintNoteBadge() {
+        var show = !!(currentUser && notesUnread && !notesMuted);
+        var txt = notesUnread > 9 ? '9+' : String(notesUnread);
         var bell = document.getElementById('notesBell');
-        if (!bell) return;
-        var b = bell.querySelector('.cc-note-badge');
-        if (!currentUser || !notesUnread || notesMuted) { if (b) b.remove(); return; }
-        if (!b) { b = document.createElement('span'); b.className = 'cc-note-badge'; bell.appendChild(b); }
-        b.textContent = notesUnread > 9 ? '9+' : String(notesUnread);
+        if (bell) {
+            var b = bell.querySelector('.cc-note-badge');
+            if (!show) { if (b) b.remove(); }
+            else {
+                if (!b) { b = document.createElement('span'); b.className = 'cc-note-badge'; bell.appendChild(b); }
+                b.textContent = txt;
+            }
+        }
+        // Phone menu (owner, 2026-11-15): the bell is gone from the
+        // phone top row, so the same unread count rides the three
+        // lines button instead, and the panel's Notifications row
+        // shows the number next to its label. Same show/hide rule
+        // as the bell's badge — signed in, unread, not muted — and
+        // the badge element is created/removed the same way, so a
+        // signed-out page carries no badge anywhere.
+        var burger = document.getElementById('mobileMenuBtn');
+        if (burger) {
+            var mb = burger.querySelector('.cc-note-badge');
+            if (!show) { if (mb) mb.remove(); }
+            else {
+                if (!mb) { mb = document.createElement('span'); mb.className = 'cc-note-badge'; mb.id = 'mobileMenuBadge'; burger.appendChild(mb); }
+                mb.textContent = txt;
+            }
+        }
+        var nc = document.getElementById('mobileNotesCount');
+        if (nc) nc.textContent = show ? txt : '';
     }
     function paintNotesList() {
         var wrap = document.getElementById('notesPanel');
@@ -182,6 +208,9 @@
                 }
                 var panel = document.getElementById('notesPanel');
                 if (panel) panel.style.display = 'none';
+                // On phones the notes live inside the menu drawer —
+                // heading to the deal closes the drawer too.
+                if (window.CC_MOBILE_NAV) window.CC_MOBILE_NAV.close();
                 if (typeof window.CC_OPEN_DEAL_COMMENT === 'function') {
                     window.CC_OPEN_DEAL_COMMENT(n.refId, n.commentId || '');
                 } else if (n.refId) {
@@ -250,6 +279,93 @@
         user.getIdToken().then(function (token) {
             return postFn('markNotificationsRead', {}, token);
         }).catch(function () { /* the badge may reappear next visit */ });
+    }
+
+    // ── Phone menu layout (owner, 2026-11-15, second redesign) ──
+    // On phones the bell + avatar leave the header's top row and
+    // the hamburger panel becomes the one menu. The account block
+    // and the notes inside that panel are NOT copies: at phone
+    // widths the real #authMenu and #notesPanel elements move into
+    // the panel's slots (and the menu's own Sign out button moves
+    // to the panel's bottom slot), so every handler wired in
+    // wireUi keeps working on the same elements. At desktop widths
+    // everything moves back to the auth area and the bell + avatar
+    // menu behave exactly as before. Pages without the panel (the
+    // subpages run auth.js alone) simply never relocate.
+    var phoneMq = null;
+    try { phoneMq = window.matchMedia ? window.matchMedia('(max-width: 900px)') : null; } catch (e) { phoneMq = null; }
+    var phoneLayout = false;
+    var movedEls = [];
+    function moveEl(el, target) {
+        if (!el || !target || el.parentNode === target) return;
+        movedEls.push({ el: el, parent: el.parentNode, next: el.nextSibling });
+        target.appendChild(el);
+    }
+    function applyPhoneLayout() {
+        if (phoneLayout) return;
+        var slot = document.getElementById('mobileAccountSlot');
+        var menu = document.getElementById('authMenu');
+        if (!slot || !menu) return; // no phone panel on this page
+        phoneLayout = true;
+        moveEl(menu, slot);
+        moveEl(document.getElementById('notesPanel'), document.getElementById('mobileNotesSlot'));
+        moveEl(document.getElementById('authMenuSignOut'), document.getElementById('mobileSignOutSlot'));
+        document.body.classList.add('cc-phone-layout');
+        syncPhoneChrome();
+    }
+    function applyDesktopLayout() {
+        if (!phoneLayout) return;
+        phoneLayout = false;
+        for (var i = movedEls.length - 1; i >= 0; i--) {
+            var m = movedEls[i];
+            if (!m.parent) continue;
+            if (m.next && m.next.parentNode === m.parent) m.parent.insertBefore(m.el, m.next);
+            else m.parent.appendChild(m.el);
+        }
+        movedEls = [];
+        var menu = document.getElementById('authMenu');
+        if (menu) menu.style.display = 'none';
+        var notes = document.getElementById('notesPanel');
+        if (notes) notes.style.display = 'none';
+        document.body.classList.remove('cc-phone-layout');
+        paintNoteBadge();
+    }
+    function applyPhoneMq() {
+        if (!phoneMq) return;
+        if (phoneMq.matches) applyPhoneLayout(); else applyDesktopLayout();
+    }
+    // The panel-only rows follow the sign-in state: signed out, the
+    // account slot shows just its Sign in row; signed in, the
+    // Notifications row and the Sign out slot appear.
+    function syncPhoneChrome() {
+        var signIn = document.getElementById('mobileSignInBtn');
+        if (signIn) signIn.style.display = currentUser ? 'none' : '';
+        var notesRow = document.getElementById('mobileNotesRow');
+        if (notesRow) notesRow.style.display = currentUser ? '' : 'none';
+        var outSlot = document.getElementById('mobileSignOutSlot');
+        if (outSlot) outSlot.style.display = currentUser ? '' : 'none';
+        paintNoteBadge();
+    }
+    // app.js's panel controller hands over to this on phone widths:
+    // opening the panel paints the account block in place (the
+    // notes stay tucked away until their row is tapped).
+    window.CC_PHONE_MENU = {
+        active: function () { return phoneLayout; },
+        onPanelOpen: function () {
+            var notes = document.getElementById('notesPanel');
+            if (notes) notes.style.display = 'none';
+            if (currentUser && typeof window.CC_PAINT_ACCOUNT_MENU === 'function') {
+                window.CC_PAINT_ACCOUNT_MENU();
+            } else {
+                var menu = document.getElementById('authMenu');
+                if (menu) menu.style.display = 'none';
+            }
+            syncPhoneChrome();
+        }
+    };
+    if (phoneMq) {
+        if (typeof phoneMq.addEventListener === 'function') phoneMq.addEventListener('change', applyPhoneMq);
+        else if (typeof phoneMq.addListener === 'function') phoneMq.addListener(applyPhoneMq);
     }
 
     function syncFromAccount(user, tries) {
@@ -376,6 +492,9 @@
         // Re-apply the unread badge after every repaint (it hangs on
         // the bell now; paintHeader owns the bell's visibility).
         paintNoteBadge();
+        // The phone panel's own rows (Sign in / Notifications /
+        // Sign out slot) follow the same sign-in state.
+        syncPhoneChrome();
     }
 
     function wireUi() {
@@ -480,9 +599,13 @@
             var head = local.length > 3 ? local.slice(0, 3) : local.charAt(0);
             return head + '\u2022\u2022\u2022' + s.slice(at);
         }
-        function openMenu() {
+        // The menu's contents, painted fresh at every open: masked
+        // email, the comment-name row (editor collapsed), the
+        // giveaway row's state and the Saved count. Shared by the
+        // desktop avatar menu and the phone panel's account block —
+        // the same element, moved into the panel on phone widths.
+        function paintAccountMenu() {
             if (!menu || !currentUser) return;
-            closeMobileNav();
             if (menuEmail) menuEmail.textContent = maskEmail(currentUser.email || '');
             if (nameInput) nameInput.value = profileUsername || '';
             // Fresh open = the comment-name editor starts collapsed.
@@ -508,8 +631,19 @@
             }
             var svCount = document.getElementById('authMenuSavedCount');
             if (svCount) svCount.textContent = (window.CC_SAVES && CC_SAVES.get().length) ? String(CC_SAVES.get().length) : '';
+        }
+        function openMenu() {
+            if (!menu || !currentUser) return;
+            closeMobileNav();
+            paintAccountMenu();
             menu.style.display = '';
         }
+        // The phone panel's account block paints through the same
+        // path (app.js → CC_PHONE_MENU.onPanelOpen → here).
+        window.CC_PAINT_ACCOUNT_MENU = function () {
+            paintAccountMenu();
+            if (menu && currentUser) menu.style.display = '';
+        };
         if (avatarEl) avatarEl.addEventListener('click', function (e) {
             e.stopPropagation();
             if (!currentUser) return;
@@ -521,12 +655,38 @@
             if (!currentUser) return;
             if (panelEl && panelEl.style.display !== 'none') closePanel(); else openPanel();
         });
-        document.addEventListener('click', function (e) {
-            if (menu && menu.style.display !== 'none' && !e.target.closest('.auth-area')) closeMenu();
+        // ── Phone panel rows (owner, 2026-11-15): inside the
+        // hamburger drawer, the Notifications row opens the notes
+        // in their slot right under it — same painting and
+        // mark-read as the bell, without closing the drawer — and
+        // the account block's Sign in row clicks the header's own
+        // Sign in button, so the one auth modal opens as always.
+        var mNotesRow = document.getElementById('mobileNotesRow');
+        if (mNotesRow) mNotesRow.addEventListener('click', function () {
+            if (!currentUser || !panelEl) return;
+            if (panelEl.style.display !== 'none') { closePanel(); return; }
+            paintNotesList();
+            markNotesRead();
+            panelEl.style.display = '';
+        });
+        var mSignInBtn = document.getElementById('mobileSignInBtn');
+        if (mSignInBtn) mSignInBtn.addEventListener('click', function () {
+            if (window.CC_MOBILE_NAV) window.CC_MOBILE_NAV.close();
+            inBtn.click();
         });
         document.addEventListener('click', function (e) {
+            // On phone widths the menu lives inside the hamburger
+            // panel, not the auth area — taps in there are inside
+            // the menu, not outside it.
+            if (menu && menu.style.display !== 'none' && !e.target.closest('.auth-area') && !e.target.closest('#mobileNavPanel')) closeMenu();
+        });
+        document.addEventListener('click', function (e) {
+            // The phone panel's Notifications row is an opener too
+            // (the notes live in the drawer there) — its tap must
+            // not read as an outside click and close what it opened.
             if (panelEl && panelEl.style.display !== 'none'
-                && !e.target.closest('#notesPanel') && !e.target.closest('#notesBell')) closePanel();
+                && !e.target.closest('#notesPanel') && !e.target.closest('#notesBell')
+                && !e.target.closest('#mobileNotesRow')) closePanel();
         });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeMenu(); closePanel(); } });
         var menuCloseBtn = document.getElementById('authMenuClose');
@@ -564,18 +724,21 @@
         var feedRow = document.getElementById('authMenuFeed');
         if (feedRow) feedRow.addEventListener('click', function () {
             closeMenu();
+            if (window.CC_MOBILE_NAV) window.CC_MOBILE_NAV.close();
             var b = document.getElementById('feedWidgetChange');
             if (b) b.click();
         });
         var gwRowBtn = document.getElementById('authMenuGiveaway');
         if (gwRowBtn) gwRowBtn.addEventListener('click', function () {
             closeMenu();
+            if (window.CC_MOBILE_NAV) window.CC_MOBILE_NAV.close();
             var g = document.getElementById('openGiveaway');
             if (g) g.click();
         });
         var savedRowBtn = document.getElementById('authMenuSaved');
         if (savedRowBtn) savedRowBtn.addEventListener('click', function () {
             closeMenu();
+            if (window.CC_MOBILE_NAV) window.CC_MOBILE_NAV.close();
             var link = document.querySelector('.main-nav a[data-category="saved"]') || document.querySelector('.category-list a[data-category="saved"]');
             if (link) link.click();
         });
@@ -647,7 +810,13 @@
         });
 
         var menuOutBtn = document.getElementById('authMenuSignOut');
-        if (menuOutBtn) menuOutBtn.addEventListener('click', function () { closeMenu(); if (auth) auth.signOut(); });
+        if (menuOutBtn) menuOutBtn.addEventListener('click', function () {
+            closeMenu();
+            // On phones the button sits at the drawer bottom —
+            // signing out tucks the drawer away too.
+            if (window.CC_MOBILE_NAV) window.CC_MOBILE_NAV.close();
+            if (auth) auth.signOut();
+        });
         toggle.addEventListener('click', function () { setMode(mode === 'signin' ? 'signup' : 'signin'); });
 
         if (googleBtn) googleBtn.addEventListener('click', function () {
@@ -739,5 +908,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         wireUi();
         paintHeader();
+        // Phone widths: the account menu + notes move into the
+        // hamburger panel (and back out if the window grows).
+        applyPhoneMq();
     });
 })();

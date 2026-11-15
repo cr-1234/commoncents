@@ -267,7 +267,7 @@ function updateEntryCount() {
         const lists = [
             { sel: '.main-nav', li: false },
             { sel: '.category-list', li: true },
-            { sel: '.mobile-nav-list', li: true }
+            { sel: '#mobileDealsSection', li: true }
         ];
         cats.forEach(cat => {
             lists.forEach(L => {
@@ -294,6 +294,11 @@ const searchInput   = document.getElementById('searchInput');
 const searchBtn     = document.getElementById('searchBtn');
 const navLinks      = document.querySelectorAll('.nav-link:not(.giveaway-nav-link), .mobile-nav-panel a[data-category]'); // exclude giveaway btn; the phone menu panel's category links ride the same wiring (2026-11-15)
 const categoryLinks = document.querySelectorAll('.category-list a');
+// The phone panel's Deals-section links get the same count badges
+// as the sidebar's (owner, 2026-11-15: "why can we have the numbers
+// next to it... my feed could have the numbers next to it") —
+// paintCategoryCounts paints both lists from the same tally.
+const panelCategoryLinks = document.querySelectorAll('#mobileDealsSection a[data-category]');
 const modal         = document.getElementById('dealModal');
 const modalBody     = document.getElementById('modalBody');
 const closeModal    = document.querySelector('.close-modal');
@@ -856,7 +861,7 @@ function paintCategoryCounts() {
         if (window.CC_SAVES && typeof window.CC_SAVES.get === 'function') savedCount = window.CC_SAVES.get().length;
         else { const rawSaved = JSON.parse(localStorage.getItem('ccMySaves') || '[]'); if (Array.isArray(rawSaved)) savedCount = rawSaved.length; }
     } catch (e) {}
-    categoryLinks.forEach(link => {
+    const paintOneCount = link => {
         const cat = link.dataset.category;
         if (!cat) return; // the "My Feed" row — painted by tailored-feed.js
         const li = link.closest('li');
@@ -884,7 +889,12 @@ function paintCategoryCounts() {
             link.appendChild(badge);
         }
         badge.textContent = n;
-    });
+    };
+    categoryLinks.forEach(paintOneCount);
+    // The phone panel's Deals section shows the same numbers next
+    // to its rows (owner, 2026-11-15) — same tally, same rules,
+    // including a zero-count category tucking its row away.
+    panelCategoryLinks.forEach(paintOneCount);
     // The "My Feed" row's badge/visibility is tailored-feed.js's job;
     // refresh it here too so it tracks deals loaded after first paint.
     if (window.CC_FEED && typeof CC_FEED.refreshMyFeedNav === 'function') CC_FEED.refreshMyFeedNav();
@@ -2364,16 +2374,23 @@ document.addEventListener('DOMContentLoaded', initApp);
 // ── Phone header: hamburger + menu panel ────────────────────────────────
 // Owner (2026-11-15, from his SlickDeals screenshot): on phones the
 // header + nav strip ate too much of the screen. The strip is gone
-// (style.css); the top row is now just the bare hamburger lines, the
-// logo, and the bell + avatar on the right, and this panel —
-// holding My Feed, All Deals, the categories, Free Stuff, Saved,
-// the Weekly Giveaway row and the page links — is the menu the
-// hamburger opens. Category taps
-// filter through the same setCategory wiring as the strip and the
-// sidebar (the panel's links are in app.js's navLinks); this block
-// only owns the panel's open/close. One header popover at a time:
-// opening the panel closes the account menu and the notes panel,
-// and auth.js closes this panel when either of those opens.
+// (style.css); the top row is the logo on the left and the bare
+// hamburger lines on the RIGHT — since the second redesign the same
+// day, the lines are the ONLY control up there: the bell and the
+// avatar left the top row, and this panel (a full-height scrolling
+// drawer from the right) is the one menu, holding the account
+// block, the Notifications row, My Feed, the expandable Deals
+// section (All Deals, the categories, Free Stuff, Saved — each
+// with its count), the Weekly Giveaway row, the page links and
+// Sign out. Category taps filter through the same setCategory
+// wiring as the strip and the sidebar (the panel's links are in
+// app.js's navLinks); this block owns the panel's open/close and
+// the Deals section's expand/collapse. On phone widths auth.js
+// moves the real account menu + notes panel INTO this panel and
+// opening the panel hands over to it (CC_PHONE_MENU) so the
+// account block paints itself; everywhere else, opening the panel
+// closes the account menu and the notes panel (one header popover
+// at a time), and auth.js closes this panel when either opens.
 (function () {
     var btn = document.getElementById('mobileMenuBtn');
     var panel = document.getElementById('mobileNavPanel');
@@ -2384,16 +2401,37 @@ document.addEventListener('DOMContentLoaded', initApp);
         btn.setAttribute('aria-expanded', 'false');
     }
     function open() {
-        var menu = document.getElementById('authMenu');
-        if (menu) menu.style.display = 'none';
-        var notes = document.getElementById('notesPanel');
-        if (notes) notes.style.display = 'none';
+        if (window.CC_PHONE_MENU && window.CC_PHONE_MENU.active()) {
+            // Phone layout: the account menu + notes live inside
+            // this panel now — let auth.js paint the account block
+            // (and tuck the notes away until their row is tapped).
+            window.CC_PHONE_MENU.onPanelOpen();
+        } else {
+            var menu = document.getElementById('authMenu');
+            if (menu) menu.style.display = 'none';
+            var notes = document.getElementById('notesPanel');
+            if (notes) notes.style.display = 'none';
+        }
         panel.style.display = '';
         btn.setAttribute('aria-expanded', 'true');
     }
     btn.addEventListener('click', function (e) {
         e.stopPropagation();
         if (isOpen()) close(); else open();
+    });
+    var closeBtn = document.getElementById('mobileNavClose');
+    if (closeBtn) closeBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        close();
+    });
+    // Deals ▾: the section starts tucked away (SlickDeals-style
+    // grouping, not one long flat list); the arrow row opens it.
+    var dealsBtn = document.getElementById('mobileDealsToggle');
+    var dealsSec = document.getElementById('mobileDealsSection');
+    if (dealsBtn && dealsSec) dealsBtn.addEventListener('click', function () {
+        var nowOpen = dealsSec.style.display !== 'none';
+        dealsSec.style.display = nowOpen ? 'none' : '';
+        dealsBtn.setAttribute('aria-expanded', nowOpen ? 'false' : 'true');
     });
     // Any tap on a panel link has done its job (a category filtered,
     // a page is loading) — the panel tucks away behind it.

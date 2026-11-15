@@ -372,6 +372,22 @@
                 badge.remove();
             }
         }
+        // The phone panel's My Feed row carries the same count
+        // (owner, 2026-11-15: "my feed could have the numbers next
+        // to it") — same badge, same number as the sidebar's.
+        if (els.myFeedPanelHost) {
+            var pBadge = els.myFeedPanelHost.querySelector('.cat-count');
+            if (has) {
+                if (!pBadge) {
+                    pBadge = document.createElement('span');
+                    pBadge.className = 'cat-count';
+                    els.myFeedPanelHost.appendChild(pBadge);
+                }
+                pBadge.textContent = matchCount();
+            } else if (pBadge) {
+                pBadge.remove();
+            }
+        }
     }
 
     function paintAll() {
@@ -491,6 +507,7 @@
         els.widgetChange = document.getElementById('feedWidgetChange');
         els.myFeedRows = document.querySelectorAll('[data-myfeed]');
         els.myFeedBadgeHost = document.querySelector('.category-list a[data-myfeed]');
+        els.myFeedPanelHost = document.querySelector('.mobile-nav-panel a[data-myfeed]');
         var doneBtn = document.getElementById('feedDoneBtn');
         var pickerX = document.getElementById('feedPickerX');
         if (pickerX && doneBtn) pickerX.addEventListener('click', function () { doneBtn.click(); });
