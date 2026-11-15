@@ -6,7 +6,11 @@
 // giveaway. The site talks to three HTTPS Cloud Functions (the same
 // pattern as analyzeRoom on Gifting Butler):
 //
-//   POST ccEnterGiveaway   {email} → enter this week's drawing
+//   POST ccEnterGiveaway   (Bearer token) → enter this week's drawing.
+//                          Sign-in is REQUIRED (2026-11-14): the server
+//                          enters the ACCOUNT email and refuses
+//                          token-less requests with 401 — there is no
+//                          typed-email entry anymore.
 //   POST ccRecordVisit     {email} → record today's visit; returns
 //                                    {visitDays, bonus} for the week
 //   POST ccGiveawayStatus  {}      → {count (PEOPLE entered), prize,
@@ -102,11 +106,15 @@
     }
 
     function enter(email, idToken) {
+        // Entry requires sign-in (gap closure, 2026-11-14): without an
+        // ID token there is nothing to send — the server refuses
+        // token-less requests with 401 now, so don't even try.
+        if (!idToken) return Promise.resolve('signin');
         // Signed-in entry: pass the account's ID token — the server uses
         // the account email and ignores the body's email field.
         // Gate refusals come back as coded errors and map to their own
         // results so the modal can explain them in plain words:
-        // 'unverified' | 'conncap' (see app.js).
+        // 'unverified' | 'conncap' | 'signin' (see app.js).
         return postFn('ccEnterGiveaway', { email: email }, idToken).then(function (res) {
             if (!res || !res.ok) return 'error';
             lsSet('ccGiveawayEmail', email);
@@ -117,6 +125,7 @@
         }).catch(function (err) {
             if (err && err.code === 'email_not_verified') return 'unverified';
             if (err && err.code === 'connection_cap') return 'conncap';
+            if (err && (err.code === 'unauthorized' || err.status === 401)) return 'signin';
             return 'error';
         });
     }

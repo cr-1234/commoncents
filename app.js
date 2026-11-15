@@ -279,6 +279,8 @@ function setupEventListeners() {
             document.getElementById('giveawaySuccess').style.display = 'none';
         }
         // Signed in? The drawing uses the account email — no typing.
+        // Signed out? Entry requires sign-in now (gap closure,
+        // 2026-11-14): no email box — the button becomes the way in.
         const emIn = document.getElementById('giveawayEmail');
         const note = document.getElementById('giveawayAccountNote');
         const signedIn = !!(window.CC_AUTH && CC_AUTH.user && CC_AUTH.user());
@@ -287,9 +289,12 @@ function setupEventListeners() {
                 emIn.style.display = 'none';
                 note.textContent = "You're signed in as " + CC_AUTH.email() + " — one tap enters you with that email.";
                 note.style.display = 'block';
+                if (giveawaySubmitBtn) giveawaySubmitBtn.textContent = "Enter This Week's Giveaway";
             } else {
-                emIn.style.display = '';
-                note.style.display = 'none';
+                emIn.style.display = 'none';
+                note.textContent = 'Please sign in to enter the giveaway — it only takes a few seconds, and after that entering is one tap.';
+                note.style.display = 'block';
+                if (giveawaySubmitBtn) giveawaySubmitBtn.textContent = 'Sign in to Enter';
             }
         }
         giveawayModal.style.display = 'flex';
@@ -339,6 +344,9 @@ function setupEventListeners() {
                         } else if (res === 'conncap' && errEl0) {
                             errEl0.textContent = 'This internet connection already has 3 entries this week \u2014 that\u2019s the maximum.';
                             errEl0.style.display = 'block';
+                        } else if (res === 'signin' && errEl0) {
+                            errEl0.textContent = 'Please sign in to enter the giveaway.';
+                            errEl0.style.display = 'block';
                         } else if (errEl0) {
                             errEl0.textContent = 'Something went wrong entering you — please try again.';
                             errEl0.style.display = 'block';
@@ -354,43 +362,13 @@ function setupEventListeners() {
                     });
                 return;
             }
-            const email      = emailInput.value.trim().toLowerCase();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-            if (!emailRegex.test(email)) {
-                emailInput.style.borderColor = '#ef4444';
-                emailInput.focus();
-                return;
-            }
-            emailInput.style.borderColor = '';
-
-            const errEl = document.getElementById('giveawayError');
-            if (errEl) errEl.style.display = 'none';
-
-            if (!window.CC_GW || !CC_GW.ready()) {
-                if (errEl) {
-                    errEl.textContent = "Entries can't be taken right now — please try again later.";
-                    errEl.style.display = 'block';
-                }
-                return;
-            }
-
-            giveawaySubmitBtn.disabled = true;
-            giveawaySubmitBtn.textContent = 'Entering…';
-            CC_GW.enter(email).then((res) => {
-                giveawaySubmitBtn.disabled = false;
-                giveawaySubmitBtn.textContent = "Enter This Week's Giveaway";
-                if (res === 'entered' || res === 'already') {
-                    updateEntryCount();
-                    showGwSuccess(res === 'already');
-                } else if (res === 'conncap' && errEl) {
-                    errEl.textContent = 'This internet connection already has 3 entries this week \u2014 that\u2019s the maximum.';
-                    errEl.style.display = 'block';
-                } else if (errEl) {
-                    errEl.textContent = 'Something went wrong entering you — please try again.';
-                    errEl.style.display = 'block';
-                }
-            });
+            // Signed out: entry requires sign-in now (gap closure,
+            // 2026-11-14) — the typed-email path is gone, and the
+            // server refuses token-less entries. Send the visitor to
+            // the sign-in modal instead.
+            giveawayModal.style.display = 'none';
+            const signInBtn = document.getElementById('signInBtn');
+            if (signInBtn) signInBtn.click();
 
             
         });
