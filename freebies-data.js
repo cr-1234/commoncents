@@ -17,6 +17,14 @@
 // howTo (short, original), votes: { up, down } (base tallies the
 // site's thumbs start from — plain numbers, 0 for a new entry;
 // entries without the field are read as 0) }.
+//
+// Added 2026-11-15: Lowe's Holiday Trolley Car workshop (verified
+// against Lowe's own Oct 8, 2026 holiday press release) and the Good
+// News Radio 2027 wall calendar (verified against the station's own
+// calendar-request page). All five standing entries re-verified the
+// same day against their brand pages (Starbucks Rewards terms,
+// Panera Benefits Terms, Krispy Kreme Rewards, Baskin-Robbins FAQ,
+// Denny's FAQ + Jan 2026 press release).
 const freebies = [
     {
         id: 1,
@@ -72,5 +80,25 @@ const freebies = [
         expires: null,
         votes: { up: 0, down: 0 },
         howTo: "Join Denny's Rewards free and add your birthday to your account; the free Everyday Value Slam birthday reward is added for members to use around their birthday."
+    },
+    {
+        id: 6,
+        title: "Free Holiday Trolley Car Kids Workshop At Lowe's",
+        store: "Lowe's",
+        description: "Lowe's free monthly kids workshop turns festive in December: little builders assemble and decorate a classic holiday trolley car, with all supplies included, and take their finished trolley home.",
+        url: "https://www.lowes.com/diy-projects-and-ideas/workshops",
+        expires: "2026-12-12",
+        votes: { up: 0, down: 0 },
+        howTo: "Join MyLowe's Rewards free, create a Kids Profile, then reserve a spot for Saturday, December 12, 2026 (10 a.m. to 1 p.m., in-store) on Lowe's workshops page — registration opened November 14 and spots go fast. Built for kids ages 4 to 11, with a parent or guardian along."
+    },
+    {
+        id: 7,
+        title: "Free 2027 Wall Calendar From Good News Radio",
+        store: "Good News Radio",
+        description: "Good News Radio is mailing out a free 2027 wall calendar to anyone who asks — a simple request form, no purchase, while supplies last.",
+        url: "https://www.goodnewsgreatmusic.org/calendarrequest",
+        expires: null,
+        votes: { up: 0, down: 0 },
+        howTo: "Open the station's calendar-request page and fill out the form with your mailing information. The calendar is mailed to you while supplies last."
     }
 ];
