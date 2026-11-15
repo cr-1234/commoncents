@@ -525,7 +525,13 @@ body.dark-mode .page-btn.active { color: #000; }
 }
 body.dark-mode .view-deal-btn { color: #000; }
 .view-deal-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(91,45,142,0.4); }
-.vote-container { display: flex; align-items: center; gap: 0.5rem; padding-top: 0.75rem; }
+/* flex-wrap is the guarantee the row can never spill out of the card:
+   the four buttons (up / down / Share / Save) cannot shrink below
+   their content width, so on narrow cards an unwrapped row overflowed
+   and the card's overflow:hidden clipped Save mid-word (owner's phone
+   screenshot, 2026-11-15). Wrapping changes nothing where the row
+   already fits on one line. */
+.vote-container { display: flex; align-items: center; gap: 0.5rem; padding-top: 0.75rem; flex-wrap: wrap; }
 .view-deal-btn { margin-top: auto; }
 .vote-btn {
     background: none; border: none; color: var(--text-secondary);
@@ -815,6 +821,15 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .pagination { flex-wrap: nowrap; gap: 0.3rem; }
     .page-btn { padding: 0.45rem 0.55rem; font-size: 0.88rem; }
     .page-btn:not(.page-nav) { min-width: 2.1rem; }
+    /* Card vote row (owner's phone screenshot, 2026-11-15): with Save
+       added as a fourth button, the row's full width ran past the
+       card's inner width at phone sizes and Save was clipped at the
+       card edge. Tighter gaps + button padding keep all four buttons
+       on one line at 360/390px; in the narrow end of the 560–900px
+       two-column band the base rule's flex-wrap folds the row inside
+       the card instead of clipping it. */
+    .vote-container { gap: 0.35rem; }
+    .vote-btn { padding: 0.25rem 0.45rem; }
     /* "Today's Best Deals" carries an inline 1.5rem size; at phone
        widths it wrapped into a tall stack next to the sort control. */
     .feed-header { gap: 0.5rem 0.75rem; }
