@@ -924,6 +924,26 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .audience-label { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
 .feed-status { color: var(--text-secondary); font-size: 0.83rem; margin: 0.65rem 0 0.2rem; }
 .feed-note { color: var(--text-secondary); font-size: 0.8rem; margin: 0.35rem 0 0.2rem; }
+/* Picker footer: the "Your feed:" summary and the Done button share
+   one row at the bottom of the panel — Done as the primary plum pill
+   at the right, beside the line that names it, instead of stranded
+   up in the panel head (owner, 2026-11-15). */
+.interest-picker-foot {
+    display: flex; align-items: center; gap: 1rem;
+    margin-top: 0.7rem; padding-top: 0.7rem;
+    border-top: 1px solid var(--border-color);
+}
+.interest-picker-foot .feed-status { margin: 0; flex: 1; }
+.interest-picker-foot .my-feed-btn {
+    flex: none;
+    background: var(--highlight); border-color: var(--highlight); color: #fff;
+}
+.interest-picker-foot .my-feed-btn:hover { background: var(--highlight); filter: brightness(0.9); color: #fff; }
+/* Narrow screens: the footer stacks — summary above, Done full-width below. */
+@media (max-width: 640px) {
+    .interest-picker-foot { flex-direction: column; align-items: stretch; gap: 0.6rem; }
+    .interest-picker-foot .my-feed-btn { width: 100%; }
+}
 .sponsored-tag { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--highlight); border: 1px solid var(--highlight); padding: 0.08rem 0.45rem; border-radius: 999px; flex: none; }
 .new-badge {
     position: absolute; top: 10px; left: 10px; z-index: 2;

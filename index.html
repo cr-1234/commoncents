@@ -207,7 +207,6 @@
             <div class="interest-picker" id="interestPicker">
                 <div class="interest-picker-head">
                     <span class="interest-picker-title">Build your feed — deals from every site, only what you care about</span>
-                    <button type="button" class="my-feed-btn" id="feedDoneBtn">Done</button>
                     <button type="button" class="picker-x" id="feedPickerX" aria-label="Close the feed picker">✕</button>
                 </div>
                 <div class="interest-chips" id="interestChips"></div>
@@ -215,8 +214,14 @@
                     <span class="audience-label">Show me deals for:</span>
                     <div class="interest-chips" id="audienceChips"></div>
                 </div>
-                <p class="feed-status" id="feedStatus"></p>
                 <p class="feed-note">One exception: sponsored deals — always labeled "Sponsored" — can appear in your feed even if they don't match your picks.</p>
+                <!-- Done lives in the footer, beside the summary line that
+                     names it — up in the head it sat stranded far from
+                     the chips and the "Your feed:" line (owner, 2026-11-15). -->
+                <div class="interest-picker-foot">
+                    <p class="feed-status" id="feedStatus"></p>
+                    <button type="button" class="my-feed-btn" id="feedDoneBtn">Done</button>
+                </div>
             </div>
             <div class="deal-grid" id="dealGrid"></div>
         </main>
