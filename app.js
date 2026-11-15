@@ -605,7 +605,10 @@ function renderDeals() {
         const matchSearch = deal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             deal.description.toLowerCase().includes(searchQuery.toLowerCase());
         const matchFeed   = !window.CC_FEED || CC_FEED.match(deal);
-        return matchCat && matchSearch && matchFeed;
+        // Audience preference (Men/Women/Everyone) applies in every
+        // view; sponsored deals bypass it (see tailored-feed.js).
+        const matchAud    = !window.CC_FEED || typeof CC_FEED.matchAudience !== 'function' || CC_FEED.matchAudience(deal);
+        return matchCat && matchSearch && matchFeed && matchAud;
     });
 
     const activeSort = document.querySelector('.dropdown-item.active');
@@ -630,6 +633,7 @@ function renderDeals() {
     // go back to page 1; then render only this page's slice.
     const feedKey = window.CC_FEED
         ? CC_FEED.mode() + ':' + (typeof CC_FEED.getInterests === 'function' ? CC_FEED.getInterests().join(',') : '')
+          + ':' + (typeof CC_FEED.getAudience === 'function' ? CC_FEED.getAudience() : 'everyone')
         : 'nofeed';
     const filterKey = [currentCategory, searchQuery, sortValue, feedKey].join('|');
     if (filterKey !== lastFilterKey) { currentPage = 1; lastFilterKey = filterKey; }
@@ -1253,10 +1257,11 @@ function getAffiliateUrl(url) {
 }
 
 // ── Share a deal (owner request 2026-11-14) ─────────────────────────────
-// Menu order matches Gifting Butler: WhatsApp, Copy link, Email,
-// Pinterest LAST, then More options (native share) when the device
-// offers it. The shared link is always the affiliate URL, so the
-// CommonCents tag rides along wherever the deal is forwarded.
+// Menu order matches Gifting Butler: Copy link FIRST, then WhatsApp,
+// Email, Pinterest, then More options (native share) when the device
+// offers it (owner order call 2026-11-14: copy link is the universal
+// action, so it leads). The shared link is always the affiliate URL,
+// so the CommonCents tag rides along wherever the deal is forwarded.
 function closeShareMenu() {
     const ov = document.getElementById('share-menu-ov');
     if (ov) ov.remove();
@@ -1274,11 +1279,11 @@ function openShareMenu(deal) {
     ov.innerHTML = `
         <div class="share-menu" role="dialog" aria-label="Share this deal">
             <div class="share-menu-head"><strong>Share this deal</strong><button type="button" class="share-menu-close" aria-label="Close">&times;</button></div>
-            <a class="share-row" href="https://wa.me/?text=${enc(text + ' ' + url)}" target="_blank" rel="noopener"><span class="share-ico">\uD83D\uDCAC</span>Share on WhatsApp</a>
             <button type="button" class="share-row share-copy"><span class="share-ico">\uD83D\uDD17</span><span class="share-copy-label">Copy link</span></button>
+            <a class="share-row" href="https://wa.me/?text=${enc(text + ' ' + url)}" target="_blank" rel="noopener"><span class="share-ico">\uD83D\uDCAC</span>Share on WhatsApp</a>
             <a class="share-row" href="mailto:?subject=${enc(deal.title)}&body=${enc(text + '\n' + url)}"><span class="share-ico">\u2709\uFE0F</span>Share by Email</a>
             <a class="share-row" href="https://pinterest.com/pin/create/button/?url=${enc(url)}&media=${enc(deal.image || '')}&description=${enc(text)}" target="_blank" rel="noopener"><span class="share-ico">\uD83D\uDCCC</span>Pin it on Pinterest</a>
-            ${navigator.share ? '<button type="button" class="share-row share-native"><span class="share-ico">\u2022\u2022\u2022</span>More options</button>' : ''}
+            ${navigator.share ? '<button type="button" class="share-row share-native"><span class="share-ico share-ico-dots">\u2022\u2022\u2022</span>More options</button>' : ''}
         </div>`;
     ov.addEventListener('click', (e) => { if (e.target === ov) closeShareMenu(); });
     ov.querySelector('.share-menu-close').addEventListener('click', closeShareMenu);

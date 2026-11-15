@@ -534,6 +534,10 @@ body.dark-mode .view-deal-btn { color: #000; }
 .share-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.72rem 0.9rem; border-radius: 0.7rem; text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.92rem; cursor: pointer; background: none; border: none; width: 100%; text-align: left; font-family: inherit; box-sizing: border-box; }
 .share-row:hover { background: rgba(91,45,142,0.10); }
 .share-ico { font-size: 1.2rem; width: 1.6rem; text-align: center; }
+/* The ••• "More options" glyph is a text character, not an emoji: at the
+   emoji size (1.2rem) it renders far heavier than the other rows' icons.
+   Shrink it into the same 1.6rem box at emoji-comparable visual weight. */
+.share-ico-dots { font-size: 0.95rem; letter-spacing: 0.08em; line-height: 1; color: #5B2D8E; display: inline-flex; align-items: center; justify-content: center; height: 1.2rem; }
 
 /* ── Buttons ────────────────────────────────────────────────── */
 .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 999px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; text-align: center; }
@@ -850,6 +854,8 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     background: var(--gold-gradient); color: #ffffff;
     border-color: transparent; font-weight: 700;
 }
+.audience-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.7rem; }
+.audience-label { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
 .feed-status { color: var(--text-secondary); font-size: 0.83rem; margin: 0.65rem 0 0.2rem; }
 .feed-note { color: var(--text-secondary); font-size: 0.8rem; margin: 0.35rem 0 0.2rem; }
 .sponsored-tag { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--highlight); border: 1px solid var(--highlight); padding: 0.08rem 0.45rem; border-radius: 999px; flex: none; }

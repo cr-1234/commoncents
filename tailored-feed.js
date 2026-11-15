@@ -175,6 +175,32 @@
         lsSet('ccNewBadges', JSON.stringify(keptBadges));
     }
 
+    // Audience preference (owner, 2026-11-14): a visitor can say "show
+    // me deals for Men / Women / Everyone" so a man isn't wading through
+    // ladies' cosmetics and a woman isn't wading through men's grooming.
+    // Every deal carries an `aud` tag ('men' | 'women' | 'all'); the
+    // preference only ever hides the opposite audience's tagged deals —
+    // 'all' deals always show, and sponsored posts bypass the filter
+    // just like they bypass the picks filter. Saved on the device only
+    // (ccAudience); default 'everyone' = no filtering.
+    var AUD_KEY = 'ccAudience';
+    var AUDIENCES = [
+        { key: 'everyone', label: 'Everyone' },
+        { key: 'men',      label: 'Men' },
+        { key: 'women',    label: 'Women' }
+    ];
+    function getAudience() {
+        var a = lsGet(AUD_KEY);
+        return (a === 'men' || a === 'women') ? a : 'everyone';
+    }
+    function matchAudience(deal) {
+        var a = getAudience();
+        if (a === 'everyone') return true;
+        if (deal.sponsored === true) return true;
+        var aud = deal.aud || 'all';
+        return a === 'men' ? aud !== 'women' : aud !== 'men';
+    }
+
     function notifyChange() {
         if (window.CC_AUTH && CC_AUTH.noteInterestsChanged) {
             try { CC_AUTH.noteInterestsChanged(getInterests()); } catch (e) {}
@@ -234,6 +260,8 @@
             }
         },
         getInterests: getInterests,
+        getAudience: getAudience,
+        matchAudience: matchAudience,
         // app.js calls this after it (re)paints the sidebar category
         // counts, so the My Feed row's badge/visibility track deals
         // loaded after the first paint too.
@@ -367,6 +395,24 @@
                 els.chips.appendChild(b);
             });
         }
+        // audience chips (single-select: Everyone / Men / Women)
+        if (els.audienceChips) {
+            els.audienceChips.innerHTML = '';
+            var aud = getAudience();
+            AUDIENCES.forEach(function (opt) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'interest-chip audience-chip' + (aud === opt.key ? ' active' : '');
+                b.textContent = opt.label;
+                b.setAttribute('data-audience', opt.key);
+                b.addEventListener('click', function () {
+                    lsSet(AUD_KEY, opt.key);
+                    paintAll();
+                    if (typeof renderDeals === 'function') renderDeals();
+                });
+                els.audienceChips.appendChild(b);
+            });
+        }
     }
 
     // Bring the picker to the reader. The old code used a bare
@@ -398,6 +444,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         els.picker = document.getElementById('interestPicker');
         els.chips = document.getElementById('interestChips');
+        els.audienceChips = document.getElementById('audienceChips');
         els.status = document.getElementById('feedStatus');
         els.widgetText = document.getElementById('feedWidgetText');
         els.widgetChange = document.getElementById('feedWidgetChange');
