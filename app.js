@@ -503,6 +503,27 @@ function setupEventListeners() {
             sSoon.style.display = active ? 'none' : '';
             if (!active) paintGwTeaser(GW_TEASERS[0], signedIn);
         }
+        // Phone panel: the small state line under the Weekly
+        // Giveaway row. The account menu's own giveaway row is
+        // hidden inside the drawer (it duplicated this row), so
+        // this line carries the state there: "Coming soon" in
+        // small type while the giveaway is off; while it's on, the
+        // entered state — the same words the account menu's row
+        // uses, from the same CC_GW state — or nothing at all.
+        const panelGw = document.getElementById('mobileGwStatus');
+        if (panelGw) {
+            if (!active) {
+                panelGw.textContent = 'Coming soon';
+                panelGw.style.display = '';
+            } else if (window.CC_GW && CC_GW.isEntered && CC_GW.isEntered()) {
+                const n = 1 + (CC_GW.bonus ? CC_GW.bonus() : 0);
+                panelGw.textContent = "You're in this week \u00b7 " + n + (n === 1 ? ' entry' : ' entries');
+                panelGw.style.display = '';
+            } else {
+                panelGw.textContent = '';
+                panelGw.style.display = 'none';
+            }
+        }
         // Modal: the teaser replaces the prize block + form + success.
         const soon = document.getElementById('giveawayComingSoon');
         const prizeBlock = document.querySelector('.giveaway-prize-block');
@@ -2378,11 +2399,12 @@ document.addEventListener('DOMContentLoaded', initApp);
 // hamburger lines on the RIGHT — since the second redesign the same
 // day, the lines are the ONLY control up there: the bell and the
 // avatar left the top row, and this panel (a full-height scrolling
-// drawer from the right) is the one menu, holding the account
-// block, the Notifications row, My Feed, the expandable Deals
-// section (All Deals, the categories, Free Stuff, Saved — each
-// with its count), the Weekly Giveaway row, the page links and
-// Sign out. Category taps filter through the same setCategory
+// drawer from the right) is the one menu, holding — in the order
+// the owner settled in the third pass the same day — My Feed, the
+// expandable Deals section (All Deals, the categories, Free Stuff,
+// Saved — each with its count), the Weekly Giveaway row (with its
+// small state line), the Notifications row, the account group, the
+// page links and Sign out. Category taps filter through the same setCategory
 // wiring as the strip and the sidebar (the panel's links are in
 // app.js's navLinks); this block owns the panel's open/close and
 // the Deals section's expand/collapse. On phone widths auth.js

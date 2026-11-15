@@ -1147,6 +1147,18 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 }
 .mobile-nav-rows a.active { background: #EDE5F8; color: var(--highlight); }
 .mobile-nav-rows a .gw-gift-mark { width: 26px; height: 26px; margin: 0 0.6rem 0 0; }
+/* The small state line under the panel's Weekly Giveaway row
+   (owner, 2026-11-15, third pass): while the giveaway is off it
+   reads "Coming soon" in small muted type under the row — the
+   account menu's own giveaway row is hidden inside the drawer
+   (it duplicated this one), so this line carries the state here;
+   while the giveaway is on it shows the entered state in the same
+   small type, or hides. The left padding lines it up with the
+   row's text (row padding + gift mark + its gap). */
+.mnav-gw-status {
+    padding: 0.05rem 0.9rem 0.35rem calc(0.9rem + 26px + 0.6rem);
+    font-size: 0.78rem; font-weight: 500; color: var(--text-secondary); line-height: 1.35;
+}
 .mnav-row {
     display: flex; align-items: center; width: 100%; min-height: 48px;
     padding: 0.5rem 0.9rem; border: none; background: none; border-radius: 12px;

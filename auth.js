@@ -301,6 +301,21 @@
         movedEls.push({ el: el, parent: el.parentNode, next: el.nextSibling });
         target.appendChild(el);
     }
+    // Inside the drawer, two of the account menu's rows duplicate
+    // panel rows (owner, 2026-11-15, third pass — he counted two
+    // giveaways and two Saveds in the panel and called it chaotic):
+    // its Giveaway row duplicates the panel's Weekly Giveaway row
+    // (whose small state line carries the giveaway state there),
+    // and its Saved deals row duplicates the Deals section's Saved
+    // link. They hide while the menu lives in the drawer and come
+    // back when it returns to the desktop auth area — the desktop
+    // menu keeps both rows exactly as before.
+    function setDrawerDupRows(show) {
+        var gw = document.getElementById('authMenuGiveaway');
+        if (gw) gw.style.display = show ? '' : 'none';
+        var sv = document.getElementById('authMenuSaved');
+        if (sv) sv.style.display = show ? '' : 'none';
+    }
     function applyPhoneLayout() {
         if (phoneLayout) return;
         var slot = document.getElementById('mobileAccountSlot');
@@ -310,6 +325,7 @@
         moveEl(menu, slot);
         moveEl(document.getElementById('notesPanel'), document.getElementById('mobileNotesSlot'));
         moveEl(document.getElementById('authMenuSignOut'), document.getElementById('mobileSignOutSlot'));
+        setDrawerDupRows(false);
         document.body.classList.add('cc-phone-layout');
         syncPhoneChrome();
     }
@@ -323,6 +339,7 @@
             else m.parent.appendChild(m.el);
         }
         movedEls = [];
+        setDrawerDupRows(true);
         var menu = document.getElementById('authMenu');
         if (menu) menu.style.display = 'none';
         var notes = document.getElementById('notesPanel');

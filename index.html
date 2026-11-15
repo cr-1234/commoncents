@@ -161,48 +161,44 @@
                                     </div>
             </div>
         </div>
-        <!-- Phone menu panel (owner, 2026-11-15, second redesign):
+        <!-- Phone menu panel (owner, 2026-11-15, third pass):
              THE one menu on phones — a full-height drawer opening
              from the right that SCROLLS (the old drop-down panel
              hung off the sticky header, so its bottom rows could
              never be reached). SlickDeals-style grouping instead of
-             one long flat list: the account block on top, a
-             Notifications row, My Feed with its count, a "Deals ▾"
-             section that expands to All Deals + every category
-             (each with its count, painted by app.js like the
-             sidebar's), Free Stuff and Saved, then the Weekly
-             Giveaway row, the page links, and Sign out at the very
-             bottom. The account block and the notes are not copies:
-             on phone widths auth.js MOVES the real account menu
-             (#authMenu) and the real notes panel (#notesPanel) in
-             here, so every existing action — change name, feed
-             picks, giveaway status, Restore, the notes list + mute
-             row — is the same wired element it always was; on
-             desktop widths they move back and the bell + avatar
-             menu work exactly as before. The category links carry
-             the same data-category wiring as the strip and the
-             sidebar, so a tap filters exactly like they do; the My
-             Feed row follows the same picks rule as the other My
-             Feed rows (painted by tailored-feed.js). Phones only:
-             style.css pins it shut above 900px no matter what. -->
+             one long flat list, in the order the owner asked for
+             after calling the second design chaotic — the main
+             things first, the account group no longer sitting on
+             top pushing them down: My Feed (with its count), the
+             "Deals ▾" section (All Deals + every category, each
+             with its count, painted by app.js like the sidebar's,
+             Free Stuff and Saved), the Weekly Giveaway row (with
+             its small state line under it), a Notifications row,
+             the account group, the page links, and Sign out at the
+             very bottom. The account block and the notes are not
+             copies: on phone widths auth.js MOVES the real account
+             menu (#authMenu) and the real notes panel (#notesPanel)
+             in here, so every existing action — change name, feed
+             picks, Restore, the notes list + mute row — is the same
+             wired element it always was; on desktop widths they
+             move back and the bell + avatar menu work exactly as
+             before. Inside the drawer the menu's own Giveaway and
+             Saved deals rows hide (auth.js) — they duplicated the
+             Weekly Giveaway row and the Deals section's Saved link.
+             The category links carry the same data-category wiring
+             as the strip and the sidebar, so a tap filters exactly
+             like they do; the My Feed row follows the same picks
+             rule as the other My Feed rows (painted by
+             tailored-feed.js). Phones only: style.css pins it shut
+             above 900px no matter what. -->
         <nav class="mobile-nav-panel" id="mobileNavPanel" style="display:none;" aria-label="Menu">
             <button type="button" class="mnav-close" id="mobileNavClose" aria-label="Close menu">✕</button>
-            <!-- Account block: signed out, just a Sign in row (it
-                 clicks the header's own Sign in button, so the one
-                 auth modal opens); signed in, auth.js moves the
-                 account menu itself into this slot on phones. -->
-            <div class="mnav-account" id="mobileAccountSlot">
-                <button type="button" class="mnav-row mnav-signin" id="mobileSignInBtn">Sign in</button>
-            </div>
-            <!-- Notifications row (signed-in only): carries the
-                 unread count; tapping it opens the notes panel in
-                 the slot right under it (auth.js moves the real
-                 #notesPanel there on phones). -->
-            <button type="button" class="mnav-row" id="mobileNotesRow" style="display:none;">
-                <span class="mnav-row-label">Notifications</span>
-                <span class="mnav-count" id="mobileNotesCount"></span>
-            </button>
-            <div class="mnav-notes-slot" id="mobileNotesSlot"></div>
+            <!-- My Feed first (owner, 2026-11-15, third pass — the
+                 account block used to sit on top and push the main
+                 things down). Painted by tailored-feed.js like
+                 every My Feed row: it exists only while the visitor
+                 has picks, with the same count badge as the
+                 sidebar's. -->
             <ul class="mobile-nav-rows mnav-top">
                 <li style="display:none;"><a href="#" data-myfeed="1">My Feed</a></li>
             </ul>
@@ -235,8 +231,46 @@
                      here in the panel instead (the sidebar box is
                      the desktop one). app.js wires it to the same
                      giveaway modal as the sidebar button. -->
-                <li><a href="#" id="openGiveawayPanel"><svg class="gw-gift-mark" aria-hidden="true"><use href="#gwGiftMark"></use></svg>Weekly Giveaway</a></li>
+                <li><a href="#" id="openGiveawayPanel"><svg class="gw-gift-mark" aria-hidden="true"><use href="#gwGiftMark"></use></svg>Weekly Giveaway</a>
+                    <!-- The row's small state line (owner,
+                         2026-11-15, third pass): while the giveaway
+                         is off it reads "Coming soon" in small muted
+                         type under the row — small text under the
+                         row, NOT a second row. The account menu's
+                         own giveaway row is hidden inside the
+                         drawer (it duplicated this one), so this
+                         line carries the giveaway state here; while
+                         the giveaway is on it shows the entered
+                         state in the same small type, or hides.
+                         Painted by app.js (paintGiveawayState) from
+                         CC_GW.isActive(). -->
+                    <div class="mnav-gw-status" id="mobileGwStatus" style="display:none;"></div>
+                </li>
             </ul>
+            <!-- Notifications row (signed-in only): carries the
+                 unread count; tapping it opens the notes panel in
+                 the slot right under it (auth.js moves the real
+                 #notesPanel there on phones). -->
+            <button type="button" class="mnav-row" id="mobileNotesRow" style="display:none;">
+                <span class="mnav-row-label">Notifications</span>
+                <span class="mnav-count" id="mobileNotesCount"></span>
+            </button>
+            <div class="mnav-notes-slot" id="mobileNotesSlot"></div>
+            <!-- Account group: signed out, just a Sign in row (it
+                 clicks the header's own Sign in button, so the one
+                 auth modal opens); signed in, auth.js moves the
+                 account menu itself into this slot on phones. It
+                 sits BELOW the main rows now (owner, 2026-11-15,
+                 third pass) instead of pushing them down from the
+                 top. Two of its rows hide while it lives in the
+                 drawer (auth.js): its Giveaway row — the Weekly
+                 Giveaway row above carries that job, with its small
+                 state line — and its Saved deals row, because Saved
+                 lives in the Deals section above. On desktop both
+                 rows are back, exactly as before. -->
+            <div class="mnav-account" id="mobileAccountSlot">
+                <button type="button" class="mnav-row mnav-signin" id="mobileSignInBtn">Sign in</button>
+            </div>
             <div class="mobile-nav-pages">
                 <a href="submit-deal.html">Submit a Deal</a>
                 <a href="advertise.html">Advertise</a>
