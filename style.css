@@ -821,15 +821,22 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .pagination { flex-wrap: nowrap; gap: 0.3rem; }
     .page-btn { padding: 0.45rem 0.55rem; font-size: 0.88rem; }
     .page-btn:not(.page-nav) { min-width: 2.1rem; }
-    /* Card vote row (owner's phone screenshot, 2026-11-15): with Save
-       added as a fourth button, the row's full width ran past the
-       card's inner width at phone sizes and Save was clipped at the
-       card edge. Tighter gaps + button padding keep all four buttons
-       on one line at 360/390px; in the narrow end of the 560–900px
-       two-column band the base rule's flex-wrap folds the row inside
-       the card instead of clipping it. */
-    .vote-container { gap: 0.35rem; }
-    .vote-btn { padding: 0.25rem 0.45rem; }
+    /* Card vote row (owner's phone screenshots, 2026-11-15): first
+       Save was clipped at the card edge; once wrapping stopped the
+       clip, Save instead folded ALONE onto a second line at the
+       left of a 392px phone — stranded under up / down / Share.
+       The row is now sized to fit on ONE line at phone widths.
+       The math (0.85rem labels, 16px icons, worst case of two-digit
+       counts + "Saved"): up ≈ 48px + down ≈ 48px + Share ≈ 70px +
+       Saved ≈ 70px + three 4px row gaps ≈ 248px total, against the
+       card's inner width of 286px at a 360px viewport (360 − 40
+       container padding − 2 card border − 32 card-content padding)
+       and 356px at 430px — headroom even if a phone renders text a
+       tenth wider than the model. The base rule's flex-wrap stays
+       as the safety net for the 560–900px two-column band, where
+       cards are narrower than a phone's single column. */
+    .vote-container { gap: 0.25rem; }
+    .vote-btn { padding: 0.3rem 0.35rem; font-size: 0.85rem; white-space: nowrap; }
     /* "Today's Best Deals" carries an inline 1.5rem size; at phone
        widths it wrapped into a tall stack next to the sort control. */
     .feed-header { gap: 0.5rem 0.75rem; }
@@ -1134,6 +1141,32 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .modal-buy-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
 .modal-buy-row .card-price { margin-bottom: 0; flex-wrap: nowrap; }
 .modal-deal-btn { margin-left: auto; }
+/* The buy row's three buttons live in ONE group (owner's modal
+   screenshot, 2026-11-15: the price + Get This Deal + Share filled
+   the first line and Save dropped ALONE onto a second line at the
+   left — his arrow: Save belongs up with the other buttons). The
+   group is a single flex child of .modal-buy-row, so the row can
+   only ever break BETWEEN the price and the group: the trio wraps
+   together, right-aligned, never one button at a time. */
+.modal-buy-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: nowrap; margin-left: auto; }
+@media (max-width: 640px) {
+    /* Slimmer trio, so the group still shares one line with — or
+       under — the price as far down as ~480px: at these metrics the
+       group is ≈317px wide (Get This Deal ≈134 + Share ≈88 + Save
+       ≈80 + two 8px gaps), inside a ≈366px modal inner width at a
+       481px viewport (modal is 90% wide, less 2×2rem padding). */
+    .modal-buy-actions { gap: 0.5rem; }
+    .modal-buy-actions .btn { padding: 0.6rem 0.75rem; font-size: 0.92rem; }
+}
+@media (max-width: 480px) {
+    /* Inside a small-phone modal the trio cannot share one line at
+       any readable size, so the group takes the full row under the
+       price as one block: the primary button spans the row and
+       Share + Save sit paired on the next line at the right. Save
+       is grouped with Share, never stranded alone on a line. */
+    .modal-buy-actions { flex-wrap: wrap; width: 100%; margin-left: 0; justify-content: flex-end; }
+    .modal-buy-actions .modal-deal-btn, .modal-buy-actions .freebie-modal-btn { flex: 1 1 100%; margin-left: 0; }
+}
 .comments-section { border-top: 1px solid var(--border-color); margin-top: 1.25rem; padding-top: 1.1rem; }
 .modal-media-banner {
     /* White, not plum: product photos sit on white backgrounds, so a
