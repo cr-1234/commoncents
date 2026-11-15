@@ -75,6 +75,47 @@ function toggleSave(deal) {
     if (currentCategory === 'saved') renderDeals();
     return hasSave(deal.id);
 }
+// ── Saved freebies ───────────────────────────────────────────
+// Freebies can be bookmarked too (owner, 2026-11-15). Their saves
+// ride the same ccMySaves list as deal saves, told apart by a
+// kind:'freebie' flag on the record — freebie ids live in their own
+// small-number space, so the flag (never the bare id) is what keeps
+// a freebie save from ever being read as a deal save. The snapshot
+// carries everything the freebie card/modal need, so a freebie that
+// later leaves freebies-data.js still renders from its snapshot.
+function hasFreebieSave(fid) { return mySaves.some(s => s.kind === 'freebie' && s.id === fid); }
+function paintFreebieSaveButtons(fid) {
+    const saved = hasFreebieSave(fid);
+    document.querySelectorAll('[data-save-fid="' + fid + '"]').forEach(btn => {
+        btn.classList.toggle('saved', saved);
+        btn.setAttribute('aria-pressed', saved ? 'true' : 'false');
+        const lbl = btn.querySelector('.save-label');
+        if (lbl) lbl.textContent = saved ? 'Saved' : 'Save';
+    });
+}
+function toggleFreebieSave(f) {
+    if (hasFreebieSave(f.id)) {
+        mySaves = mySaves.filter(s => !(s.kind === 'freebie' && s.id === f.id));
+    } else {
+        mySaves.push({
+            kind: 'freebie',
+            id: f.id,
+            title: f.title || '',
+            store: f.store || '',
+            image: f.image || '',
+            url: f.url || '',
+            description: f.description || '',
+            howTo: f.howTo || '',
+            expires: (typeof f.expires === 'string' ? f.expires : null),
+            ts: Date.now()
+        });
+    }
+    saveMySaves();
+    paintFreebieSaveButtons(f.id);
+    // In the Saved view, unsaving removes the card from the list too.
+    if (currentCategory === 'saved') renderDeals();
+    return hasFreebieSave(f.id);
+}
 // Bridge for auth.js: read the local saved list, replace it wholesale
 // (sign-in union merge / Restore from backup), or toggle a deal.
 window.CC_SAVES = {
@@ -83,17 +124,35 @@ window.CC_SAVES = {
         const clean = [];
         const seen = {};
         if (Array.isArray(list)) list.forEach(s => {
-            if (s && Number.isInteger(s.id) && s.id > 0 && !seen[s.id]) {
-                seen[s.id] = true;
+            if (!s || !Number.isInteger(s.id) || s.id <= 0) return;
+            if (s.kind === 'freebie') {
+                const fk = 'f' + s.id;
+                if (seen[fk]) return;
+                seen[fk] = true;
                 clean.push({
+                    kind: 'freebie',
                     id: s.id,
                     title: s.title || '',
-                    price: (typeof s.price === 'number' ? s.price : 0),
+                    store: s.store || '',
                     image: s.image || '',
                     url: s.url || '',
+                    description: s.description || '',
+                    howTo: s.howTo || '',
+                    expires: (typeof s.expires === 'string' ? s.expires : null),
                     ts: (typeof s.ts === 'number' ? s.ts : 0)
                 });
+                return;
             }
+            if (seen[s.id]) return;
+            seen[s.id] = true;
+            clean.push({
+                id: s.id,
+                title: s.title || '',
+                price: (typeof s.price === 'number' ? s.price : 0),
+                image: s.image || '',
+                url: s.url || '',
+                ts: (typeof s.ts === 'number' ? s.ts : 0)
+            });
         });
         mySaves = clean;
         saveMySaves();
@@ -109,6 +168,17 @@ const SAVE_BOOKMARK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="16" he
 // counts must be DERIVED, never mutated — mutating them let a returning
 // visitor's switch subtract a vote that wasn't in the count (totals hit -1).
 function voteCount(deal, type) { return (deal.votes[type] || 0) + (myVotes[deal.id] === type ? 1 : 0); }
+// Freebie votes (owner, 2026-11-15): same derived-count rule as deals,
+// but the visitor's vote is stored under a NAMESPACED key — 'f' + the
+// freebie id — because freebie ids live in their own small-number
+// space (1, 2, 3…) and must never collide with a deal id in the
+// shared ccMyVotes map (or in the account copy it syncs to). Base
+// counts come from the freebie record's own votes field (seeded 0).
+function freebieVoteKey(f) { return 'f' + f.id; }
+function freebieVoteCount(f, type) {
+    const base = (f.votes && typeof f.votes[type] === 'number') ? f.votes[type] : 0;
+    return base + (myVotes[freebieVoteKey(f)] === type ? 1 : 0);
+}
 let searchQuery = '';
 
 // Pagination: 12 deals per page (3 across x 4 rows), applied AFTER
@@ -799,27 +869,112 @@ function showFreebiesIntro(show) {
     }
     el.style.display = show ? '' : 'none';
 }
-function createFreebieCard(f) {
-    const article = document.createElement('article');
-    article.className = 'deal-card freebie-card';
-    const when = f.expires
+function freebieWhenText(f) {
+    return f.expires
         ? 'Ends ' + new Date(f.expires + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
         : 'Ongoing';
+}
+// Freebie cards are full citizens now (owner, 2026-11-15): the same
+// card shape as a deal card — fixed title/description heights (the
+// shared .card-title/.card-desc rules), the action button pinned to
+// the bottom via margin-top:auto (the .freebie-btn rule, mirroring
+// .view-deal-btn), a vote row with thumbs + Share + Save, and the
+// card opens a modal. The old card's variable-height "How to get it"
+// paragraph is what made buttons land at different heights; that
+// text lives in the modal now, like a deal's dealNote. One builder
+// serves every surface (All Deals, My Feed, Free Stuff, Saved); the
+// snapshot variant renders a saved freebie whose entry has left
+// freebies-data.js, from the record captured at save time.
+function buildFreebieCard(f, snapshot) {
+    const article = document.createElement('article');
+    article.className = 'deal-card freebie-card' + (snapshot ? ' saved-freebie-card' : '');
+    const key = freebieVoteKey(f);
+    const isSaved = hasFreebieSave(f.id);
+    const savedDate = snapshot && snapshot.ts ? new Date(snapshot.ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
     article.innerHTML = `
-        ${f.image ? `<div class="card-image"><img src="${f.image}" alt="${f.title}" loading="lazy"><span class="free-badge">FREE</span></div>` : ''}
+        ${f.image ? `<div class="card-image"><img src="${f.image}" alt="${f.title}" loading="lazy"><span class="free-badge">FREE</span>${snapshot ? '<span class="saved-freebie-badge">SAVED FREEBIE</span>' : ''}</div>` : ''}
         <div class="card-content">
-            ${f.image ? '' : '<span class="free-badge free-badge-inline">FREE</span>'}
+            ${f.image ? '' : `<span class="free-badge free-badge-inline">FREE</span>${snapshot ? '<span class="saved-freebie-badge saved-freebie-badge-inline">SAVED FREEBIE</span>' : ''}`}
             <div class="card-meta">
                 <span class="card-source">${f.store}</span>
                 <span class="card-category">Free Stuff</span>
             </div>
             <h3 class="card-title">${f.title}</h3>
             ${f.description ? `<p class="card-desc">${f.description}</p>` : ''}
-            ${f.howTo ? `<p class="freebie-howto"><strong>How to get it:</strong> ${f.howTo}</p>` : ''}
-            <div class="freebie-when">${when}</div>
+            <div class="freebie-when">${snapshot && savedDate ? 'Saved ' + savedDate : freebieWhenText(f)}</div>
             <a href="${f.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width freebie-btn">Get This Freebie</a>
+            <div class="vote-container" style="border-top:none; padding-top:0;">
+                <button class="vote-btn upvote-btn ${myVotes[key] === 'up' ? 'active' : ''}" data-fid="${f.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                    <span>${freebieVoteCount(f, 'up')}</span>
+                </button>
+                <button class="vote-btn downvote-btn ${myVotes[key] === 'down' ? 'active' : ''}" data-fid="${f.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+                    <span>${freebieVoteCount(f, 'down')}</span>
+                </button>
+                <button class="vote-btn share-btn" aria-label="Share this freebie" title="Share">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+                    <span>Share</span>
+                </button>
+                <button class="vote-btn save-btn ${isSaved ? 'saved' : ''}" data-save-fid="${f.id}" aria-pressed="${isSaved ? 'true' : 'false'}" aria-label="Save this freebie" title="Save this freebie">
+                    ${SAVE_BOOKMARK_SVG}
+                    <span class="save-label">${isSaved ? 'Saved' : 'Save'}</span>
+                </button>
+            </div>
         </div>`;
+    article.addEventListener('click', (e) => {
+        if (e.target.closest('a') || e.target.closest('button')) return;
+        openFreebieModal(f);
+    });
+    article.querySelector('.upvote-btn').addEventListener('click', (e) => handleFreebieVote(e, f, 'up'));
+    article.querySelector('.downvote-btn').addEventListener('click', (e) => handleFreebieVote(e, f, 'down'));
+    article.querySelector('.share-btn').addEventListener('click', (e) => { e.stopPropagation(); openShareMenu(f, true); });
+    article.querySelector('.save-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleFreebieSave(f); });
     return article;
+}
+function createFreebieCard(f) { return buildFreebieCard(f, null); }
+function createSavedFreebieCard(save) { return buildFreebieCard(save, save); }
+
+// The freebie modal: the deal modal's shell and styling, freebie
+// content — picture banner, store line, title, full description, the
+// "How to get it" box, the Ongoing/Ends line, and the Get This
+// Freebie button (the brand URL verbatim, new tab). No price, no
+// coupon elements, and NO comments — comments stay deals-only. This
+// deliberately does not go through openModal: no ccView is counted
+// for a freebie, ever.
+function openFreebieModal(f) {
+    window._ccOpenDealId = null; // keep the deal-comment machinery out
+    const key = freebieVoteKey(f);
+    const isSaved = hasFreebieSave(f.id);
+    modalBody.innerHTML = `
+        ${f.image ? `<div class="modal-media-banner"><img src="${f.image}" alt="${f.title}"></div>` : ''}
+        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${f.store} &middot; Free Stuff</div>
+        <h2 style="margin:0.5rem 0 1rem;">${f.title}</h2>
+        <div class="modal-buy-row">
+            <span class="freebie-when" style="font-size:1rem; margin:0;">${freebieWhenText(f)}</span>
+            <a href="${f.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary freebie-modal-btn">Get This Freebie</a>
+            <button type="button" class="btn share-modal-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px; margin-right:0.35rem;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Share</span></button>
+            <button type="button" class="btn save-modal-btn ${isSaved ? 'saved' : ''}" data-save-fid="${f.id}" aria-pressed="${isSaved ? 'true' : 'false'}"><span style="vertical-align:-3px; margin-right:0.35rem; display:inline-block;">${SAVE_BOOKMARK_SVG}</span><span class="save-label">${isSaved ? 'Saved' : 'Save'}</span></button>
+        </div>
+        ${f.description ? `<p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${f.description}</p>` : ''}
+        ${f.howTo ? `<div class="deal-note"><strong>How to get it:</strong> ${f.howTo}</div>` : ''}
+        <div class="vote-container" style="margin-bottom:0.25rem;">
+            <button class="vote-btn upvote-btn ${myVotes[key] === 'up' ? 'active' : ''}" data-fid="${f.id}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                <span>${freebieVoteCount(f, 'up')}</span>
+            </button>
+            <button class="vote-btn downvote-btn ${myVotes[key] === 'down' ? 'active' : ''}" data-fid="${f.id}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+                <span>${freebieVoteCount(f, 'down')}</span>
+            </button>
+        </div>`;
+    modal.style.display = 'flex';
+    modalBody.querySelector('.upvote-btn').addEventListener('click', (e) => handleFreebieVote(e, f, 'up'));
+    modalBody.querySelector('.downvote-btn').addEventListener('click', (e) => handleFreebieVote(e, f, 'down'));
+    const fbShareBtn = modalBody.querySelector('.share-modal-btn');
+    if (fbShareBtn) fbShareBtn.addEventListener('click', (e) => { e.stopPropagation(); openShareMenu(f, true); });
+    const fbSaveBtn = modalBody.querySelector('.save-modal-btn');
+    if (fbSaveBtn) fbSaveBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFreebieSave(f); });
 }
 function renderFreebies() {
     showFreebiesIntro(true);
@@ -879,6 +1034,15 @@ function renderSaved() {
     }
     // Newest save first.
     mySaves.slice().reverse().forEach(save => {
+        if (save.kind === 'freebie') {
+            // A saved freebie whose entry is still live renders its
+            // normal card; one that left freebies-data.js (or expired)
+            // renders from its snapshot, tagged "Saved freebie".
+            const liveF = (typeof freebies !== 'undefined' && Array.isArray(freebies))
+                ? freebies.find(x => x.id === save.id && isFreebieLive(x)) : null;
+            dealGrid.appendChild(liveF ? createFreebieCard(liveF) : createSavedFreebieCard(save));
+            return;
+        }
         const live = deals.find(d => d.id === save.id && !isDealExpired(d));
         dealGrid.appendChild(live ? createDealCard(live) : createSavedSnapshotCard(save));
     });
@@ -1121,6 +1285,31 @@ function handleVote(e, deal, type) {
     downBtn.classList.toggle('active', myVotes[deal.id] === 'down');
     upBtn.querySelector('span').textContent = voteCount(deal, 'up');
     downBtn.querySelector('span').textContent = voteCount(deal, 'down');
+}
+
+// The freebie twin of handleVote: identical flip-my-vote behaviour,
+// keyed by the namespaced freebie key and counted via
+// freebieVoteCount. Persists through the same saveMyVotes() path, so
+// freebie votes get the same device memory + account sync as deals.
+function handleFreebieVote(e, f, type) {
+    e.stopPropagation();
+    const key = freebieVoteKey(f);
+    const btn = e.currentTarget;
+    const container = btn.closest('.vote-container');
+    const mine = myVotes[key];
+    if (mine === type) {
+        delete myVotes[key];
+    } else {
+        myVotes[key] = type;
+        btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+    }
+    saveMyVotes();
+    const upBtn = container.querySelector('.upvote-btn');
+    const downBtn = container.querySelector('.downvote-btn');
+    upBtn.classList.toggle('active', myVotes[key] === 'up');
+    downBtn.classList.toggle('active', myVotes[key] === 'down');
+    upBtn.querySelector('span').textContent = freebieVoteCount(f, 'up');
+    downBtn.querySelector('span').textContent = freebieVoteCount(f, 'down');
 }
 
 
@@ -1753,18 +1942,21 @@ function closeShareMenu() {
     if (ov) ov.remove();
 }
 
-function openShareMenu(deal) {
+function openShareMenu(deal, isFreebie) {
     if (!deal) return;
     closeShareMenu();
-    const url = getAffiliateUrl(deal.url);
-    const text = deal.title + ' \u2014 $' + deal.price + ' at CommonCents';
+    // Freebies share their own brand URL VERBATIM — there is no
+    // affiliate link to apply (owner, 2026-11-15) — and the share
+    // text is just the freebie's title (no price to quote).
+    const url = isFreebie ? (deal.url || '') : getAffiliateUrl(deal.url);
+    const text = isFreebie ? deal.title : deal.title + ' \u2014 $' + deal.price + ' at CommonCents';
     const enc = encodeURIComponent;
     const ov = document.createElement('div');
     ov.id = 'share-menu-ov';
     ov.className = 'share-menu-ov';
     ov.innerHTML = `
-        <div class="share-menu" role="dialog" aria-label="Share this deal">
-            <div class="share-menu-head"><strong>Share this deal</strong><button type="button" class="share-menu-close" aria-label="Close">&times;</button></div>
+        <div class="share-menu" role="dialog" aria-label="Share this ${isFreebie ? 'freebie' : 'deal'}">
+            <div class="share-menu-head"><strong>Share this ${isFreebie ? 'freebie' : 'deal'}</strong><button type="button" class="share-menu-close" aria-label="Close">&times;</button></div>
             <button type="button" class="share-row share-copy"><span class="share-ico">\uD83D\uDD17</span><span class="share-copy-label">Copy link</span></button>
             <a class="share-row" href="https://wa.me/?text=${enc(text + ' ' + url)}" target="_blank" rel="noopener"><span class="share-ico">\uD83D\uDCAC</span>Share on WhatsApp</a>
             <a class="share-row" href="mailto:?subject=${enc(deal.title)}&body=${enc(text + '\n' + url)}"><span class="share-ico">\u2709\uFE0F</span>Share by Email</a>
