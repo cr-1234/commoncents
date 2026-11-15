@@ -1926,6 +1926,24 @@ window.CC_OPEN_DEAL_COMMENT = function (dealId, commentId) {
     return true;
 };
 
+// A notification tapped somewhere the deal machinery isn't loaded
+// (a subpage running auth.js alone) can't open its item there, so
+// auth.js stashes the target in sessionStorage and sends the
+// visitor home — open it on arrival, exactly once (owner rule,
+// 2026-11-15: never a dead click).
+(function () {
+    let raw = null;
+    try {
+        raw = sessionStorage.getItem('ccOpenNote');
+        if (raw) sessionStorage.removeItem('ccOpenNote');
+    } catch (e) { /* storage unavailable — nothing to hand over */ }
+    if (!raw) return;
+    try {
+        const t = JSON.parse(raw);
+        if (t && t.refId) window.CC_OPEN_DEAL_COMMENT(t.refId, t.commentId || '');
+    } catch (e) { /* a garbled hand-off opens nothing */ }
+})();
+
 function getStoreName(url) {
     if (!url) return '';
     try {
@@ -2193,10 +2211,12 @@ document.addEventListener('DOMContentLoaded', initApp);
 // scrollbar is hidden (scrollbar-width: none). So a visitor at the
 // top sees Categories and part of the Weekly Giveaway box with no
 // sign that the Notify Me button and Your Feed sit further down
-// (owner, 2026-11-15). The "More below" pill (index.html, styled in
+// (owner, 2026-11-15). The hint button (index.html, styled in
 // style.css) floats at the sidebar's bottom edge only while more
 // content sits below the visible part; it fades away at the bottom,
 // and clicking it scrolls the sidebar down by about a screen.
+// Arrow only — it launched as a "More below" pill and the owner
+// asked for the words gone the same day (keep the site simple).
 (function () {
     var sidebar = document.querySelector('.sidebar');
     var btn = document.getElementById('sidebarScrollHint');

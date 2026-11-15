@@ -304,11 +304,11 @@ body:not(.dark-mode) .glass {
    nothing tells the visitor more sits below (owner, 2026-11-15).
    The wrap is a zero-height sticky strip at the end of the
    sidebar's content: while the sidebar is scrolled up it pins the
-   pill to the visible bottom edge; at the very bottom it rests in
-   place and app.js has already faded the pill out. Only the pill
-   itself takes clicks (the wrap never blocks the content under
-   it). Desktop only in effect — the sidebar is display:none on
-   phones, which takes the pill with it. */
+   button to the visible bottom edge; at the very bottom it rests
+   in place and app.js has already faded the button out. Only the
+   button itself takes clicks (the wrap never blocks the content
+   under it). Desktop only in effect — the sidebar is display:none
+   on phones, which takes the button with it. */
 .sidebar-scroll-hint-wrap {
     position: sticky; bottom: 0.6rem; height: 0; z-index: 6;
     pointer-events: none;
@@ -316,11 +316,14 @@ body:not(.dark-mode) .glass {
 .sidebar-scroll-hint {
     position: absolute; bottom: 0; left: 50%;
     transform: translate(-50%, 6px);
-    display: inline-flex; align-items: center; gap: 0.3rem;
+    /* Arrow only (owner, 2026-11-15: keep the site simple — the
+       chevron alone, in the same soft plum circle the "More below"
+       pill used to stretch into). */
+    width: 34px; height: 34px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
     background: var(--highlight); color: #fff;
     border: none; cursor: pointer; pointer-events: none;
-    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.02em;
-    padding: 0.42rem 0.8rem; border-radius: 999px;
+    border-radius: 999px;
     box-shadow: 0 6px 18px rgba(91,45,142,0.35);
     opacity: 0; visibility: hidden;
     transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
@@ -812,7 +815,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
        the sticky header itself instead: full-width header, menu pinned
        to its right edge just below it, never wider than the screen. */
     .auth-area { position: static; }
-    .auth-menu { top: calc(100% + 6px); right: 8px; width: min(300px, calc(100vw - 16px)); }
+    .auth-menu, .notes-panel { top: calc(100% + 6px); right: 8px; width: min(300px, calc(100vw - 16px)); }
     .deal-grid { grid-template-columns: 1fr; }
     .header-content { flex-wrap: wrap; }
     /* One fixed phone header at every width (owner's video,
@@ -1009,11 +1012,35 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 
 /* ── Accounts: header sign-in + auth modal ──────────────────────── */
 .auth-area { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; margin-left: auto; position: relative; }
+/* Bell + avatar share one row at the top of the auth column. */
+.auth-row { display: flex; align-items: center; gap: 0.45rem; }
+/* Notifications bell (owner, 2026-11-15 — like Gifting Butler's):
+   a soft plum circle next to the avatar, plum bell glyph, the red
+   unread badge hanging off its rim (the .cc-note-badge rule below —
+   it rode the avatar until today). */
+.cc-bell {
+    position: relative; width: 32px; height: 32px; border-radius: 50%;
+    background: #EDE5F8; color: var(--highlight); border: none; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; padding: 0;
+    box-shadow: 0 3px 10px rgba(91,45,142,0.18);
+}
+.cc-bell:hover { background: #E1D1F8; }
+.cc-bell svg { display: block; }
 .auth-menu {
     position: absolute; top: calc(100% + 8px); right: 0; width: 300px; z-index: 130;
     background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
     box-shadow: 0 18px 40px rgba(40,20,70,0.18); padding: 1rem; text-align: left;
 }
+/* The notifications panel hangs off the header like the account
+   menu (same card, same anchor). The note rows inside reuse the
+   .auth-menu-note styles — they were born in the menu and kept
+   their names when the notes moved here. */
+.notes-panel {
+    position: absolute; top: calc(100% + 8px); right: 0; width: 300px; z-index: 130;
+    background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(40,20,70,0.18); padding: 1rem; text-align: left;
+}
+.notes-panel.is-empty .auth-menu-notes-head { display: none; }
 .auth-menu-email { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0; word-break: break-all; padding-right: 1.6rem; }
 /* One even rhythm for the whole menu (owner, 2026-11-13: "why are those
    buttons not evenly spaced?"): a single gap rule for every direct
@@ -1075,9 +1102,12 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    plum shows on light photos, a white halo keeps it readable on
    dark ones, and it's inside the button, so a tap on the arrow is a
    tap on the picture: the menu opens. */
-/* Notification badge on the avatar + the list inside the account
-   menu (engagement plan, 2026-11-13). Red badge = the standard
-   "you have something new" signal; it clears when the menu opens. */
+/* Notification badge (engagement plan, 2026-11-13) + the note
+   rows. Red badge = the standard "you have something new" signal.
+   The badge rode the avatar until 2026-11-15; it now hangs on the
+   header bell next to the avatar, and the notes live in the bell's
+   own panel (.notes-panel above) instead of the account menu.
+   Opening the panel clears the badge. */
 .cc-note-badge { position: absolute; top: -7px; right: -7px; min-width: 22px; height: 22px; border-radius: 999px; background: #dc2626; color: #fff; font-size: .74rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center; padding: 0 5px; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.28); z-index: 4; }
 .auth-menu-notes { border-top: 1px solid var(--border-color); margin-top: 0; padding-top: .5rem; }
 .auth-menu-notes.is-empty { border-top: none; padding-top: 0; }
