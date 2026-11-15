@@ -617,6 +617,11 @@
             // The giveaway teaser swaps its account CTA for a "ready"
             // note on sign-in (and back on sign-out).
             if (typeof window.CC_PAINT_GW_STATE === 'function') window.CC_PAINT_GW_STATE();
+            // An open deal window re-reads its comments area on a
+            // sign-in change: auth resolves asynchronously, so a member
+            // who opened a deal before it landed must not stay stuck
+            // with the signed-out snapshot (app.js owns the hook).
+            if (typeof window.CC_ON_AUTH_CHANGED === 'function') window.CC_ON_AUTH_CHANGED();
             if (currentUser) {
                 // The giveaway treats the account email as "your email"
                 // everywhere (entry state, visit-day bonuses).

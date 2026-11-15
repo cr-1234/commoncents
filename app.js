@@ -1179,12 +1179,22 @@ function openModal(deal) {
         bindCommentActions();
         cl.scrollTop = toBottom ? cl.scrollHeight : st;
     };
-    const ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
-    const ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
-    const ccGenName = (window.CC_AUTH && CC_AUTH.fallbackName) ? CC_AUTH.fallbackName() : '';
-    const ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || ccGenName || 'Member') : null;
+    // The signed-in user is read LIVE, not frozen at open time: Firebase
+    // delivers the session asynchronously, so a member who opens a deal
+    // before auth lands would otherwise keep the signed-out snapshot
+    // ("Sign in to comment", no Reply buttons) for the whole visit even
+    // though they are signed in. paintCommentForm() below re-reads this
+    // whenever auth.js reports a sign-in change (CC_ON_AUTH_CHANGED).
+    let ccUser = null, ccProfileName = '', ccGenName = '', ccDisplayName = null;
+    const refreshCcUser = () => {
+        ccUser = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;
+        ccProfileName = (ccUser && typeof CC_AUTH.username === 'function') ? (CC_AUTH.username() || '') : '';
+        ccGenName = (window.CC_AUTH && CC_AUTH.fallbackName) ? CC_AUTH.fallbackName() : '';
+        ccDisplayName = ccUser ? (ccProfileName || ccUser.displayName || ccGenName || 'Member') : null;
+    };
+    refreshCcUser();
     const cmtInfo = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
-    const commentFormHTML = ccUser ? `
+    const buildCommentFormHTML = () => ccUser ? `
                         <p style="margin-bottom:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Commenting as <strong style="color:var(--text-primary);">${escHtml(ccDisplayName)}</strong> <button type="button" id="commentNameInfo" class="cmt-info-btn" aria-label="About your comment name">${cmtInfo}<span class="cmt-tip" role="tooltip">You can ${ccProfileName ? 'change' : 'set'} your comment name — tap your profile circle at the top right of the page.</span></button></p>
                         <textarea id="commentText" rows="2" placeholder="Your comment..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); font-family:inherit;"></textarea>
                         <button id="postCommentBtn" class="btn btn-primary" style="font-size:0.88rem; padding:0.45rem 1.3rem;">Post Comment</button>
@@ -1225,8 +1235,8 @@ function openModal(deal) {
         <div class="comments-section">
                     <h3 style="font-size:1.05rem; margin-bottom:0.75rem;">Comments</h3>
                     <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;">${buildCommentsHTML()}</div>
-                    <div>
-                        ${commentFormHTML}
+                    <div id="commentFormWrap">
+                        ${buildCommentFormHTML()}
                     </div>
         </div>`;
 
@@ -1245,6 +1255,10 @@ function openModal(deal) {
         modalCode.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyDealCode(modalCode, deal.code); } });
     }
 
+    // The composer's buttons are bound through a helper so the
+    // auth-change repaint (paintCommentForm) can rebind them after
+    // swapping the composer's HTML.
+    const bindCommentForm = () => {
     const nameInfoBtn = document.getElementById('commentNameInfo');
     if (nameInfoBtn) {
         // Hover shows the tooltip on desktop (CSS); a tap toggles it for touch.
@@ -1315,6 +1329,8 @@ function openModal(deal) {
             if (b) b.click();
         });
     }
+    };
+    bindCommentForm();
 
     // Own-comment actions: pencil edits in place, trash deletes. Bound
     // through a helper so the list-only re-renders (optimistic posting)
@@ -1414,6 +1430,25 @@ function openModal(deal) {
     });
     };
     bindCommentActions();
+
+    // Track which face the composer currently shows so a sign-in change
+    // can swap it (and the Reply buttons, which follow the same state)
+    // without wiping text the member may have typed.
+    let ccFormSignedIn = !!ccUser;
+    const paintCommentForm = () => {
+        refreshCcUser();
+        if (!!ccUser === ccFormSignedIn) return;
+        ccFormSignedIn = !!ccUser;
+        const wrap = document.getElementById('commentFormWrap');
+        if (wrap) { wrap.innerHTML = buildCommentFormHTML(); bindCommentForm(); }
+        renderCommentsList(false);
+    };
+    // auth.js calls this hook on every sign-in change (same pattern as
+    // CC_PAINT_GW_STATE): when auth lands after this deal was opened,
+    // the comments area catches up with the signed-in header.
+    window.CC_ON_AUTH_CHANGED = () => {
+        if (window._ccOpenDealId === deal.id && modal.style.display !== 'none') paintCommentForm();
+    };
 
     // Stored comments: fetch the saved thread for this deal and swap it in
     // (the server is the source of truth once it answers). Skipped on the
