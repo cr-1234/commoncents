@@ -1214,8 +1214,23 @@ function renderDeals() {
         return;
     }
     const pageStart = (currentPage - 1) * DEALS_PER_PAGE;
-    filtered.slice(pageStart, pageStart + DEALS_PER_PAGE)
-        .forEach(deal => dealGrid.appendChild(createDealCard(deal)));
+    const pageDeals = filtered.slice(pageStart, pageStart + DEALS_PER_PAGE);
+    // Sister-site ad card (owner, 2026-11-15: "sister ads as cards
+    // in the feed too"). The Gifting Butler house picture also sits
+    // inside the feed as one card — in addition to the rail/strip
+    // ad, which stays exactly as it is. Browse views only (Saved
+    // and Free Stuff return earlier; search never carries it),
+    // page 1 only, right after the 6th deal card, and only when
+    // the page shows at least 7 deals. It is NOT a deal: `filtered`
+    // and the pagination math never see it, so page 1 renders its
+    // 12 deals PLUS the ad card and no count anywhere changes.
+    // Freebies appended below ride after the deals, so counting
+    // deal cards here lands the ad after the 6th deal regardless.
+    const showFeedAd = currentPage === 1 && !searchQuery && pageDeals.length >= 7;
+    pageDeals.forEach((deal, i) => {
+        dealGrid.appendChild(createDealCard(deal));
+        if (showFeedAd && i === 5) dealGrid.appendChild(createFeedAdCard());
+    });
     if (currentPage === 1) {
         feedFreebies.forEach(f => dealGrid.appendChild(createFreebieCard(f)));
     }
@@ -1288,6 +1303,21 @@ function renderPagination(totalPages) {
     }
     if (winEnd < totalPages) makeGap();
     makeBtn('Next →', currentPage + 1, { nav: true, disabled: currentPage >= totalPages });
+}
+
+// The in-feed sister-site ad: the same restored Gifting Butler
+// house picture the rail carries (img/gb-house-ad.png, same link,
+// same alt text), rendered as one card among the deal cards and
+// labelled "Our sister site" so it never masquerades as a deal.
+// Deliberately NOT a .deal-card — no modal, no votes, no counts;
+// the picture itself is the link, exactly like the rail ad.
+function createFeedAdCard() {
+    const article = document.createElement('article');
+    article.className = 'feed-ad-card';
+    article.innerHTML = `
+        <span class="feed-ad-label">Our sister site</span>
+        <a class="feed-ad-link" href="https://giftingbutler-74395.web.app" target="_blank" rel="noopener noreferrer"><img src="img/gb-house-ad.png" alt="Gifting Butler — looking for a gift, not just a deal?" loading="lazy"></a>`;
+    return article;
 }
 
 function createDealCard(deal) {
