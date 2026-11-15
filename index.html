@@ -55,8 +55,9 @@
       <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
     <!-- Branded giveaway gift mark (owner, 2026-11-14): a plum gift box
-         drawn in the site's own palette — plum gradient box, light-plum
-         ribbon cross and bow, soft light-plum backdrop. Replaces the
+         drawn in the site's own palette — plum gradient box with a
+         light-plum bow only, no ribbon cross (owner, 2026-11-15),
+         soft light-plum backdrop. Replaces the
          generic gold/red gift emoji everywhere the giveaway appears.
          Use with: <svg class="gw-gift-mark"><use href="#gwGiftMark"></use></svg> -->
     <linearGradient id="gwGiftGrad" x1="0" y1="0" x2="0" y2="1">
@@ -66,9 +67,7 @@
     <symbol id="gwGiftMark" viewBox="0 0 48 48">
       <rect x="2" y="2" width="44" height="44" rx="13" fill="#EDE5F8"/>
       <rect x="11.5" y="22.5" width="25" height="17" rx="2.5" fill="url(#gwGiftGrad)"/>
-      <rect x="11.5" y="29" width="25" height="4" fill="#EDE5F8"/>
       <rect x="9" y="15.5" width="30" height="7" rx="2.5" fill="#7C3AED"/>
-      <rect x="22" y="15.5" width="4" height="24" fill="#EDE5F8"/>
       <path d="M23.4 14.2 C18.2 6.8 10.2 7.2 11.2 12.4 C12 16.2 19.4 16.6 23.4 14.2 Z" fill="#C9A8F0"/>
       <path d="M24.6 14.2 C29.8 6.8 37.8 7.2 36.8 12.4 C36 16.2 28.6 16.6 24.6 14.2 Z" fill="#C9A8F0"/>
       <circle cx="24" cy="15" r="2" fill="#5B2D8E"/>
