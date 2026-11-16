@@ -14,7 +14,7 @@
 <body>
     <header class="site-header">
         <div class="container header-content">
-            <a href="index.html" class="logo-link">
+            <a href="index.html" class="logo-link" onclick="try{localStorage.setItem('ccFeedView',JSON.stringify({mode:'browse',category:'all'}))}catch(e){}">
                 <div class="logo-container">
                     <img class="logo-mark-img" src="logo-tag.png" alt="" aria-hidden="true">
                     <div class="logo-text-group">

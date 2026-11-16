@@ -393,6 +393,30 @@ function initApp() {
 
 // Event Listeners
 function setupEventListeners() {
+    // Header logo = the front page, always (owner, 2026-11-15):
+    // "when you push on the top CommonCents it always has to go back
+    // to the front page." The logo's plain href reloaded the page and
+    // the saved-view restore (ccFeedView) landed the visitor right
+    // back in the view they left — Saved, My Feed, a search — so the
+    // tap looked dead. Instead the tap resets the view in place: All
+    // Deals, page 1 (the filter change resets pagination), search
+    // cleared, scrolled to the top (setCategory's rule). The reset is
+    // persisted by CC_FEED.goHome, so a later reload agrees.
+    const logoLink = document.querySelector('.logo-link');
+    if (logoLink) {
+        logoLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.CC_FEED && typeof CC_FEED.goHome === 'function') CC_FEED.goHome();
+            if (searchInput) searchInput.value = '';
+            searchQuery = '';
+            // Explicit, not via the render filter: from page 2 of All
+            // Deals itself nothing in the filter changes, so the
+            // pagination reset there would never fire.
+            currentPage = 1;
+            setCategory('all');
+        });
+    }
+
     searchBtn.addEventListener('click', handleSearch);
     searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') handleSearch();
