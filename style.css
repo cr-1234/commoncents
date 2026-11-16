@@ -1559,8 +1559,8 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     box-shadow: 0 8px 24px rgba(91,45,142,0.16), 0 0 0 1px var(--highlight);
     border-color: var(--highlight);
 }
-.feed-ad-link { display: block; }
-.feed-ad-link img { width: 100%; height: auto; display: block; }
+.feed-ad-link { display: flex; flex: 1; align-items: center; }
+.feed-ad-link img { width: 100%; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(91,45,142,0.16); }
 
 /* Phone header, second slimming pass (owner, 2026-11-15 — his
    screenshot of the already-slimmed header with the logo block
