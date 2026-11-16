@@ -127,15 +127,11 @@
     function paintNoteBadge() {
         var show = !!(currentUser && notesUnread && !notesMuted);
         var txt = notesUnread > 9 ? '9+' : String(notesUnread);
-        var bell = document.getElementById('notesBell');
-        if (bell) {
-            var b = bell.querySelector('.cc-note-badge');
-            if (!show) { if (b) b.remove(); }
-            else {
-                if (!b) { b = document.createElement('span'); b.className = 'cc-note-badge'; bell.appendChild(b); }
-                b.textContent = txt;
-            }
-        }
+        // Desktop (owner, 2026-11-15, later): no header bell — the
+        // unread count rides the Notifications row inside the
+        // avatar menu. Same show/hide rule as the bell's badge had.
+        var menuCount = document.getElementById('authMenuNotesCount');
+        if (menuCount) menuCount.textContent = show ? txt : '';
         // Phone menu (owner, 2026-11-15): the bell is gone from the
         // phone top row, so the same unread count rides the three
         // lines button instead, and the panel's Notifications row
@@ -609,8 +605,9 @@
         var nameEditor = document.getElementById('authMenuNameEditor');
         var nameCancel = document.getElementById('authMenuNameCancel');
         function closeMenu() { if (menu) menu.style.display = 'none'; }
-        // ── Notifications bell + panel (owner, 2026-11-15): the bell
-        // next to the avatar opens the notes panel; opening it does
+        // ── Notifications panel (owner, 2026-11-15): the
+        // Notifications row inside the avatar menu opens the panel;
+        // opening it does
         // what opening the account menu used to do — paint the list
         // and mark the notes read. Bell and menu never show at once.
         var bellEl = document.getElementById('notesBell');
@@ -734,7 +731,8 @@
             closePanel();
             if (menu && menu.style.display !== 'none') closeMenu(); else openMenu();
         });
-        if (bellEl) bellEl.addEventListener('click', function (e) {
+        var menuNotesRow = document.getElementById('authMenuNotesRow');
+        if (menuNotesRow) menuNotesRow.addEventListener('click', function (e) {
             e.stopPropagation();
             if (!currentUser) return;
             if (panelEl && panelEl.style.display !== 'none') closePanel(); else openPanel();
@@ -769,7 +767,7 @@
             // (the notes live in the drawer there) — its tap must
             // not read as an outside click and close what it opened.
             if (panelEl && panelEl.style.display !== 'none'
-                && !e.target.closest('#notesPanel') && !e.target.closest('#notesBell')
+                && !e.target.closest('#notesPanel') && !e.target.closest('#authMenuNotesRow')
                 && !e.target.closest('#mobileNotesRow')) closePanel();
         });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeMenu(); closePanel(); } });

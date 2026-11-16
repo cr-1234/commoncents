@@ -1321,21 +1321,28 @@ function renderDeals() {
     }
     const pageStart = (currentPage - 1) * DEALS_PER_PAGE;
     const pageDeals = filtered.slice(pageStart, pageStart + DEALS_PER_PAGE);
-    // Sister-site ad card (owner, 2026-11-15: "sister ads as cards
-    // in the feed too"). The Gifting Butler house picture also sits
-    // inside the feed as one card — in addition to the rail/strip
-    // ad, which stays exactly as it is. Browse views only (Saved
+    // Sister-site ad card (owner, 2026-11-15). The Gifting Butler
+    // card sits inside the feed as one card among the deals — its
+    // only home; the rail/strip carries the sponsor ad alone.
+    // Browse views only (Saved
     // and Free Stuff return earlier; search never carries it),
-    // page 1 only, right after the 6th deal card, and only when
-    // the page shows at least 7 deals. It is NOT a deal: `filtered`
+    // page 1 only, closing the first row (owner: the right side
+    // of the page is what people see first), and only when the
+    // page shows at least 7 deals. It is NOT a deal: `filtered`
     // and the pagination math never see it, so page 1 renders its
     // 12 deals PLUS the ad card and no count anywhere changes.
     // Freebies appended below ride after the deals, so counting
-    // deal cards here lands the ad after the 6th deal regardless.
+    // deal cards here lands the ad in the first row regardless.
     const showFeedAd = currentPage === 1 && !searchQuery && pageDeals.length >= 7;
+    let feedAdAfter = 5;
+    if (showFeedAd) {
+        let cols = 3;
+        try { cols = (window.getComputedStyle(dealGrid).gridTemplateColumns || '').split(' ').filter(Boolean).length || 3; } catch (e) {}
+        feedAdAfter = cols >= 2 ? cols - 2 : 0;
+    }
     pageDeals.forEach((deal, i) => {
         dealGrid.appendChild(createDealCard(deal));
-        if (showFeedAd && i === 5) dealGrid.appendChild(createFeedAdCard());
+        if (showFeedAd && i === feedAdAfter) dealGrid.appendChild(createFeedAdCard());
     });
     if (currentPage === 1) {
         feedFreebies.forEach(f => dealGrid.appendChild(createFreebieCard(f)));
@@ -1424,7 +1431,7 @@ function createFeedAdCard() {
     const article = document.createElement('article');
     article.className = 'feed-ad-card gb-feed-card';
     article.innerHTML = `
-        <a class="gb-feed-link" href="https://giftingbutler-74395.web.app" target="_blank" rel="noopener noreferrer"><span class="gb-feed-txt"><span class="gb-feed-name">Gifting Butler</span><span class="gb-feed-line">Looking for a gift, not just a deal?</span><span class="gb-feed-btn">Browse gifts &#8594;</span></span><img class="gb-feed-mark" src="img/gb-g-mark.png" alt="Gifting Butler" loading="lazy"></a>`;
+        <a class="gb-feed-link" href="https://giftingbutler-74395.web.app" target="_blank" rel="noopener noreferrer"><img class="gb-feed-mark" src="img/gb-g-mark.png" alt="Gifting Butler" loading="lazy"><span class="gb-feed-name">Gifting Butler</span><span class="gb-feed-line">Looking for a gift, not just a deal?</span><span class="gb-feed-btn">Browse gifts &#8594;</span></a>`;
     return article;
 }
 

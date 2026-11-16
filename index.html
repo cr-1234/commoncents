@@ -120,16 +120,11 @@
                 <a href="#" class="nav-link" data-category="saved">Saved</a>
             </nav>
             <div class="auth-area" id="authArea">
-                <div class="auth-row">
-                    <!-- Notifications bell (owner, 2026-11-15 — like
-                         Gifting Butler): sits next to the avatar, shows
-                         only while signed in, and carries the unread
-                         badge (the badge used to ride the avatar). The
-                         panel below holds the notes themselves — they
-                         used to live inside the account menu. -->
-                    <button type="button" class="cc-bell" id="notesBell" style="display:none;" aria-label="Notifications" title="Notifications">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                    </button>
+                <div class="auth-row">                    <!-- Notifications live inside the avatar menu
+                         (owner, 2026-11-15, later: the bell next to
+                         the sign-in looked weird — take it away and
+                         put it in the avatar). The panel below holds
+                         the notes themselves. -->
                     <span class="auth-email" id="authEmail" style="display:none;"></span>
                 </div>
                 <button type="button" class="auth-btn" id="signInBtn">Sign in</button>
@@ -141,6 +136,7 @@
                 <div class="auth-menu" id="authMenu" style="display:none;">
                     <button type="button" class="auth-menu-close" id="authMenuClose" aria-label="Close menu">✕</button>
                     <div class="auth-menu-email" id="authMenuEmail"></div>
+                    <button type="button" class="auth-menu-link auth-menu-link-row" id="authMenuNotesRow"><span class="auth-menu-link-label">Notifications</span><span class="auth-menu-link-count" id="authMenuNotesCount"></span></button>
                     <button type="button" class="auth-menu-link auth-menu-link-row" id="authMenuNameRow"><span class="auth-menu-link-label" id="authMenuNameLabel">Comment name</span><span class="auth-menu-link-count auth-menu-change-chip">Change</span></button>
                     <div id="authMenuNameEditor" style="display:none;">
                         <label class="auth-menu-label" for="authMenuNameInput">Comment name</label>
