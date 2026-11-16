@@ -1565,11 +1565,6 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     border-color: var(--highlight);
 }
 .gb-feed-link { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 0.55rem; padding: 1.6rem 1.1rem; text-decoration: none; text-align: center; }
-/* Same small-caps tag the Gifting Butler card carries ("Our other
-   site", owner, 2026-11-16): the card says what it is on top, the
-   way the sponsor strip says "Sponsored" on top. Not "Sponsored" —
-   nobody paid for this slot; it is our own other site. */
-.gb-feed-label { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: #9a8ab0; }
 .gb-feed-mark { height: 104px; width: auto; display: block; }
 .gb-feed-name { font-family: Georgia, 'Times New Roman', serif; font-size: 1.45rem; font-weight: 700; color: var(--highlight); line-height: 1.15; }
 .gb-feed-line { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.35; }
