@@ -49,8 +49,15 @@
 
     var voteSaveTimer = null;
     function saveVotesNow(user, map) {
+        // The vote stamp maps (cast times + deletion tombstones) ride
+        // along, read at fire time so they always match the map being
+        // sent — they are what lets a deliberate un-vote survive the
+        // sign-in union merge on every device.
+        var body = { votes: map };
+        if (window.CC_VOTES && typeof CC_VOTES.getTimes === 'function') body.voteTimes = CC_VOTES.getTimes();
+        if (window.CC_VOTES && typeof CC_VOTES.getTombs === 'function') body.voteTombstones = CC_VOTES.getTombs();
         return user.getIdToken().then(function (token) {
-            return postFn('ccSaveVotes', { votes: map }, token);
+            return postFn('ccSaveVotes', body, token);
         }).catch(function () { /* saving retries on the next change */ });
     }
     // Called by app.js whenever the local vote map changes.
@@ -64,8 +71,12 @@
 
     var savesSaveTimer = null;
     function saveSavesNow(user, list) {
+        // The deletion tombstones ride along, read at fire time so
+        // they always match the list being sent.
+        var body = { saves: list };
+        if (window.CC_SAVES && typeof CC_SAVES.getTombs === 'function') body.saveTombstones = CC_SAVES.getTombs();
         return user.getIdToken().then(function (token) {
-            return postFn('ccSaveSaves', { saves: list }, token);
+            return postFn('ccSaveSaves', body, token);
         }).catch(function () { /* saving retries on the next change */ });
     }
     // Called by app.js whenever the local saved-deal list changes.
@@ -412,37 +423,93 @@
                 // lift them into the account.
                 saveNow(user, local);
             }
-            // Votes merge the same never-lose way: union of the
-            // account's map and this device's — the account fills gaps,
-            // the device keeps its own, and the union goes back up.
+            // Votes merge the never-lose way — union of the account's
+            // map and this device's — EXCEPT where a deletion
+            // tombstone says the member removed the vote on purpose:
+            // a tombstone at least as new as every stamped copy of
+            // the vote wins, so an un-vote sticks on every device
+            // (owner bug report, 2026-11-15). Votes nobody stamped
+            // (everything saved before tombstones existed) count as
+            // time 0 and still union exactly as before, so a stale or
+            // empty device can never shrink the account by signing in.
             if (window.CC_VOTES) {
                 var acctVotes = (res.votes && typeof res.votes === 'object' && !Array.isArray(res.votes)) ? res.votes : {};
                 var localVotes = CC_VOTES.get();
-                var merged = Object.assign({}, acctVotes, localVotes);
-                if (Object.keys(merged).length > Object.keys(localVotes).length) CC_VOTES.set(merged);
-                else if (Object.keys(localVotes).length > Object.keys(acctVotes).length) saveVotesNow(user, localVotes);
+                var acctVTimes = (res.voteTimes && typeof res.voteTimes === 'object' && !Array.isArray(res.voteTimes)) ? res.voteTimes : {};
+                var localVTimes = (typeof CC_VOTES.getTimes === 'function') ? CC_VOTES.getTimes() : {};
+                var acctVTombs = (res.voteTombstones && typeof res.voteTombstones === 'object' && !Array.isArray(res.voteTombstones)) ? res.voteTombstones : {};
+                var localVTombs = (typeof CC_VOTES.getTombs === 'function') ? CC_VOTES.getTombs() : {};
+                var vKeys = {};
+                [acctVotes, localVotes, acctVTimes, localVTimes, acctVTombs, localVTombs].forEach(function (m) {
+                    Object.keys(m).forEach(function (k) { vKeys[k] = true; });
+                });
+                var mergedVotes = {}, mergedVTimes = {}, mergedVTombs = {};
+                Object.keys(vKeys).forEach(function (k) {
+                    var tomb = Math.max(acctVTombs[k] || 0, localVTombs[k] || 0);
+                    var aHas = Object.prototype.hasOwnProperty.call(acctVotes, k);
+                    var lHas = Object.prototype.hasOwnProperty.call(localVotes, k);
+                    var aT = aHas ? (acctVTimes[k] || 0) : -1;
+                    var lT = lHas ? (localVTimes[k] || 0) : -1;
+                    var bestT = Math.max(aT, lT);
+                    if (bestT < 0) { if (tomb) mergedVTombs[k] = tomb; return; }
+                    if (tomb && tomb >= bestT) { mergedVTombs[k] = tomb; return; }
+                    if (lHas && lT >= aT) { mergedVotes[k] = localVotes[k]; if (lT > 0) mergedVTimes[k] = lT; }
+                    else { mergedVotes[k] = acctVotes[k]; if (aT > 0) mergedVTimes[k] = aT; }
+                });
+                var vDiffers = JSON.stringify(mergedVotes) !== JSON.stringify(localVotes)
+                    || JSON.stringify(mergedVTimes) !== JSON.stringify(localVTimes)
+                    || JSON.stringify(mergedVTombs) !== JSON.stringify(localVTombs);
+                var acctStale = JSON.stringify(mergedVotes) !== JSON.stringify(acctVotes)
+                    || JSON.stringify(mergedVTimes) !== JSON.stringify(acctVTimes)
+                    || JSON.stringify(mergedVTombs) !== JSON.stringify(acctVTombs);
+                if (vDiffers) CC_VOTES.set(mergedVotes, mergedVTimes, mergedVTombs); // set() also pushes the merge back up
+                else if (acctStale) saveVotesNow(user, mergedVotes);
             }
-            // Saves merge the same never-lose way: union by deal id —
-            // the account's record wins when both sides saved the same
-            // deal, device-only saves are kept, and the union goes
-            // back up whenever either side was missing something.
+            // Saves merge the same never-lose way — union by item —
+            // with the same tombstone exception: a record whose
+            // tombstone is at least as new as the record's own save
+            // time was removed on purpose and stays out. Records are
+            // keyed by kind + id (a deal and a freebie can share a
+            // number); when both sides hold a record, the newer save
+            // wins, ties go to the account's copy as before.
             if (window.CC_SAVES) {
                 var acctSaves = Array.isArray(res.saves) ? res.saves : [];
                 var localSaves = CC_SAVES.get();
-                var byId = {};
-                localSaves.forEach(function (s) { byId[s.id] = s; });
-                acctSaves.forEach(function (s) { byId[s.id] = s; });
-                var mergedSaves = Object.keys(byId).map(function (k) { return byId[k]; });
-                var localById = {};
-                localSaves.forEach(function (s) { localById[s.id] = s; });
-                var differs = mergedSaves.length !== localSaves.length || mergedSaves.some(function (s) {
-                    return !localById[s.id] || JSON.stringify(localById[s.id]) !== JSON.stringify(s);
+                var acctSTombs = (res.saveTombstones && typeof res.saveTombstones === 'object' && !Array.isArray(res.saveTombstones)) ? res.saveTombstones : {};
+                var localSTombs = (typeof CC_SAVES.getTombs === 'function') ? CC_SAVES.getTombs() : {};
+                var sTombs = {};
+                Object.keys(acctSTombs).forEach(function (k) { if (typeof acctSTombs[k] === 'number') sTombs[k] = acctSTombs[k]; });
+                Object.keys(localSTombs).forEach(function (k) { if (typeof localSTombs[k] === 'number') sTombs[k] = Math.max(sTombs[k] || 0, localSTombs[k]); });
+                var sKeyOf = function (s) { return (s.kind === 'freebie' ? 'f' : 'd') + s.id; };
+                var sWin = {}, sOrder = [];
+                var sConsider = function (s, isAcct) {
+                    if (!s || !Number.isInteger(s.id) || s.id <= 0) return;
+                    var k = sKeyOf(s);
+                    var ts = (typeof s.ts === 'number' && isFinite(s.ts)) ? s.ts : 0;
+                    var cur = sWin[k];
+                    if (!cur) { sWin[k] = { rec: s, ts: ts }; sOrder.push(k); return; }
+                    if (ts > cur.ts || (ts === cur.ts && isAcct)) sWin[k] = { rec: s, ts: ts };
+                };
+                localSaves.forEach(function (s) { sConsider(s, false); });
+                acctSaves.forEach(function (s) { sConsider(s, true); });
+                var mergedSaves = [], mergedSTombs = {};
+                sOrder.forEach(function (k) {
+                    var w = sWin[k];
+                    var tomb = sTombs[k] || 0;
+                    if (tomb && tomb >= w.ts) { mergedSTombs[k] = tomb; return; }
+                    mergedSaves.push(w.rec);
                 });
-                var acctIds = {};
-                acctSaves.forEach(function (s) { acctIds[s.id] = true; });
-                var localHasNew = localSaves.some(function (s) { return !acctIds[s.id]; });
-                if (differs) CC_SAVES.set(mergedSaves); // set() also pushes the union back up
-                else if (localHasNew) saveSavesNow(user, mergedSaves);
+                // Tombstones for items neither side currently holds
+                // still matter — a third device may hold the item.
+                Object.keys(sTombs).forEach(function (k) { if (!sWin[k] && !(k in mergedSTombs)) mergedSTombs[k] = sTombs[k]; });
+                var sDiffers = JSON.stringify(mergedSaves) !== JSON.stringify(localSaves)
+                    || JSON.stringify(mergedSTombs) !== JSON.stringify(localSTombs);
+                var acctSKeys = {};
+                acctSaves.forEach(function (s) { acctSKeys[sKeyOf(s)] = JSON.stringify(s); });
+                var acctSStale = mergedSaves.some(function (s) { return acctSKeys[sKeyOf(s)] !== JSON.stringify(s); })
+                    || JSON.stringify(mergedSTombs) !== JSON.stringify(acctSTombs);
+                if (sDiffers) CC_SAVES.set(mergedSaves, mergedSTombs); // set() also pushes the merge back up
+                else if (acctSStale) saveSavesNow(user, mergedSaves);
             }
         }).catch(function () { /* guest picks remain in effect */ });
     }
@@ -815,8 +882,26 @@
             }).then(function (res) {
                 if (!res || res.error) { showRestoreMsg('Restore failed — try again.'); return; }
                 if (res.empty) { showRestoreMsg('No backup yet — one is saved automatically if your votes or picks ever shrink.'); return; }
-                if (window.CC_VOTES && res.votes) CC_VOTES.set(res.votes);
-                if (window.CC_SAVES && Array.isArray(res.saves)) CC_SAVES.set(res.saves);
+                // Restore is the member explicitly asking for the
+                // backup's state back, so tombstones for the restored
+                // items are dropped — otherwise a removal recorded
+                // after the backup would kill the restore at the next
+                // sign-in merge. Other items' tombstones stand.
+                if (window.CC_VOTES && res.votes) {
+                    var rTombs = (res.voteTombstones && typeof res.voteTombstones === 'object' && !Array.isArray(res.voteTombstones))
+                        ? Object.assign({}, res.voteTombstones)
+                        : (typeof CC_VOTES.getTombs === 'function' ? CC_VOTES.getTombs() : {});
+                    Object.keys(res.votes).forEach(function (k) { delete rTombs[k]; });
+                    var rTimes = (res.voteTimes && typeof res.voteTimes === 'object' && !Array.isArray(res.voteTimes)) ? res.voteTimes : undefined;
+                    CC_VOTES.set(res.votes, rTimes, rTombs);
+                }
+                if (window.CC_SAVES && Array.isArray(res.saves)) {
+                    var rSTombs = (res.saveTombstones && typeof res.saveTombstones === 'object' && !Array.isArray(res.saveTombstones))
+                        ? Object.assign({}, res.saveTombstones)
+                        : (typeof CC_SAVES.getTombs === 'function' ? CC_SAVES.getTombs() : {});
+                    res.saves.forEach(function (s) { delete rSTombs[(s.kind === 'freebie' ? 'f' : 'd') + s.id]; });
+                    CC_SAVES.set(res.saves, rSTombs);
+                }
                 if (window.CC_FEED && Array.isArray(res.interests) && res.interests.length) CC_FEED.setInterests(res.interests, true);
                 if (res.username) { profileUsername = res.username; paintNameRow(); }
                 var when = res.savedAt ? new Date(res.savedAt).toLocaleDateString() : '';
