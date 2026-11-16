@@ -7,20 +7,45 @@ let currentCategory = 'all';
 // removes one instead of adding mine.
 let myVotes = {};
 try { myVotes = JSON.parse(localStorage.getItem('ccMyVotes') || '{}'); } catch (e) { myVotes = {}; }
+// When each of my votes was cast, and when each removed vote was
+// removed (deletion tombstones). The sign-in merge in auth.js compares
+// these stamps against the account's copies: a vote whose tombstone is
+// at least as new as every copy of the vote stays removed, on this
+// device and every other. Without them the union merge resurrected
+// un-votes (owner bug report, 2026-11-15).
+let myVoteTimes = {};
+try { const vt = JSON.parse(localStorage.getItem('ccMyVoteTimes') || '{}'); if (vt && typeof vt === 'object' && !Array.isArray(vt)) myVoteTimes = vt; } catch (e) { myVoteTimes = {}; }
+let myVoteTombs = {};
+try { const vb = JSON.parse(localStorage.getItem('ccMyVoteTombs') || '{}'); if (vb && typeof vb === 'object' && !Array.isArray(vb)) myVoteTombs = vb; } catch (e) { myVoteTombs = {}; }
+function cleanStampMap(m) {
+    const out = {};
+    if (m && typeof m === 'object' && !Array.isArray(m)) Object.keys(m).forEach(function (k) {
+        if (/^[A-Za-z0-9_-]{1,16}$/.test(k) && typeof m[k] === 'number' && isFinite(m[k]) && m[k] > 0) out[k] = m[k];
+    });
+    return out;
+}
 function saveMyVotes() {
     try { localStorage.setItem('ccMyVotes', JSON.stringify(myVotes)); } catch (e) {}
+    try { localStorage.setItem('ccMyVoteTimes', JSON.stringify(myVoteTimes)); } catch (e) {}
+    try { localStorage.setItem('ccMyVoteTombs', JSON.stringify(myVoteTombs)); } catch (e) {}
     // Account Guard: signed-in members also keep their votes on their
     // account (auth.js debounces and pushes them to ccSaveVotes).
     if (window.CC_AUTH && CC_AUTH.noteVotesChanged) { try { CC_AUTH.noteVotesChanged(myVotes); } catch (e) {} }
 }
 // Bridge for auth.js: read the local vote map, or replace it wholesale
 // (sign-in union merge / Restore from backup) and repaint the counts.
+// set() may also be handed the merged stamp maps; omitting them leaves
+// the local stamps untouched.
 window.CC_VOTES = {
     get: function () { return Object.assign({}, myVotes); },
-    set: function (map) {
+    getTimes: function () { return Object.assign({}, myVoteTimes); },
+    getTombs: function () { return Object.assign({}, myVoteTombs); },
+    set: function (map, times, tombs) {
         var clean = {};
         if (map && typeof map === 'object') Object.keys(map).forEach(function (k) { if (map[k] === 'up' || map[k] === 'down') clean[k] = map[k]; });
         myVotes = clean;
+        if (times !== undefined) myVoteTimes = cleanStampMap(times);
+        if (tombs !== undefined) myVoteTombs = cleanStampMap(tombs);
         saveMyVotes();
         if (typeof renderDeals === 'function') renderDeals();
     }
@@ -38,8 +63,26 @@ try {
     const rawSaves = JSON.parse(localStorage.getItem('ccMySaves') || '[]');
     if (Array.isArray(rawSaves)) mySaves = rawSaves.filter(s => s && Number.isInteger(s.id) && s.id > 0);
 } catch (e) { mySaves = []; }
+// Deletion tombstones for saves: {key: removedAtMs}, keyed 'd<id>' for
+// deals and 'f<id>' for freebies (the same namespacing freebie votes
+// use). Recorded on every deliberate unsave, cleared on a re-save.
+// The sign-in merge in auth.js drops any record whose tombstone is at
+// least as new as the record's own save time — that is what makes an
+// unsave stick instead of being undone by the union merge (owner bug
+// report, 2026-11-15).
+let mySaveTombs = {};
+try { const st = JSON.parse(localStorage.getItem('ccSaveTombs') || '{}'); if (st && typeof st === 'object' && !Array.isArray(st)) mySaveTombs = st; } catch (e) { mySaveTombs = {}; }
+function saveTombKey(s) { return (s && s.kind === 'freebie' ? 'f' : 'd') + (s && s.id); }
+function cleanSaveTombs(m) {
+    const out = {};
+    if (m && typeof m === 'object' && !Array.isArray(m)) Object.keys(m).forEach(function (k) {
+        if (/^[df]\d{1,16}$/.test(k) && typeof m[k] === 'number' && isFinite(m[k]) && m[k] > 0) out[k] = m[k];
+    });
+    return out;
+}
 function saveMySaves() {
     try { localStorage.setItem('ccMySaves', JSON.stringify(mySaves)); } catch (e) {}
+    try { localStorage.setItem('ccSaveTombs', JSON.stringify(mySaveTombs)); } catch (e) {}
     if (window.CC_AUTH && CC_AUTH.noteSavesChanged) { try { CC_AUTH.noteSavesChanged(mySaves); } catch (e) {} }
     // Every saves mutation funnels through here (toggle, sign-in
     // merge, Restore) — repaint the sidebar counts so the Saved
@@ -59,6 +102,7 @@ function paintSaveButtons(id) {
 function toggleSave(deal) {
     if (hasSave(deal.id)) {
         mySaves = mySaves.filter(s => s.id !== deal.id);
+        mySaveTombs['d' + deal.id] = Date.now();
     } else {
         mySaves.push({
             id: deal.id,
@@ -68,6 +112,7 @@ function toggleSave(deal) {
             url: deal.url || '',
             ts: Date.now()
         });
+        delete mySaveTombs['d' + deal.id];
     }
     saveMySaves();
     paintSaveButtons(deal.id);
@@ -96,6 +141,7 @@ function paintFreebieSaveButtons(fid) {
 function toggleFreebieSave(f) {
     if (hasFreebieSave(f.id)) {
         mySaves = mySaves.filter(s => !(s.kind === 'freebie' && s.id === f.id));
+        mySaveTombs['f' + f.id] = Date.now();
     } else {
         mySaves.push({
             kind: 'freebie',
@@ -109,6 +155,7 @@ function toggleFreebieSave(f) {
             expires: (typeof f.expires === 'string' ? f.expires : null),
             ts: Date.now()
         });
+        delete mySaveTombs['f' + f.id];
     }
     saveMySaves();
     paintFreebieSaveButtons(f.id);
@@ -118,9 +165,12 @@ function toggleFreebieSave(f) {
 }
 // Bridge for auth.js: read the local saved list, replace it wholesale
 // (sign-in union merge / Restore from backup), or toggle a deal.
+// set() may also be handed the merged tombstone map; omitting it
+// leaves the local tombstones untouched.
 window.CC_SAVES = {
     get: function () { return mySaves.map(s => Object.assign({}, s)); },
-    set: function (list) {
+    getTombs: function () { return Object.assign({}, mySaveTombs); },
+    set: function (list, tombs) {
         const clean = [];
         const seen = {};
         if (Array.isArray(list)) list.forEach(s => {
@@ -155,6 +205,7 @@ window.CC_SAVES = {
             });
         });
         mySaves = clean;
+        if (tombs !== undefined) mySaveTombs = cleanSaveTombs(tombs);
         saveMySaves();
         if (typeof renderDeals === 'function') renderDeals();
     },
@@ -1312,8 +1363,12 @@ function handleVote(e, deal, type) {
     const mine = myVotes[deal.id];
     if (mine === type) {
         delete myVotes[deal.id];
+        myVoteTombs[deal.id] = Date.now();
+        delete myVoteTimes[deal.id];
     } else {
         myVotes[deal.id] = type;
+        myVoteTimes[deal.id] = Date.now();
+        delete myVoteTombs[deal.id];
         btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
     }
     saveMyVotes();
@@ -1337,8 +1392,12 @@ function handleFreebieVote(e, f, type) {
     const mine = myVotes[key];
     if (mine === type) {
         delete myVotes[key];
+        myVoteTombs[key] = Date.now();
+        delete myVoteTimes[key];
     } else {
         myVotes[key] = type;
+        myVoteTimes[key] = Date.now();
+        delete myVoteTombs[key];
         btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
     }
     saveMyVotes();
