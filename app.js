@@ -1411,19 +1411,20 @@ function renderPagination(totalPages) {
     makeBtn('Next →', currentPage + 1, { nav: true, disabled: currentPage >= totalPages });
 }
 
-// The in-feed sister-site ad: the same restored Gifting Butler
-// house picture the rail carries (img/gb-house-ad.png, same link,
-// same alt text), rendered as one card among the deal cards. The
-// "Our sister site" label it launched with was removed at the
-// owner's word (2026-11-15: "i dont want our sister site") — the
-// card is now the picture alone. Deliberately NOT a .deal-card —
-// no modal, no votes, no counts; the picture itself is the link,
-// exactly like the rail ad.
+// The in-feed sister-site ad, as a designed card that fills its
+// cell like a deal card (owner, 2026-11-15: the earlier picture
+// version sat in a tall, mostly-empty card — "huge empty space
+// before and after it, looks very funny"). The plum G is cropped
+// from the house picture (img/gb-g-mark.png); the name, line and
+// button are real elements, centred in the card. Deliberately NOT
+// a .deal-card — no modal, no votes, no counts. This card is the
+// sister promo's ONLY home: never in the side rail or the bottom
+// strip (owner, 2026-11-15 — those carry the sponsor ad only).
 function createFeedAdCard() {
     const article = document.createElement('article');
-    article.className = 'feed-ad-card';
+    article.className = 'feed-ad-card gb-feed-card';
     article.innerHTML = `
-        <a class="feed-ad-link" href="https://giftingbutler-74395.web.app" target="_blank" rel="noopener noreferrer"><img src="img/gb-house-ad.png" alt="Gifting Butler — looking for a gift, not just a deal?" loading="lazy"></a>`;
+        <a class="gb-feed-link" href="https://giftingbutler-74395.web.app" target="_blank" rel="noopener noreferrer"><img class="gb-feed-mark" src="img/gb-g-mark.png" alt="Gifting Butler" loading="lazy"><span class="gb-feed-name">Gifting Butler</span><span class="gb-feed-line">Looking for a gift, not just a deal?</span><span class="gb-feed-btn">Browse gifts &#8594;</span></a>`;
     return article;
 }
 
