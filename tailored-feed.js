@@ -194,46 +194,24 @@
 
     // Freebies get the same seen treatment as deals (owner request,
     // 2026-11-16): a freebie carries a NEW badge until the visitor
-    // opens it, then the badge is gone for good. Freebies carry no
-    // posted-time stamp, so "new" is tracked by arrival instead: an
-    // id this device has never loaded before joins the badge set,
-    // and only opening that freebie retires its badge. On a first
-    // visit every live freebie is new to the device — exactly how
-    // deals behave on a first visit.
+    // opens it, then the badge is gone for good — the mark simply
+    // means "you haven't opened this one yet", exactly the promise
+    // the deal badges make. Freebies carry no posted-time stamp, so
+    // there is no arrival bookkeeping: unopened is new, opened is
+    // seen, persisted on the device.
     var seenFreebies = new Set();
     try {
         (JSON.parse(lsGet('ccSeenFreebies') || '[]') || []).forEach(function (id) { seenFreebies.add(id); });
     } catch (e) {}
-    var newFreebieBadges = new Set();
-    try {
-        (JSON.parse(lsGet('ccNewFreebieBadges') || '[]') || []).forEach(function (id) { newFreebieBadges.add(id); });
-    } catch (e) {}
-    var knownFreebies = new Set();
-    try {
-        (JSON.parse(lsGet('ccKnownFreebies') || '[]') || []).forEach(function (id) { knownFreebies.add(id); });
-    } catch (e) {}
     if (typeof freebies !== 'undefined' && Array.isArray(freebies)) {
-        var fToday;
-        try {
-            fToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
-        } catch (e) {
-            fToday = new Date().toISOString().slice(0, 10);
+        // Prune ids whose freebies have left the list, so the stored
+        // set stays small as freebies come and go.
+        var liveFIds = new Set(freebies.map(function (f) { return f.id; }));
+        var keptSeenF = [...seenFreebies].filter(function (id) { return liveFIds.has(id); });
+        if (keptSeenF.length !== seenFreebies.size) {
+            seenFreebies = new Set(keptSeenF);
+            lsSet('ccSeenFreebies', JSON.stringify(keptSeenF));
         }
-        var liveFIds = new Set(freebies.filter(function (f) { return !f.expires || f.expires >= fToday; }).map(function (f) { return f.id; }));
-        liveFIds.forEach(function (id) {
-            if (!knownFreebies.has(id) && !seenFreebies.has(id)) newFreebieBadges.add(id);
-        });
-        // Prune: only live, unopened freebies keep a badge or a seen
-        // mark, and the known set becomes exactly the live set — a
-        // freebie that truly leaves and later returns is news again.
-        newFreebieBadges = new Set([...newFreebieBadges].filter(function (id) {
-            return liveFIds.has(id) && !seenFreebies.has(id);
-        }));
-        seenFreebies = new Set([...seenFreebies].filter(function (id) { return liveFIds.has(id); }));
-        knownFreebies = liveFIds;
-        lsSet('ccSeenFreebies', JSON.stringify([...seenFreebies]));
-        lsSet('ccNewFreebieBadges', JSON.stringify([...newFreebieBadges]));
-        lsSet('ccKnownFreebies', JSON.stringify([...knownFreebies]));
     }
 
     // Audience preference (owner, 2026-11-14): a visitor can say "show
@@ -341,18 +319,13 @@
         },
         isNewFreebie: function (f) {
             if (!f || f.id == null) return false;
-            if (seenFreebies.has(f.id)) return false;
-            return newFreebieBadges.has(f.id);
+            return !seenFreebies.has(f.id);
         },
         markFreebieSeen: function (f) {
             if (!f || f.id == null) return;
             if (!seenFreebies.has(f.id)) {
                 seenFreebies.add(f.id);
                 lsSet('ccSeenFreebies', JSON.stringify([...seenFreebies]));
-            }
-            // Opening the freebie retires its badge for good.
-            if (newFreebieBadges.delete(f.id)) {
-                lsSet('ccNewFreebieBadges', JSON.stringify([...newFreebieBadges]));
             }
         },
         getInterests: getInterests,
