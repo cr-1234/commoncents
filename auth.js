@@ -122,12 +122,13 @@
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
     function paintNoteBadge() {
-        var bell = document.getElementById('notesBell');
-        if (!bell) return;
-        var b = bell.querySelector('.cc-note-badge');
-        if (!currentUser || !notesUnread || notesMuted) { if (b) b.remove(); return; }
-        if (!b) { b = document.createElement('span'); b.className = 'cc-note-badge'; bell.appendChild(b); }
-        b.textContent = notesUnread > 9 ? '9+' : String(notesUnread);
+        // Desktop (owner, 2026-11-15, later): no header bell — the
+        // unread count rides the Notifications row inside the
+        // avatar menu. Same show/hide rule as the bell's badge had.
+        var menuCount = document.getElementById('authMenuNotesCount');
+        if (!menuCount) return;
+        if (!currentUser || !notesUnread || notesMuted) { menuCount.textContent = ''; return; }
+        menuCount.textContent = notesUnread > 9 ? '9+' : String(notesUnread);
     }
     function paintNotesList() {
         var wrap = document.getElementById('notesPanel');
@@ -473,8 +474,9 @@
         var nameEditor = document.getElementById('authMenuNameEditor');
         var nameCancel = document.getElementById('authMenuNameCancel');
         function closeMenu() { if (menu) menu.style.display = 'none'; }
-        // ── Notifications bell + panel (owner, 2026-11-15): the bell
-        // next to the avatar opens the notes panel; opening it does
+        // ── Notifications panel (owner, 2026-11-15): the
+        // Notifications row inside the avatar menu opens the panel;
+        // opening it does
         // what opening the account menu used to do — paint the list
         // and mark the notes read. Bell and menu never show at once.
         var bellEl = document.getElementById('notesBell');
@@ -573,7 +575,8 @@
             closePanel();
             if (menu && menu.style.display !== 'none') closeMenu(); else openMenu();
         });
-        if (bellEl) bellEl.addEventListener('click', function (e) {
+        var menuNotesRow = document.getElementById('authMenuNotesRow');
+        if (menuNotesRow) menuNotesRow.addEventListener('click', function (e) {
             e.stopPropagation();
             if (!currentUser) return;
             if (panelEl && panelEl.style.display !== 'none') closePanel(); else openPanel();
@@ -583,7 +586,7 @@
         });
         document.addEventListener('click', function (e) {
             if (panelEl && panelEl.style.display !== 'none'
-                && !e.target.closest('#notesPanel') && !e.target.closest('#notesBell')) closePanel();
+                && !e.target.closest('#notesPanel') && !e.target.closest('#authMenuNotesRow')) closePanel();
         });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeMenu(); closePanel(); } });
         var menuCloseBtn = document.getElementById('authMenuClose');
