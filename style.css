@@ -1626,5 +1626,49 @@ body.dark-mode .amazon-browse-btn { color: #000; }
         box-shadow: none; padding: 0.25rem 0 0.35rem;
     }
     .mobile-nav-panel .auth-menu-close { display: none; }
-    .mobile-nav-panel .auth-menu-email { padding-right: 0; }
+    /* In the drawer the email line also lines up with the row
+       text (0.9rem in from the panel edge, like every row). */
+    .mobile-nav-panel .auth-menu-email { padding-right: 0; padding-left: 0.9rem; }
+    /* Uniform rows (owner, 2026-11-15, fourth pass — the order
+       "looks very neat", but the styling read patchwork: My Feed
+       was a big tinted box (its .active fill), the middle rows
+       were plain white, the account rows were purple pills
+       again, and the page links sat in two columns — colour on
+       top, colour on the bottom, none in the middle, then white
+       again. Now EVERY row in the panel wears the same clothes:
+       plain white, 48px, the same plum semibold text, counts at
+       the right edge. The current view loses its filled box —
+       inside the panel the active row is just plum text like
+       every other row. The account menu's rows drop their pill
+       fill while they live in the drawer and stack flush like
+       the rest (the Change chip stays a small outlined pill —
+       it is a button; the masked email stays the plain line it
+       already was), and the page links go single column. Sign
+       out keeps its pale red bar: it is the one action row, and
+       the owner did not object to it. Desktop is untouched —
+       these rules live in the phone block, scoped to the panel,
+       and the desktop menu keeps its pills. */
+    .mobile-nav-panel .mobile-nav-rows a,
+    .mobile-nav-panel .mobile-nav-list a,
+    .mobile-nav-panel .mnav-row,
+    .mobile-nav-panel .mobile-nav-pages a {
+        background: transparent; color: var(--highlight);
+        font-size: 0.98rem; font-weight: 600;
+        min-height: 48px; padding: 0.5rem 0.9rem;
+    }
+    .mobile-nav-panel .mobile-nav-rows a.active,
+    .mobile-nav-panel .mobile-nav-list a.active { background: transparent; }
+    .mobile-nav-panel .mobile-nav-pages { display: flex; flex-direction: column; gap: 0; }
+    .mobile-nav-panel .auth-menu-links { gap: 0; }
+    .mobile-nav-panel .auth-menu-link {
+        background: transparent; color: var(--highlight);
+        font-size: 0.98rem; font-weight: 600;
+        min-height: 48px; padding: 0.5rem 0.9rem;
+        display: flex; align-items: center;
+    }
+    .mobile-nav-panel .auth-menu-link:hover { background: transparent; }
+    .mobile-nav-panel .auth-menu-link.auth-menu-signout {
+        background: #FDECEC; color: #B3261E; justify-content: center;
+    }
+    .mobile-nav-panel .auth-menu-link.auth-menu-signout:hover { background: #FAD9D9; }
 }
