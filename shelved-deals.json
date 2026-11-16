@@ -238,5 +238,30 @@
     "shelvedAt": "2026-11-15",
     "shelvedReason": "Unavailable on Amazon — no price and no buy box",
     "lastSeenPrice": null
+  },
+  {
+    "id": 1088,
+    "title": "Levi's Men's 514 Straight Fit Jeans For $48.65 From Amazon",
+    "category": "clothing",
+    "fc": "Clothing",
+    "price": 48.65,
+    "originalPrice": 64.99,
+    "discount": 25,
+    "image": "https://m.media-amazon.com/images/I/81SIU64JGVL._AC_SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B07RR2V6ZP?tag=commoncents0050-20",
+    "description": "Levi's 514 straight fit jeans in a dark rinse — the classic cut that goes with everything. At $48.65, a solid price for Levi's denim.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-13T10:28:08Z",
+    "source": "techbargains",
+    "aud": "men",
+    "gallery": [
+      "https://m.media-amazon.com/images/I/81WpqDSpATL._AC_SL1500_.jpg"
+    ],
+    "shelvedAt": "2026-11-16",
+    "shelvedReason": "Price rose to $52.46 — only 19% off its $64.99 list (posted $48.65).",
+    "lastSeenPrice": 52.46
   }
 ]
