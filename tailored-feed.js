@@ -371,7 +371,7 @@
         });
         var cc = 'all';
         try { if (typeof currentCategory !== 'undefined' && currentCategory) cc = currentCategory; } catch (e) {}
-        document.querySelectorAll('.main-nav a[data-category], .category-list a[data-category]').forEach(function (l) {
+        document.querySelectorAll('.main-nav a[data-category], .category-list a[data-category], .mobile-nav-panel a[data-category]').forEach(function (l) {
             l.classList.toggle('active', !inMine && l.getAttribute('data-category') === cc);
         });
         if (els.myFeedBadgeHost) {
@@ -385,6 +385,22 @@
                 badge.textContent = matchCount();
             } else if (badge) {
                 badge.remove();
+            }
+        }
+        // The phone panel's My Feed row carries the same count
+        // (owner, 2026-11-15: "my feed could have the numbers next
+        // to it") — same badge, same number as the sidebar's.
+        if (els.myFeedPanelHost) {
+            var pBadge = els.myFeedPanelHost.querySelector('.cat-count');
+            if (has) {
+                if (!pBadge) {
+                    pBadge = document.createElement('span');
+                    pBadge.className = 'cat-count';
+                    els.myFeedPanelHost.appendChild(pBadge);
+                }
+                pBadge.textContent = matchCount();
+            } else if (pBadge) {
+                pBadge.remove();
             }
         }
     }
@@ -506,6 +522,7 @@
         els.widgetChange = document.getElementById('feedWidgetChange');
         els.myFeedRows = document.querySelectorAll('[data-myfeed]');
         els.myFeedBadgeHost = document.querySelector('.category-list a[data-myfeed]');
+        els.myFeedPanelHost = document.querySelector('.mobile-nav-panel a[data-myfeed]');
         var doneBtn = document.getElementById('feedDoneBtn');
         var pickerX = document.getElementById('feedPickerX');
         if (pickerX && doneBtn) pickerX.addEventListener('click', function () { doneBtn.click(); });

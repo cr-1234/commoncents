@@ -290,12 +290,66 @@ function updateEntryCount() {
         : 'Top prize reached — good luck on Sunday!';
 }
 
+// Category completeness (owner, 2026-11-15): the nav lists are
+// static HTML, so a category the collector files deals under but
+// the lists never named — General is the live case (the hand
+// warmers) — had NO tap target anywhere: not the sidebar, not the
+// strip, not the phone menu panel, and the owner asked where the
+// section went. Before the wiring below captures the lists, add a
+// link for every category the live deals actually carry that a list
+// is missing, in the picker's order, just before Free Stuff. The
+// sidebar's count pass then paints its count like any other row,
+// and a category with no live deals simply never gets a link.
+(function ensureCategoryLinks() {
+    try {
+        const order = ['tech', 'tools', 'household', 'groceries', 'kids', 'beauty', 'clothing', 'pets', 'general'];
+        const present = {};
+        const label = {};
+        (typeof deals !== 'undefined' ? deals : []).forEach(d => {
+            if (!d || d.dead || !d.category) return;
+            present[d.category] = true;
+            if (!label[d.category]) label[d.category] = d.fc || d.category;
+        });
+        const cats = Object.keys(present).sort((a, b) => {
+            const ia = order.indexOf(a), ib = order.indexOf(b);
+            return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+        });
+        if (!cats.length) return;
+        const lists = [
+            { sel: '.main-nav', li: false },
+            { sel: '.category-list', li: true },
+            { sel: '#mobileDealsSection', li: true }
+        ];
+        cats.forEach(cat => {
+            lists.forEach(L => {
+                const host = document.querySelector(L.sel);
+                if (!host || host.querySelector('a[data-category="' + cat + '"]')) return;
+                const a = document.createElement('a');
+                a.href = '#';
+                a.dataset.category = cat;
+                a.textContent = label[cat];
+                let node = a;
+                if (L.li) { node = document.createElement('li'); node.appendChild(a); }
+                const anchor = host.querySelector('a[data-category="freebies"]');
+                const anchorNode = anchor ? (L.li ? anchor.closest('li') : anchor) : null;
+                if (anchorNode) host.insertBefore(node, anchorNode);
+                else host.appendChild(node);
+            });
+        });
+    } catch (e) {}
+})();
+
 // DOM Elements
 const dealGrid      = document.getElementById('dealGrid');
 const searchInput   = document.getElementById('searchInput');
 const searchBtn     = document.getElementById('searchBtn');
-const navLinks      = document.querySelectorAll('.nav-link:not(.giveaway-nav-link)'); // exclude giveaway btn
+const navLinks      = document.querySelectorAll('.nav-link:not(.giveaway-nav-link), .mobile-nav-panel a[data-category]'); // exclude giveaway btn; the phone menu panel's category links ride the same wiring (2026-11-15)
 const categoryLinks = document.querySelectorAll('.category-list a');
+// The phone panel's Deals-section links get the same count badges
+// as the sidebar's (owner, 2026-11-15: "why can we have the numbers
+// next to it... my feed could have the numbers next to it") —
+// paintCategoryCounts paints both lists from the same tally.
+const panelCategoryLinks = document.querySelectorAll('#mobileDealsSection a[data-category]');
 const modal         = document.getElementById('dealModal');
 const modalBody     = document.getElementById('modalBody');
 const closeModal    = document.querySelector('.close-modal');
@@ -439,6 +493,7 @@ function setupEventListeners() {
     const giveawayModal     = document.getElementById('giveawayModal');
     const openGiveaway      = document.getElementById('openGiveaway');
     const openGiveawaySide  = document.getElementById('openGiveawaySidebar');
+    const openGiveawayPanel = document.getElementById('openGiveawayPanel');
     const closeGiveaway     = document.getElementById('closeGiveaway');
     const giveawaySubmitBtn = document.getElementById('giveawaySubmitBtn');
 
@@ -522,6 +577,27 @@ function setupEventListeners() {
             sAct.style.display = active ? '' : 'none';
             sSoon.style.display = active ? 'none' : '';
             if (!active) paintGwTeaser(GW_TEASERS[0], signedIn);
+        }
+        // Phone panel: the small state line under the Weekly
+        // Giveaway row. The account menu's own giveaway row is
+        // hidden inside the drawer (it duplicated this row), so
+        // this line carries the state there: "Coming soon" in
+        // small type while the giveaway is off; while it's on, the
+        // entered state — the same words the account menu's row
+        // uses, from the same CC_GW state — or nothing at all.
+        const panelGw = document.getElementById('mobileGwStatus');
+        if (panelGw) {
+            if (!active) {
+                panelGw.textContent = 'Coming soon';
+                panelGw.style.display = '';
+            } else if (window.CC_GW && CC_GW.isEntered && CC_GW.isEntered()) {
+                const n = 1 + (CC_GW.bonus ? CC_GW.bonus() : 0);
+                panelGw.textContent = "You're in this week \u00b7 " + n + (n === 1 ? ' entry' : ' entries');
+                panelGw.style.display = '';
+            } else {
+                panelGw.textContent = '';
+                panelGw.style.display = 'none';
+            }
         }
         // Modal: the teaser replaces the prize block + form + success.
         const soon = document.getElementById('giveawayComingSoon');
@@ -629,8 +705,9 @@ function setupEventListeners() {
         giveawayModal.style.display = 'flex';
     }
 
-    if (openGiveaway)     openGiveaway.addEventListener('click', openGiveawayModal);
-    if (openGiveawaySide) openGiveawaySide.addEventListener('click', openGiveawayModal);
+    if (openGiveaway)      openGiveaway.addEventListener('click', openGiveawayModal);
+    if (openGiveawaySide)  openGiveawaySide.addEventListener('click', openGiveawayModal);
+    if (openGiveawayPanel) openGiveawayPanel.addEventListener('click', openGiveawayModal);
 
     // Coming-soon CTAs (sidebar + modal): send the visitor to the
     // sign-in modal — the same path the signed-out entry button uses.
@@ -880,7 +957,7 @@ function paintCategoryCounts() {
         if (window.CC_SAVES && typeof window.CC_SAVES.get === 'function') savedCount = window.CC_SAVES.get().length;
         else { const rawSaved = JSON.parse(localStorage.getItem('ccMySaves') || '[]'); if (Array.isArray(rawSaved)) savedCount = rawSaved.length; }
     } catch (e) {}
-    categoryLinks.forEach(link => {
+    const paintOneCount = link => {
         const cat = link.dataset.category;
         if (!cat) return; // the "My Feed" row — painted by tailored-feed.js
         const li = link.closest('li');
@@ -908,7 +985,12 @@ function paintCategoryCounts() {
             link.appendChild(badge);
         }
         badge.textContent = n;
-    });
+    };
+    categoryLinks.forEach(paintOneCount);
+    // The phone panel's Deals section shows the same numbers next
+    // to its rows (owner, 2026-11-15) — same tally, same rules,
+    // including a zero-count category tucking its row away.
+    panelCategoryLinks.forEach(paintOneCount);
     // The "My Feed" row's badge/visibility is tailored-feed.js's job;
     // refresh it here too so it tracks deals loaded after first paint.
     if (window.CC_FEED && typeof CC_FEED.refreshMyFeedNav === 'function') CC_FEED.refreshMyFeedNav();
@@ -1164,6 +1246,10 @@ function renderSaved() {
 
 function renderDeals() {
     dealGrid.innerHTML = '';
+    // On phones every browsing view renders compact list rows while
+    // the Saved view keeps the big cards (owner, 2026-11-15);
+    // style.css keys the row layout off this class.
+    dealGrid.classList.toggle('saved-view', currentCategory === 'saved');
     if (currentCategory === 'freebies') { renderFreebies(); return; }
     if (currentCategory === 'saved') { renderSaved(); return; }
     showFreebiesIntro(false);
@@ -1234,8 +1320,30 @@ function renderDeals() {
         return;
     }
     const pageStart = (currentPage - 1) * DEALS_PER_PAGE;
-    filtered.slice(pageStart, pageStart + DEALS_PER_PAGE)
-        .forEach(deal => dealGrid.appendChild(createDealCard(deal)));
+    const pageDeals = filtered.slice(pageStart, pageStart + DEALS_PER_PAGE);
+    // Sister-site ad card (owner, 2026-11-15). The Gifting Butler
+    // card sits inside the feed as one card among the deals — its
+    // only home; the rail/strip carries the sponsor ad alone.
+    // Browse views only (Saved
+    // and Free Stuff return earlier; search never carries it),
+    // page 1 only, closing the first row (owner: the right side
+    // of the page is what people see first), and only when the
+    // page shows at least 7 deals. It is NOT a deal: `filtered`
+    // and the pagination math never see it, so page 1 renders its
+    // 12 deals PLUS the ad card and no count anywhere changes.
+    // Freebies appended below ride after the deals, so counting
+    // deal cards here lands the ad in the first row regardless.
+    const showFeedAd = currentPage === 1 && !searchQuery && pageDeals.length >= 7;
+    let feedAdAfter = 5;
+    if (showFeedAd) {
+        let cols = 3;
+        try { cols = (window.getComputedStyle(dealGrid).gridTemplateColumns || '').split(' ').filter(Boolean).length || 3; } catch (e) {}
+        feedAdAfter = cols >= 2 ? cols - 2 : 0;
+    }
+    pageDeals.forEach((deal, i) => {
+        dealGrid.appendChild(createDealCard(deal));
+        if (showFeedAd && i === feedAdAfter) dealGrid.appendChild(createFeedAdCard());
+    });
     if (currentPage === 1) {
         feedFreebies.forEach(f => dealGrid.appendChild(createFreebieCard(f)));
     }
@@ -1308,6 +1416,23 @@ function renderPagination(totalPages) {
     }
     if (winEnd < totalPages) makeGap();
     makeBtn('Next →', currentPage + 1, { nav: true, disabled: currentPage >= totalPages });
+}
+
+// The in-feed sister-site ad, as a designed card that fills its
+// cell like a deal card (owner, 2026-11-15: the earlier picture
+// version sat in a tall, mostly-empty card — "huge empty space
+// before and after it, looks very funny"). The plum G is cropped
+// from the house picture (img/gb-g-mark.png); the name, line and
+// button are real elements, centred in the card. Deliberately NOT
+// a .deal-card — no modal, no votes, no counts. This card is the
+// sister promo's ONLY home: never in the side rail or the bottom
+// strip (owner, 2026-11-15 — those carry the sponsor ad only).
+function createFeedAdCard() {
+    const article = document.createElement('article');
+    article.className = 'feed-ad-card gb-feed-card';
+    article.innerHTML = `
+        <a class="gb-feed-link" href="https://giftingbutler-74395.web.app" target="_blank" rel="noopener noreferrer"><img class="gb-feed-mark" src="img/gb-g-mark.png" alt="Gifting Butler" loading="lazy"><span class="gb-feed-name">Gifting Butler</span><span class="gb-feed-line">Looking for a gift, not just a deal?</span><span class="gb-feed-btn">Browse gifts &#8594;</span></a>`;
+    return article;
 }
 
 function createDealCard(deal) {
@@ -1891,8 +2016,16 @@ function openModal(deal) {
     }
     const skipLoadOnce = !!deal._skipLoadOnce;
     delete deal._skipLoadOnce;
+    // Picture gallery (owner, 2026-11-15): a deal with extra clean
+    // product shots gets a swipeable banner — main picture first,
+    // dots underneath showing position. One picture renders exactly
+    // the banner it always has, no dots.
+    const galleryPics = [deal.image].concat(Array.isArray(deal.gallery) ? deal.gallery.filter(u => u && u !== deal.image) : []);
+    const mediaHtml = galleryPics.length > 1
+        ? `<div class="modal-media-banner modal-gallery"><div class="modal-gallery-track">${galleryPics.map(u => `<img src="${u}" alt="${deal.title}">`).join('')}</div></div><div class="modal-gallery-dots">${galleryPics.map((u, i) => `<span class="modal-gallery-dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>`
+        : `<div class="modal-media-banner"><img src="${deal.image}" alt="${deal.title}"></div>`;
     modalBody.innerHTML = `
-        <div class="modal-media-banner"><img src="${deal.image}" alt="${deal.title}"></div>
+        ${mediaHtml}
         <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${getStoreName(deal.url)} &middot; ${deal.category}${deal.sponsored ? ' &middot; <span style="color:var(--highlight); font-weight:700;">Sponsored</span>' : ''}</div>
         <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
         <div class="modal-buy-row">
@@ -1927,6 +2060,16 @@ function openModal(deal) {
         </div>`;
 
     modal.style.display = 'flex';
+
+    // Gallery dots follow the swipe/scroll position.
+    const galTrack = modalBody.querySelector('.modal-gallery-track');
+    if (galTrack) {
+        const galDots = modalBody.querySelectorAll('.modal-gallery-dot');
+        galTrack.addEventListener('scroll', () => {
+            const i = Math.max(0, Math.min(galDots.length - 1, Math.round(galTrack.scrollLeft / galTrack.clientWidth)));
+            galDots.forEach((d, j) => d.classList.toggle('active', j === i));
+        }, { passive: true });
+    }
 
     modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
     modalBody.querySelector('.downvote-btn').addEventListener('click',  (e) => handleVote(e, deal, 'down'));
@@ -2338,4 +2481,84 @@ document.addEventListener('DOMContentLoaded', initApp);
     }
     window.CC_SIDEBAR_HINT = { shouldShow: shouldShow, update: update };
     update();
+})();
+
+// ── Phone header: hamburger + menu panel ────────────────────────────────
+// Owner (2026-11-15, from his SlickDeals screenshot): on phones the
+// header + nav strip ate too much of the screen. The strip is gone
+// (style.css); the top row is the logo on the left and the bare
+// hamburger lines on the RIGHT — since the second redesign the same
+// day, the lines are the ONLY control up there: the bell and the
+// avatar left the top row, and this panel (a full-height scrolling
+// drawer from the right) is the one menu, holding — in the order
+// the owner settled in the third pass the same day — My Feed, the
+// expandable Deals section (All Deals, the categories, Free Stuff,
+// Saved — each with its count), the Weekly Giveaway row (with its
+// small state line), the Notifications row, the account group, the
+// page links and Sign out. Category taps filter through the same setCategory
+// wiring as the strip and the sidebar (the panel's links are in
+// app.js's navLinks); this block owns the panel's open/close and
+// the Deals section's expand/collapse. On phone widths auth.js
+// moves the real account menu + notes panel INTO this panel and
+// opening the panel hands over to it (CC_PHONE_MENU) so the
+// account block paints itself; everywhere else, opening the panel
+// closes the account menu and the notes panel (one header popover
+// at a time), and auth.js closes this panel when either opens.
+(function () {
+    var btn = document.getElementById('mobileMenuBtn');
+    var panel = document.getElementById('mobileNavPanel');
+    if (!btn || !panel) return;
+    function isOpen() { return panel.style.display !== 'none'; }
+    function close() {
+        panel.style.display = 'none';
+        btn.setAttribute('aria-expanded', 'false');
+    }
+    function open() {
+        if (window.CC_PHONE_MENU && window.CC_PHONE_MENU.active()) {
+            // Phone layout: the account menu + notes live inside
+            // this panel now — let auth.js paint the account block
+            // (and tuck the notes away until their row is tapped).
+            window.CC_PHONE_MENU.onPanelOpen();
+        } else {
+            var menu = document.getElementById('authMenu');
+            if (menu) menu.style.display = 'none';
+            var notes = document.getElementById('notesPanel');
+            if (notes) notes.style.display = 'none';
+        }
+        panel.style.display = '';
+        btn.setAttribute('aria-expanded', 'true');
+    }
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (isOpen()) close(); else open();
+    });
+    var closeBtn = document.getElementById('mobileNavClose');
+    if (closeBtn) closeBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        close();
+    });
+    // Deals ▾: the section starts tucked away (SlickDeals-style
+    // grouping, not one long flat list); the arrow row opens it.
+    var dealsBtn = document.getElementById('mobileDealsToggle');
+    var dealsSec = document.getElementById('mobileDealsSection');
+    if (dealsBtn && dealsSec) dealsBtn.addEventListener('click', function () {
+        var nowOpen = dealsSec.style.display !== 'none';
+        dealsSec.style.display = nowOpen ? 'none' : '';
+        dealsBtn.setAttribute('aria-expanded', nowOpen ? 'false' : 'true');
+    });
+    // Any tap on a panel link has done its job (a category filtered,
+    // a page is loading) — the panel tucks away behind it.
+    panel.addEventListener('click', function (e) {
+        if (e.target.closest('a')) close();
+    });
+    // The panel's Weekly Giveaway row is a panel link like any
+    // other, so the tap-to-close handler above already tucks the
+    // panel away behind the giveaway modal it opens.
+    document.addEventListener('click', function (e) {
+        if (isOpen() && !e.target.closest('#mobileNavPanel') && !e.target.closest('#mobileMenuBtn')) close();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') close();
+    });
+    window.CC_MOBILE_NAV = { open: open, close: close, isOpen: isOpen };
 })();

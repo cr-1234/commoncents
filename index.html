@@ -76,6 +76,21 @@
 </svg>
     <header class="site-header">
         <div class="container header-content">
+            <!-- Phone menu button (owner, 2026-11-15 — SlickDeals-style):
+                 on phones the header is ONE compact row and this
+                 hamburger opens the menu panel. It sits on the RIGHT
+                 of the row (owner, 2026-11-15, second redesign: the
+                 bell and avatar left the top row entirely and
+                 everything lives under these lines now — controls
+                 split left/right "makes no sense"). The logo stays
+                 left; this button is the only control on the right.
+                 When there are unread notifications it carries the
+                 same count badge the bell carries on desktop
+                 (painted by auth.js). Desktop never sees it
+                 (style.css keeps it display:none there). -->
+            <button type="button" class="hamburger-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileNavPanel">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+            </button>
             <a href="index.html" class="logo-link">
                 <div class="logo-container">
                     <img class="logo-mark-img" src="logo-tag.png" alt="" aria-hidden="true">
@@ -142,6 +157,127 @@
                                     </div>
             </div>
         </div>
+        <!-- Phone menu panel (owner, 2026-11-15, third pass):
+             THE one menu on phones — a full-height drawer opening
+             from the right that SCROLLS (the old drop-down panel
+             hung off the sticky header, so its bottom rows could
+             never be reached). SlickDeals-style grouping instead of
+             one long flat list, in the order the owner asked for
+             after calling the second design chaotic — the main
+             things first, the account group no longer sitting on
+             top pushing them down: My Feed (with its count), the
+             "Deals ▾" section (All Deals + every category, each
+             with its count, painted by app.js like the sidebar's,
+             Free Stuff and Saved), the Weekly Giveaway row (with
+             its small state line under it), a Notifications row,
+             the account group, the page links, and Sign out at the
+             very bottom. The account block and the notes are not
+             copies: on phone widths auth.js MOVES the real account
+             menu (#authMenu) and the real notes panel (#notesPanel)
+             in here, so every existing action — change name, feed
+             picks, Restore, the notes list + mute row — is the same
+             wired element it always was; on desktop widths they
+             move back and the bell + avatar menu work exactly as
+             before. Inside the drawer the menu's own Giveaway and
+             Saved deals rows hide (auth.js) — they duplicated the
+             Weekly Giveaway row and the Deals section's Saved link.
+             The category links carry the same data-category wiring
+             as the strip and the sidebar, so a tap filters exactly
+             like they do; the My Feed row follows the same picks
+             rule as the other My Feed rows (painted by
+             tailored-feed.js). Phones only: style.css pins it shut
+             above 900px no matter what. -->
+        <nav class="mobile-nav-panel" id="mobileNavPanel" style="display:none;" aria-label="Menu">
+            <button type="button" class="mnav-close" id="mobileNavClose" aria-label="Close menu">✕</button>
+            <!-- My Feed first (owner, 2026-11-15, third pass — the
+                 account block used to sit on top and push the main
+                 things down). Painted by tailored-feed.js like
+                 every My Feed row: it exists only while the visitor
+                 has picks, with the same count badge as the
+                 sidebar's. -->
+            <ul class="mobile-nav-rows mnav-top">
+                <li style="display:none;"><a href="#" data-myfeed="1">My Feed</a></li>
+            </ul>
+            <!-- Deals ▾ (SlickDeals-style expand): starts tucked
+                 away; the arrow button opens the section. The list
+                 keeps the .mobile-nav-list class and its own id —
+                 the category backfill (app.js) and the count painter
+                 aim at it directly. -->
+            <button type="button" class="mnav-row mnav-deals-toggle" id="mobileDealsToggle" aria-expanded="false" aria-controls="mobileDealsSection">
+                <span class="mnav-row-label">Deals</span>
+                <span class="mnav-arrow" aria-hidden="true">▾</span>
+            </button>
+            <ul class="mobile-nav-list" id="mobileDealsSection" style="display:none;">
+                <li><a href="#" data-category="all">All Deals</a></li>
+                <li><a href="#" data-category="tech">Tech</a></li>
+                <li><a href="#" data-category="tools">Tools</a></li>
+                <li><a href="#" data-category="household">Household</a></li>
+                <li><a href="#" data-category="groceries">Groceries</a></li>
+                <li><a href="#" data-category="kids">Kids</a></li>
+                <li><a href="#" data-category="beauty">Beauty</a></li>
+                <li><a href="#" data-category="clothing">Clothing</a></li>
+                <li><a href="#" data-category="pets">Pets</a></li>
+                <li><a href="#" data-category="freebies">Free Stuff</a></li>
+                <li><a href="#" data-category="saved">Saved</a></li>
+            </ul>
+            <ul class="mobile-nav-rows mnav-extra">
+                <!-- Giveaway row (owner, 2026-11-15): the gift icon
+                     left the top row when the header was slimmed
+                     down, so the giveaway's phone entry point lives
+                     here in the panel instead (the sidebar box is
+                     the desktop one). app.js wires it to the same
+                     giveaway modal as the sidebar button. -->
+                <li><a href="#" id="openGiveawayPanel"><svg class="gw-gift-mark" aria-hidden="true"><use href="#gwGiftMark"></use></svg>Weekly Giveaway</a>
+                    <!-- The row's small state line (owner,
+                         2026-11-15, third pass): while the giveaway
+                         is off it reads "Coming soon" in small muted
+                         type under the row — small text under the
+                         row, NOT a second row. The account menu's
+                         own giveaway row is hidden inside the
+                         drawer (it duplicated this one), so this
+                         line carries the giveaway state here; while
+                         the giveaway is on it shows the entered
+                         state in the same small type, or hides.
+                         Painted by app.js (paintGiveawayState) from
+                         CC_GW.isActive(). -->
+                    <div class="mnav-gw-status" id="mobileGwStatus" style="display:none;"></div>
+                </li>
+            </ul>
+            <!-- Notifications row (signed-in only): carries the
+                 unread count; tapping it opens the notes panel in
+                 the slot right under it (auth.js moves the real
+                 #notesPanel there on phones). -->
+            <button type="button" class="mnav-row" id="mobileNotesRow" style="display:none;">
+                <span class="mnav-row-label">Notifications</span>
+                <span class="mnav-count" id="mobileNotesCount"></span>
+            </button>
+            <div class="mnav-notes-slot" id="mobileNotesSlot"></div>
+            <!-- Account group: signed out, just a Sign in row (it
+                 clicks the header's own Sign in button, so the one
+                 auth modal opens); signed in, auth.js moves the
+                 account menu itself into this slot on phones. It
+                 sits BELOW the main rows now (owner, 2026-11-15,
+                 third pass) instead of pushing them down from the
+                 top. Two of its rows hide while it lives in the
+                 drawer (auth.js): its Giveaway row — the Weekly
+                 Giveaway row above carries that job, with its small
+                 state line — and its Saved deals row, because Saved
+                 lives in the Deals section above. On desktop both
+                 rows are back, exactly as before. -->
+            <div class="mnav-account" id="mobileAccountSlot">
+                <button type="button" class="mnav-row mnav-signin" id="mobileSignInBtn">Sign in</button>
+            </div>
+            <div class="mobile-nav-pages">
+                <a href="submit-deal.html">Submit a Deal</a>
+                <a href="advertise.html">Advertise</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <!-- Sign out at the very bottom (signed-in only):
+                 auth.js moves the account menu's own Sign out
+                 button into this slot on phones. -->
+            <div class="mnav-signout-slot" id="mobileSignOutSlot"></div>
+        </nav>
     </header>
 
     <div class="container main-content">
@@ -255,9 +391,6 @@
             <div class="ad-rail-contact">
                 <a href="tel:7328333503">&#128222; 732-833-3503</a>
                 <a href="mailto:chavirdesign@gmail.com">&#9993;&#65038; chavirdesign@gmail.com</a>
-            </div>
-            <div class="house-ad">
-                <a href="https://giftingbutler-74395.web.app" target="_blank" rel="noopener noreferrer"><img src="img/gb-house-ad.png" alt="Gifting Butler — looking for a gift, not just a deal?"></a>
             </div>
         </aside>
     </div>

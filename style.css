@@ -830,7 +830,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
        squeeze onto whatever row had room. Now: logo + sign-in always
        share row 1 (the logo shrinks a touch so they always fit),
        search always gets its own full-width row, nav strip under it. */
-    .header-content { row-gap: 0.6rem; column-gap: 0.6rem; }
+    .header-content { row-gap: 0.6rem; column-gap: 0.5rem; }
     /* The logo must NEVER shrink (owner, 2026-11-12: on phones the
        "CENTS" end of COMMONCENTS got cut off — the shrinkable
        logo-link let the auth column squeeze it). The logo is a fixed
@@ -881,14 +881,58 @@ body.dark-mode .amazon-browse-btn { color: #000; }
        cards are narrower than a phone's single column. */
     .vote-container { gap: 0.25rem; }
     .vote-btn { padding: 0.3rem 0.35rem; font-size: 0.85rem; white-space: nowrap; }
+    /* Compact list rows (owner, 2026-11-15 — the SlickDeals and
+       Dan's Deals phone views show 5–7 deals per screen; ours showed
+       ONE giant card). In every browsing view (All Deals, My Feed,
+       categories, search, Free Stuff) the card becomes a horizontal
+       row: the deal's clean picture as a ~104px thumbnail on the
+       left, then the store/category line, title, price row and the
+       vote row. No description and no View Deal button — the row
+       itself opens the same modal as always (the card's own click
+       handler), and the modal keeps its Get This Deal button. Share
+       and Save go icon-only so the vote row fits on ONE line beside
+       the thumbnail. The Saved view is a personal shelf, not a
+       scanning feed, so it keeps the big cards — renderDeals marks
+       its grid .saved-view and every rule here steps aside for it. */
+    .deal-grid { gap: 0.6rem; }
+    .deal-grid:not(.saved-view) .deal-card { flex-direction: row; }
+    /* The thumbnail box is FIXED at 104x104 (owner's video,
+       2026-11-15): with height:auto a tall thin picture (a water
+       bottle) stretched its whole row to card height. The img rule
+       above already fits the picture inside with object-fit:contain
+       on white, so every row is now the same height whatever shape
+       the picture is — portrait, landscape or square. */
+    .deal-grid:not(.saved-view) .card-image { flex: 0 0 104px; width: 104px; height: 104px; }
+    .deal-grid:not(.saved-view) .card-image img { padding: 0.35rem; }
+    .deal-grid:not(.saved-view) .card-content { padding: 0.6rem 0.75rem 0.65rem 0.3rem; min-width: 0; }
+    .deal-grid:not(.saved-view) .card-meta { margin-bottom: 0.25rem; }
+    .deal-grid:not(.saved-view) .card-title { font-size: 0.95rem; min-height: 0; margin-bottom: 0.3rem; }
+    .deal-grid:not(.saved-view) .card-desc { display: none; }
+    .deal-grid:not(.saved-view) .card-price { margin-bottom: 0.4rem; }
+    .deal-grid:not(.saved-view) .card-date { display: none; }
+    .deal-grid:not(.saved-view) .view-deal-btn,
+    .deal-grid:not(.saved-view) .freebie-btn { display: none; }
+    .deal-grid:not(.saved-view) .dead-note { display: none; }
+    .deal-grid:not(.saved-view) .freebie-when { margin: 0.05rem 0 0.4rem; }
+    .deal-grid:not(.saved-view) .new-badge,
+    .deal-grid:not(.saved-view) .expired-badge,
+    .deal-grid:not(.saved-view) .free-badge,
+    .deal-grid:not(.saved-view) .gone-badge { top: 6px; left: 6px; }
+    .deal-grid:not(.saved-view) .vote-btn { padding: 0.25rem 0.3rem; }
+    .deal-grid:not(.saved-view) .vote-btn.share-btn span,
+    .deal-grid:not(.saved-view) .vote-btn .save-label { display: none; }
     /* "Today's Best Deals" carries an inline 1.5rem size; at phone
        widths it wrapped into a tall stack next to the sort control. */
     .feed-header { gap: 0.5rem 0.75rem; }
     .feed-header h1 { font-size: 1.22rem !important; }
-    .main-nav {
-        display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.5rem;
-        width: 100%; order: 4; margin-top: 0.75rem; white-space: nowrap; align-items: center;
-    }
+    /* The nav strip is RETIRED on phones (owner, 2026-11-15): it ate
+       a full row of the screen. Everything it showed now lives in
+       the hamburger's menu panel (.mobile-nav-panel), and the top
+       row is just hamburger + logo + the round icon buttons. The
+       .nav-link rules below stay for the strip markup, which remains
+       in the page (desktop hides it too, as it always has). */
+    .main-nav { display: none; }
+    .auth-row { gap: 0.35rem; }
     .nav-link {
         color: var(--text-secondary); font-weight: 500; font-size: 0.88rem;
         padding: 0.4rem 1rem; border-radius: 9999px !important; transition: all 0.2s;
@@ -914,9 +958,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 /* Tablet band (owner's Tab S4 shot, 2026-11-12): at 560–900px the
    one-card-per-row phone layout stretched each card across the whole
    tablet and the search bar ran screen-wide. Two cards per row here,
-   and the search keeps a sane centered width. */
+   and the search keeps a sane centered width. Since 2026-11-15 the
+   browsing views are compact full-width rows at every phone/tablet
+   width, so the two-up grid survives only in the Saved view, whose
+   big cards are the ones that used to stretch. */
 @media (min-width: 560px) and (max-width: 900px) {
-    .deal-grid { grid-template-columns: repeat(2, 1fr); }
+    .deal-grid { grid-template-columns: 1fr; }
+    .deal-grid.saved-view { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ── Tailored feed: interest picker + NEW badge ─────────────────── */
@@ -1022,7 +1070,9 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 /* Notifications bell (owner, 2026-11-15 — like Gifting Butler's):
    a soft plum circle next to the avatar, plum bell glyph, the red
    unread badge hanging off its rim (the .cc-note-badge rule below —
-   it rode the avatar until today). */
+   it rode the avatar until today). On phones the circle goes away
+   (see the max-width:900px block below): just the bare bell glyph
+   with its badge, SlickDeals-style. */
 .cc-bell {
     position: relative; width: 32px; height: 32px; border-radius: 50%;
     background: #EDE5F8; color: var(--highlight); border: none; cursor: pointer;
@@ -1031,6 +1081,129 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 }
 .cc-bell:hover { background: #E1D1F8; }
 .cc-bell svg { display: block; }
+/* Phone header pieces (owner, 2026-11-15 — SlickDeals-style): the
+   hamburger and the menu panel live in the DOM at every width, but
+   only phones ever show them — the button stays display:none above
+   900px and the panel is pinned shut there outright, so the desktop
+   header is exactly what it was. */
+.hamburger-btn {
+    display: none; width: 36px; height: 36px; flex: 0 0 auto;
+    border: none; border-radius: 50%; background: #EDE5F8; color: var(--highlight);
+    cursor: pointer; padding: 0; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(91,45,142,0.18);
+}
+.hamburger-btn:hover { background: #E1D1F8; }
+.hamburger-btn svg { display: block; }
+/* The phone rules for the header MUST live after the base rules
+   above: the selectors are single-class, so at equal specificity
+   the later rule in the file wins. The show-rules used to sit in
+   the max-width:900px block far above, and the base display:none
+   quietly overrode them — the hamburger never appeared at ANY
+   width (owner's phone test, 2026-11-15). Keep this block below
+   the base rules. Inside it, the header slims down the way the
+   owner asked after seeing both previews (2026-11-15): the
+   hamburger is BARE plum lines (no circle, no disc, no shadow —
+   SlickDeals just shows the lines), the bell is a bare glyph with
+   its badge, the giveaway gift icon is gone from the top row
+   entirely (it lives in the menu panel and the sidebar now), and
+   the header itself goes flat white — no tinted glass band, no
+   blur, no shadow, so the top stops reading as one big box. */
+@media (max-width: 900px) {
+    .hamburger-btn { display: inline-flex; background: none; border-radius: 0; box-shadow: none; }
+    .hamburger-btn:hover { background: none; }
+    .cc-bell { background: none; box-shadow: none; }
+    .cc-bell:hover { background: none; }
+    .site-header { background-color: #ffffff; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
+}
+/* The panel drops from the sticky header's bottom edge, full width,
+   one clean card: big tappable rows for the feed destinations, then
+   the page links in two quiet columns. */
+.mobile-nav-panel {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 120;
+    background: var(--bg-card); border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 18px 40px rgba(40,20,70,0.18);
+    padding: 0.6rem 20px 0.9rem;
+}
+@media (min-width: 901px) {
+    .mobile-nav-panel { display: none !important; }
+}
+.mobile-nav-list { list-style: none; margin: 0; padding: 0; }
+.mobile-nav-list a {
+    display: flex; align-items: center; min-height: 48px;
+    padding: 0.5rem 0.9rem; border-radius: 12px;
+    color: var(--text-primary); font-weight: 600; font-size: 0.98rem; text-decoration: none;
+}
+.mobile-nav-list a.active { background: #EDE5F8; color: var(--highlight); }
+/* The panel's Weekly Giveaway row carries the gift mark inline,
+   sized to the row (the base .gw-gift-mark is a big centred mark). */
+.mobile-nav-list a .gw-gift-mark { width: 26px; height: 26px; margin: 0 0.6rem 0 0; }
+/* The second-design panel (owner, 2026-11-15) groups its rows:
+   .mobile-nav-rows lists (My Feed on top, the Giveaway row) share
+   the category list's row look without being the category list,
+   and the panel's own button rows (Sign in, Notifications,
+   Deals ▾) match them. Count pills ride at the right edge of a
+   row — the same plum pill the sidebar's .cat-count paints, here
+   for panel links and the Notifications row alike. */
+.mobile-nav-rows { list-style: none; margin: 0; padding: 0; }
+.mobile-nav-rows a {
+    display: flex; align-items: center; min-height: 48px;
+    padding: 0.5rem 0.9rem; border-radius: 12px;
+    color: var(--text-primary); font-weight: 600; font-size: 0.98rem; text-decoration: none;
+}
+.mobile-nav-rows a.active { background: #EDE5F8; color: var(--highlight); }
+.mobile-nav-rows a .gw-gift-mark { width: 26px; height: 26px; margin: 0 0.6rem 0 0; }
+/* The small state line under the panel's Weekly Giveaway row
+   (owner, 2026-11-15, third pass): while the giveaway is off it
+   reads "Coming soon" in small muted type under the row — the
+   account menu's own giveaway row is hidden inside the drawer
+   (it duplicated this one), so this line carries the state here;
+   while the giveaway is on it shows the entered state in the same
+   small type, or hides. The left padding lines it up with the
+   row's text (row padding + gift mark + its gap). */
+.mnav-gw-status {
+    padding: 0.05rem 0.9rem 0.35rem calc(0.9rem + 26px + 0.6rem);
+    font-size: 0.78rem; font-weight: 500; color: var(--text-secondary); line-height: 1.35;
+}
+.mnav-row {
+    display: flex; align-items: center; width: 100%; min-height: 48px;
+    padding: 0.5rem 0.9rem; border: none; background: none; border-radius: 12px;
+    color: var(--text-primary); font: inherit; font-weight: 600; font-size: 0.98rem;
+    cursor: pointer; text-align: left; box-sizing: border-box;
+}
+.mnav-row-label { flex: 1 1 auto; min-width: 0; }
+.mnav-count {
+    margin-left: auto; flex: none;
+    background: #EDE5F8; color: var(--highlight);
+    border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+    padding: 0.08rem 0.55rem; line-height: 1.5;
+}
+.mnav-count:empty { display: none; }
+.mobile-nav-panel a .cat-count {
+    margin-left: auto; flex: none;
+    background: #EDE5F8; color: var(--highlight);
+    border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+    padding: 0.08rem 0.55rem; line-height: 1.5;
+}
+.mnav-arrow { margin-left: auto; flex: none; color: var(--highlight); transition: transform 0.15s; }
+.mnav-deals-toggle[aria-expanded="true"] .mnav-arrow { transform: rotate(180deg); }
+.mnav-close {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; margin-left: auto;
+    border: none; border-radius: 50%; background: #EDE5F8; color: var(--highlight);
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; line-height: 1;
+}
+.mnav-close:hover { background: #E1D1F8; }
+.mnav-account { border-bottom: 1px solid var(--border-color); padding-bottom: 0.35rem; margin-bottom: 0.3rem; }
+.mnav-signout-slot { margin-top: 0.6rem; }
+.mobile-nav-pages {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem 0.5rem;
+    border-top: 1px solid var(--border-color); margin-top: 0.45rem; padding-top: 0.45rem;
+}
+.mobile-nav-pages a {
+    display: flex; align-items: center; min-height: 44px;
+    padding: 0.4rem 0.9rem; border-radius: 12px;
+    color: var(--text-secondary); font-weight: 600; font-size: 0.92rem; text-decoration: none;
+}
 .auth-menu {
     position: absolute; top: calc(100% + 8px); right: 0; width: 300px; z-index: 130;
     background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
@@ -1248,6 +1421,26 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     margin-bottom: 1.25rem; overflow: hidden;
 }
 .modal-media-banner img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 1rem; }
+/* Deal-window picture gallery (owner, 2026-11-15 — clean product
+   shots only): when a deal carries extra pictures, the banner holds
+   a swipeable track, main picture first, with position dots under
+   it (the SlickDeals pattern). A deal with one picture keeps the
+   plain banner above, no dots. Cards and list rows never gallery —
+   they keep the single main picture. */
+.modal-media-banner.modal-gallery { display: block; }
+.modal-gallery-track {
+    display: flex; height: 100%; overflow-x: auto;
+    scroll-snap-type: x mandatory; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.modal-gallery-track::-webkit-scrollbar { display: none; }
+.modal-media-banner .modal-gallery-track img {
+    flex: 0 0 100%; width: 100%; height: 100%; max-width: none;
+    object-fit: contain; scroll-snap-align: center;
+}
+.modal-gallery-dots { display: flex; justify-content: center; gap: 6px; margin: -0.6rem 0 1rem; }
+.modal-gallery-dot { width: 7px; height: 7px; border-radius: 50%; background: #D9CCEE; transition: background 0.15s; }
+.modal-gallery-dot.active { background: var(--highlight); }
 .deal-note strong { color: var(--highlight); }
 .deal-note-tag {
     display: inline-flex; align-items: center; flex: none;
@@ -1344,9 +1537,146 @@ body.dark-mode .amazon-browse-btn { color: #000; }
    the giveaway count badge above is NOT styled like it. */
 .auth-menu-change-chip { background: #fff; border: 1px solid rgba(91,45,142,0.35); color: #5B2D8E; border-radius: 999px; padding: 0.12rem 0.6rem; font-weight: 600; font-size: 0.75rem; }
 .auth-menu-link:hover .auth-menu-change-chip { background: #EDE5F8; border-color: rgba(91,45,142,0.55); }
-/* The house ad is a picture now (the image carries its own panel,
-   text and pill), so the wrapper only spaces it and the image itself
-   takes the old panel's radius/border. */
 .house-ad { margin-top: 1.25rem; }
 .house-ad a { display: block; }
 .house-ad img { width: 100%; height: auto; display: block; border-radius: 16px; border: 1px solid rgba(91,45,142,0.16); }
+
+/* Sister-site ad as a card inside the deal feed (owner, 2026-11-15:
+   "sister ads as cards in the feed too"). app.js drops ONE of these
+   into the grid on page 1 of the browse views, after the 6th deal;
+   it is not a deal and never enters any count. It borrows the deal
+   cards' shell (white, radius, border, same hover lift) so it sits
+   naturally among them. The "Our sister site" label it launched
+   with was removed at the owner's word (2026-11-15: "i dont want
+   our sister site") — the card is now the picture alone. It is
+   deliberately NOT a .deal-card, so the phone list-row rules step
+   aside for it: at phone widths the grid is a single column and
+   this stays a full-width card block between the rows, never a
+   compact row. */
+.feed-ad-card {
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius); overflow: hidden;
+    border: 1px solid var(--border-color);
+    display: flex; flex-direction: column; position: relative;
+    transition: box-shadow 0.22s, border-color 0.22s;
+}
+.feed-ad-card:hover {
+    box-shadow: 0 8px 24px rgba(91,45,142,0.16), 0 0 0 1px var(--highlight);
+    border-color: var(--highlight);
+}
+.gb-feed-link { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 0.55rem; padding: 1.6rem 1.1rem; text-decoration: none; text-align: center; }
+.gb-feed-mark { height: 104px; width: auto; display: block; }
+.gb-feed-name { font-family: Georgia, 'Times New Roman', serif; font-size: 1.45rem; font-weight: 700; color: var(--highlight); line-height: 1.15; }
+.gb-feed-line { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.35; }
+.gb-feed-btn { margin-top: 0.45rem; background: var(--highlight); color: #fff; font-weight: 700; font-size: 0.88rem; padding: 0.55rem 1.15rem; border-radius: 999px; }
+
+/* Phone header, second slimming pass (owner, 2026-11-15 — his
+   screenshot of the already-slimmed header with the logo block
+   underlined: "also too much"). The bulk he was pointing at: the
+   logo was TWO lines — COMMONCENTS with MAKING EVERY CENT COUNT
+   under it — so the top row stood tall and text-heavy next to
+   SlickDeals/Dan's, who show just the name on one line. On phones
+   the tagline line goes away (the tagline stays in the footer and
+   everywhere else it lives), the mark and title drop a notch, and
+   the header's vertical padding, row gap and search offset shrink
+   so the whole top block (header row + search row) sits visibly
+   slimmer. This block lives at the END of the file on purpose:
+   the base .logo-mark-img rule above sits far below the earlier
+   phone blocks and quietly outranked their 32px (the same
+   later-rule-wins lesson as the hamburger cascade bug), so these
+   rules must come last to win at phone widths. Desktop is
+   untouched: nothing here applies above 900px. */
+@media (max-width: 900px) {
+    .logo-tagline { display: none; }
+    .logo-mark-img { height: 28px; }
+    .logo-title { font-size: 0.95rem; }
+    .site-header { padding: 0.55rem 0; }
+    .header-content { row-gap: 0.35rem; }
+    .search-bar { margin: 0.2rem auto 0; }
+}
+
+/* Phone menu, second design (owner, 2026-11-15 — "everything looks
+   very messy on both sites... put everything in the three bars"):
+   the bell and the avatar LEAVE the top row — the whole auth area
+   is gone from the phone header — and the three lines move to the
+   RIGHT side of the row (the logo stays left; controls split
+   left/right "makes no sense"). The lines are the one menu now:
+   their badge carries the unread count the bell used to show.
+   The panel itself stops being a drop-down hanging off the sticky
+   header — that was the scroll bug: pinned to the header, its
+   bottom rows (Saved, Advertise, About) sat below the screen with
+   no way to reach them. It is now a full-height drawer opening
+   from the right with its OWN scroll, so every row is reachable.
+   The account menu and the notes panel move inside it on phones
+   (auth.js relocates the real elements), so in the drawer they
+   sit flat and static — no dropdown card, no shadow, no absolute
+   anchor. This block lives at the END of the file on purpose: the
+   base .mobile-nav-panel / .auth-menu / .notes-panel rules sit far
+   above, and these must win at phone widths (the same
+   later-rule-wins lesson as the hamburger cascade bug). Desktop is
+   untouched: nothing here applies above 900px, and the panel stays
+   pinned shut there outright. */
+@media (max-width: 900px) {
+    .auth-area { display: none; }
+    .hamburger-btn { order: 2; margin-left: auto; position: relative; }
+    .mobile-nav-panel {
+        position: fixed; top: 0; right: 0; left: auto;
+        width: min(330px, 88vw); height: 100%; height: 100dvh;
+        overflow-y: auto; overscroll-behavior: contain;
+        border-bottom: none; border-left: 1px solid var(--border-color);
+        box-shadow: -18px 0 40px rgba(40,20,70,0.18);
+        padding: 0.75rem 16px 1.25rem; z-index: 200;
+    }
+    .mobile-nav-panel .auth-menu,
+    .mobile-nav-panel .notes-panel {
+        position: static; width: auto; max-height: none;
+        background: transparent; border: none; border-radius: 0;
+        box-shadow: none; padding: 0.25rem 0 0.35rem;
+    }
+    .mobile-nav-panel .auth-menu-close { display: none; }
+    /* In the drawer the email line also lines up with the row
+       text (0.9rem in from the panel edge, like every row). */
+    .mobile-nav-panel .auth-menu-email { padding-right: 0; padding-left: 0.9rem; }
+    /* Uniform rows (owner, 2026-11-15, fourth pass — the order
+       "looks very neat", but the styling read patchwork: My Feed
+       was a big tinted box (its .active fill), the middle rows
+       were plain white, the account rows were purple pills
+       again, and the page links sat in two columns — colour on
+       top, colour on the bottom, none in the middle, then white
+       again. Now EVERY row in the panel wears the same clothes:
+       plain white, 48px, the same plum semibold text, counts at
+       the right edge. The current view loses its filled box —
+       inside the panel the active row is just plum text like
+       every other row. The account menu's rows drop their pill
+       fill while they live in the drawer and stack flush like
+       the rest (the Change chip stays a small outlined pill —
+       it is a button; the masked email stays the plain line it
+       already was), and the page links go single column. Sign
+       out keeps its pale red bar: it is the one action row, and
+       the owner did not object to it. Desktop is untouched —
+       these rules live in the phone block, scoped to the panel,
+       and the desktop menu keeps its pills. */
+    .mobile-nav-panel .mobile-nav-rows a,
+    .mobile-nav-panel .mobile-nav-list a,
+    .mobile-nav-panel .mnav-row,
+    .mobile-nav-panel .mobile-nav-pages a {
+        background: transparent; color: var(--highlight);
+        font-size: 0.98rem; font-weight: 600;
+        min-height: 48px; padding: 0.5rem 0.9rem;
+    }
+    .mobile-nav-panel .mobile-nav-rows a.active,
+    .mobile-nav-panel .mobile-nav-list a.active { background: transparent; }
+    .mobile-nav-panel .mobile-nav-pages { display: flex; flex-direction: column; gap: 0; }
+    .mobile-nav-panel .auth-menu-links { gap: 0; }
+    .mobile-nav-panel .auth-menu-link {
+        background: transparent; color: var(--highlight);
+        font-size: 0.98rem; font-weight: 600;
+        min-height: 48px; padding: 0.5rem 0.9rem;
+        display: flex; align-items: center;
+    }
+    .mobile-nav-panel .auth-menu-link:hover { background: transparent; }
+    .mobile-nav-panel .auth-menu-link.auth-menu-signout {
+        background: #FDECEC; color: #B3261E; justify-content: center;
+    }
+    .mobile-nav-panel .auth-menu-link.auth-menu-signout:hover { background: #FAD9D9; }
+}
