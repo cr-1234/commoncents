@@ -37,6 +37,15 @@
 // same day against their brand pages (Starbucks Rewards terms,
 // Panera Benefits Terms, Krispy Kreme Rewards, Baskin-Robbins FAQ,
 // Denny's FAQ + Jan 2026 press release).
+//
+// Added 2026-11-16: Fancy Feast 2026 Feastivities Ornament (verified
+// against Purina's own feastivities page; ornaments restock daily
+// Nov 9-20 in the myPurina app). Walgreens 6 free photo cards
+// (code 6PREM, through Nov 17) was checked the same day and NOT
+// added: both aggregator pictures show real people's family photos,
+// not a clean shot of the item — no clean picture, no freebie.
+// All five standing entries re-verified live again this day
+// (Starbucks, Panera, Krispy Kreme, Baskin-Robbins, Denny's).
 const freebies = [
     {
         id: 1,
@@ -103,5 +112,16 @@ const freebies = [
         expires: "2026-12-12",
         votes: { up: 0, down: 0 },
         howTo: "Join MyLowe's Rewards free, create a Kids Profile, then reserve a spot for Saturday, December 12, 2026 (10 a.m. to 1 p.m., in-store) on Lowe's workshops page — registration opened November 14 and spots go fast. Built for kids ages 4 to 11, with a parent or guardian along."
+    },
+    {
+        id: 7,
+        title: "Free 2026 Fancy Feast Feastivities Ornament",
+        store: "Fancy Feast",
+        image: "img/freebie-fancyfeast-ornament.png",
+        description: "Fancy Feast is giving away a complimentary 2026 Feastivities ornament — a festive keepsake for cat lovers, with a floral gift box and ribbon to hang it by. It is claimed through the myPurina app, one per person, while the daily supply lasts.",
+        url: "https://www.purina.com/fancy-feast/feastivities",
+        expires: "2026-11-20",
+        votes: { up: 0, down: 0 },
+        howTo: "Download the free myPurina app and sign up, then open the ornament offer in the app between 11 a.m. and 5:30 p.m. ET — ornaments restock daily through November 20 and go fast, so check early in the window."
     }
 ];
