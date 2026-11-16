@@ -305,6 +305,21 @@
         // The browse category half of the saved view; app.js restores it
         // at startup (and validates it against the actual nav links).
         savedCategory: function () { return viewCategory; },
+        // The header logo's promise (owner, 2026-11-15): tapping the
+        // CommonCents name ALWAYS lands on the front page — All Deals.
+        // The logo used to be a plain link home: the click reloaded
+        // the page and the saved-view restore above put the visitor
+        // straight back where they were (Saved, My Feed, a category),
+        // so the logo appeared to do nothing. app.js calls this on a
+        // logo tap, then setCategory('all') repaints and re-renders;
+        // the reset is persisted too, so even a later reload lands on
+        // the front page.
+        goHome: function () {
+            mode = 'browse';
+            viewCategory = 'all';
+            saveView();
+            paintAll();
+        },
         setInterests: function (keys, fromAccount) {
             var valid = (keys || []).filter(function (k) {
                 return INTERESTS.some(function (i) { return i.key === k; });
