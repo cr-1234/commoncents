@@ -918,6 +918,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     .deal-grid:not(.saved-view) .expired-badge,
     .deal-grid:not(.saved-view) .free-badge,
     .deal-grid:not(.saved-view) .gone-badge { top: 6px; left: 6px; }
+    .deal-grid:not(.saved-view) .new-badge-freebie { left: auto; right: 6px; }
     .deal-grid:not(.saved-view) .vote-btn { padding: 0.25rem 0.3rem; }
     .deal-grid:not(.saved-view) .vote-btn.share-btn span,
     .deal-grid:not(.saved-view) .vote-btn .save-label { display: none; }
@@ -1062,6 +1063,10 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     font-size: 11px; font-weight: 800; letter-spacing: 0.05em;
     padding: 0.28rem 0.65rem; border-radius: 999px;
 }
+/* A freebie's NEW badge (owner, 2026-11-16) sits at the picture's
+   top-right — the top-left corner already carries its FREE badge. */
+.new-badge-freebie { left: auto; right: 10px; }
+.new-badge-inline { position: static; display: inline-block; margin: 0 0 0.55rem 0.4rem; }
 
 /* ── Accounts: header sign-in + auth modal ──────────────────────── */
 .auth-area { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; margin-left: auto; position: relative; }

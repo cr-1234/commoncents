@@ -1074,9 +1074,9 @@ function buildFreebieCard(f, snapshot) {
     const isSaved = hasFreebieSave(f.id);
     const savedDate = snapshot && snapshot.ts ? new Date(snapshot.ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
     article.innerHTML = `
-        ${f.image ? `<div class="card-image"><img src="${f.image}" alt="${f.title}" loading="lazy"><span class="free-badge">FREE</span>${snapshot ? '<span class="saved-freebie-badge">SAVED FREEBIE</span>' : ''}</div>` : ''}
+        ${f.image ? `<div class="card-image"><img src="${f.image}" alt="${f.title}" loading="lazy"><span class="free-badge">FREE</span>${!snapshot && window.CC_FEED && CC_FEED.isNewFreebie && CC_FEED.isNewFreebie(f) ? '<span class="new-badge new-badge-freebie">NEW</span>' : ''}${snapshot ? '<span class="saved-freebie-badge">SAVED FREEBIE</span>' : ''}</div>` : ''}
         <div class="card-content">
-            ${f.image ? '' : `<span class="free-badge free-badge-inline">FREE</span>${snapshot ? '<span class="saved-freebie-badge saved-freebie-badge-inline">SAVED FREEBIE</span>' : ''}`}
+            ${f.image ? '' : `<span class="free-badge free-badge-inline">FREE</span>${!snapshot && window.CC_FEED && CC_FEED.isNewFreebie && CC_FEED.isNewFreebie(f) ? '<span class="new-badge new-badge-inline">NEW</span>' : ''}${snapshot ? '<span class="saved-freebie-badge saved-freebie-badge-inline">SAVED FREEBIE</span>' : ''}`}
             <div class="card-meta">
                 <span class="card-source">${f.store}</span>
                 <span class="card-category">Free Stuff</span>
@@ -1130,6 +1130,17 @@ function createSavedFreebieCard(save) { return buildFreebieCard(save, save); }
 // this modal fires none).
 function openFreebieModal(f) {
     window._ccOpenDealId = null; // no deal thread is open; ccSetupComments sets the thread key below
+    // Opening a freebie counts as seeing it, same as a deal (owner,
+    // 2026-11-16): retire its NEW badge on the spot and for good.
+    if (window.CC_FEED && CC_FEED.markFreebieSeen) {
+        try { CC_FEED.markFreebieSeen(f); } catch (e) {}
+        document.querySelectorAll('#dealGrid .freebie-card').forEach(function (card) {
+            if (card.querySelector('[data-fid="' + f.id + '"]')) {
+                const fb = card.querySelector('.new-badge');
+                if (fb) fb.remove();
+            }
+        });
+    }
     const skipLoadOnce = !!f._skipLoadOnce;
     delete f._skipLoadOnce;
     const key = freebieVoteKey(f);
