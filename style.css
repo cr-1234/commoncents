@@ -264,14 +264,19 @@ body:not(.dark-mode) .glass {
 
 /* ── Layout ─────────────────────────────────────────────────── */
 .main-content {
-    display: grid; grid-template-columns: 250px 1fr 290px;
+    display: grid; grid-template-columns: 250px 1fr;
     gap: 1.75rem; align-items: start; padding-top: 2rem; padding-bottom: 2rem;
 }
 /* Ad-blocker fallback (JS adds .no-ads when the sponsor rail is not actually visible): the deals take the rail's space back so the layout looks normal. */
 .main-content.no-ads { grid-template-columns: 250px 1fr; }
-/* Right rail: one sponsored slot (the CR Design ad from the emails).
-   Sticky like the sidebar; steps aside on narrower screens. */
-.ad-rail { position: sticky; top: 6rem; }
+/* Sponsored slot (the CR Design ad from the emails). Owner,
+   2026-11-15: moved out of the side rail to a centred strip at
+   the bottom, under the deals and the pagination — the same
+   placement phones already had. The side column is valuable
+   space; while there is one sponsor, the bottom keeps the ad
+   seen on every page without costing the deals their width.
+   When more sponsors arrive, the rail can come back. */
+.ad-rail { position: static; grid-column: 1 / -1; width: 100%; max-width: 430px; margin: 0.5rem auto 0; }
 .ad-rail-label {
     font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem;
