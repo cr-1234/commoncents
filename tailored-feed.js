@@ -245,6 +245,22 @@
             try { CC_AUTH.noteInterestsChanged(getInterests()); } catch (e) {}
         }
     }
+
+    // The opened-deals state, for the account sync (owner request,
+    // 2026-11-16): signed in, the deals/freebies you've opened follow
+    // your account, so a deal read on your phone doesn't still say
+    // NEW DEAL on your computer. auth.js pushes changes up
+    // (noteSeenChanged) and folds the account's set back in at
+    // sign-in (applyAccountSeen) — always by union, since opening is
+    // one-way and a union can never resurrect a badge wrongly.
+    function getSeenState() {
+        return { deals: [...seenDeals], freebies: [...seenFreebies] };
+    }
+    function notifySeenChanged() {
+        if (window.CC_AUTH && CC_AUTH.noteSeenChanged) {
+            try { CC_AUTH.noteSeenChanged(getSeenState()); } catch (e) {}
+        }
+    }
     // Mirrors app.js isDealExpired: only deals marked dead are
     // expired — never age alone. The tailored feed shows live deals.
     function isExpired(d) {
@@ -308,14 +324,18 @@
         },
         markSeen: function (deal) {
             if (!deal || deal.id == null) return;
+            var changed = false;
             if (!seenDeals.has(deal.id)) {
                 seenDeals.add(deal.id);
                 lsSet('ccSeenDeals', JSON.stringify([...seenDeals]));
+                changed = true;
             }
             // Opening the deal retires its badge for good.
             if (newBadges.delete(deal.id)) {
                 lsSet('ccNewBadges', JSON.stringify([...newBadges]));
+                changed = true;
             }
+            if (changed) notifySeenChanged();
         },
         isNewFreebie: function (f) {
             if (!f || f.id == null) return false;
@@ -326,7 +346,30 @@
             if (!seenFreebies.has(f.id)) {
                 seenFreebies.add(f.id);
                 lsSet('ccSeenFreebies', JSON.stringify([...seenFreebies]));
+                notifySeenChanged();
             }
+        },
+        getSeenState: getSeenState,
+        // Sign-in union merge (auth.js calls this with the union of
+        // the account's opened ids and this device's): fold the ids
+        // in, retire the matching NEW badges, persist, repaint, and
+        // push the merged set back up so the account holds the union.
+        applyAccountSeen: function (state) {
+            if (!state) return;
+            var changed = false;
+            (Array.isArray(state.deals) ? state.deals : []).forEach(function (id) {
+                if (!seenDeals.has(id)) { seenDeals.add(id); changed = true; }
+                if (newBadges.delete(id)) changed = true;
+            });
+            (Array.isArray(state.freebies) ? state.freebies : []).forEach(function (id) {
+                if (!seenFreebies.has(id)) { seenFreebies.add(id); changed = true; }
+            });
+            if (!changed) return;
+            lsSet('ccSeenDeals', JSON.stringify([...seenDeals]));
+            lsSet('ccNewBadges', JSON.stringify([...newBadges]));
+            lsSet('ccSeenFreebies', JSON.stringify([...seenFreebies]));
+            if (typeof window.renderDeals === 'function') { try { window.renderDeals(); } catch (e) {} }
+            notifySeenChanged();
         },
         getInterests: getInterests,
         getAudience: getAudience,

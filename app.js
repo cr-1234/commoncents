@@ -536,7 +536,13 @@ function setupEventListeners() {
     // shape): the waitlist form swaps to a "You're on the list ✓" line
     // once this device has joined (ccGwWaitlistEmail); signed-in
     // visitors get their account email prefilled and lose the
-    // create-account line (they already have one).
+    // create-account line (they already have one). The joined line
+    // follows the signed-in account (owner's call, 2026-11-16): while
+    // signed in it only shows when the stored email IS the account
+    // email (or was joined from this page just now) — a different
+    // account sees the form, prefilled with its own email, instead of
+    // somebody else's "on the list" line. Signed out, the device
+    // memory applies as before.
     const GW_TEASERS = [
         { form: 'sidebarGwWaitlistForm', email: 'sidebarGwWaitlistEmail', err: 'sidebarGwWaitlistErr', btn: 'sidebarGwWaitlistBtn', done: 'sidebarGwWaitlistDone', alt: 'sidebarGwAccountLine' },
         { form: 'modalGwWaitlistForm', email: 'modalGwWaitlistEmail', err: 'modalGwWaitlistErr', btn: 'modalGwWaitlistBtn', done: 'modalGwWaitlistDone', alt: 'modalGwAccountLine' }
@@ -544,13 +550,20 @@ function setupEventListeners() {
     function gwJoinedEmail() {
         try { return localStorage.getItem('ccGwWaitlistEmail') || ''; } catch (e) { return ''; }
     }
+    let gwSessionJoined = '';
     function paintGwTeaser(ids, signedIn) {
         const form = document.getElementById(ids.form);
         const done = document.getElementById(ids.done);
         const alt = document.getElementById(ids.alt);
         const input = document.getElementById(ids.email);
         const joined = gwJoinedEmail();
-        if (joined) {
+        const acct = signedIn && window.CC_AUTH && CC_AUTH.email ? String(CC_AUTH.email() || '') : '';
+        const joinedHere = !!joined && (
+            !signedIn ||
+            joined.toLowerCase() === acct.toLowerCase() ||
+            joined.toLowerCase() === gwSessionJoined.toLowerCase()
+        );
+        if (joinedHere) {
             if (form) form.style.display = 'none';
             if (done) {
                 done.textContent = "You're on the list ✓ — we'll email you at " + joined + ' when it launches.';
@@ -745,6 +758,7 @@ function setupEventListeners() {
             if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
             CC_GW.joinWaitlist(em).then(() => {
                 try { localStorage.setItem('ccGwWaitlistEmail', em); } catch (e) {}
+                gwSessionJoined = em;
                 if (btn) { btn.disabled = false; btn.textContent = 'Notify Me'; }
                 paintGiveawayState();
             }).catch(() => {
