@@ -285,5 +285,27 @@
     "shelvedAt": "2026-11-17",
     "shelvedReason": "Price rose to list price — no discount left",
     "lastSeenPrice": 3.79
+  },
+  {
+    "id": 1090,
+    "title": "Tapo ColorPro 2K QHD Wi-Fi Outdoor PoE Plug-In Security Camera C325WB For $49.99 From Amazon",
+    "category": "tech",
+    "fc": "Tech",
+    "price": 49.99,
+    "originalPrice": 74.99,
+    "discount": 33,
+    "image": "https://m.media-amazon.com/images/I/514lnXnnnPL._AC_SL1000_.jpg",
+    "url": "https://www.amazon.com/dp/B0C48DZJ6Y?tag=commoncents0050-20",
+    "description": "Tapo's ColorPro outdoor camera sees in full color even in near-darkness, no spotlight needed, with 2K QHD video and free person, pet, and vehicle detection. Wired or PoE, weatherproof, and $49.99 — its lowest price yet.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-13T10:28:08Z",
+    "source": "slickdeals",
+    "aud": "all",
+    "shelvedAt": "2026-11-17",
+    "shelvedReason": "Temporarily out of stock on Amazon",
+    "lastSeenPrice": 49.99
   }
 ]
