@@ -263,5 +263,27 @@
     "shelvedAt": "2026-11-16",
     "shelvedReason": "Price rose to $52.46 — only 19% off its $64.99 list (posted $48.65).",
     "lastSeenPrice": 52.46
+  },
+  {
+    "id": 1026,
+    "title": "Snyder’s Of Hanover Gluten Free Mini Pretzels 8oz. Bag For $3 From Amazon",
+    "category": "groceries",
+    "fc": "Groceries",
+    "price": 3,
+    "originalPrice": 3.79,
+    "discount": 21,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/02120113/product-B00GCFS3M4.jpg",
+    "url": "https://www.amazon.com/dp/B00GCFS3M4?tag=commoncents0050-20",
+    "description": "Gluten-free mini pretzels from Snyder's of Hanover in an 8oz snack bag. A pantry filler at $3 — toss a few into your next Amazon order.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-03T04:34:05Z",
+    "source": "dansdeals",
+    "aud": "all",
+    "shelvedAt": "2026-11-17",
+    "shelvedReason": "Price rose to list price — no discount left",
+    "lastSeenPrice": 3.79
   }
 ]
