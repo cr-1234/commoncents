@@ -4,6 +4,9 @@
 // backend (the one Gifting Butler uses). Signing in gets you:
 //   - Your feed interests saved to your account (ccGetProfile /
 //     ccSaveInterests) — they follow you across devices.
+//   - The deals/freebies you've opened saved to your account
+//     (ccSaveSeen, returned by ccGetProfile) — so the NEW DEAL
+//     badges follow you across devices too.
 //   - One-tap giveaway entry: the drawing uses your account email,
 //     no typing (ccEnterGiveaway accepts the sign-in token).
 // Guests are untouched: picks stay saved in the browser, as before.
@@ -86,6 +89,26 @@
         var user = currentUser;
         var copy = (list || []).map(function (s) { return Object.assign({}, s); });
         savesSaveTimer = setTimeout(function () { saveSavesNow(user, copy); }, 600);
+    }
+
+    var seenSaveTimer = null;
+    function saveSeenNow(user, state) {
+        return user.getIdToken().then(function (token) {
+            return postFn('ccSaveSeen', { seenDeals: state.deals, seenFreebies: state.freebies }, token);
+        }).catch(function () { /* saving retries on the next change */ });
+    }
+    // Called by tailored-feed.js whenever a deal/freebie is opened.
+    // The server unions what it receives into the account's set, so
+    // pushing this device's full set is always safe.
+    function noteSeenChanged(state) {
+        if (!currentUser) return;
+        clearTimeout(seenSaveTimer);
+        var user = currentUser;
+        var copy = {
+            deals: (state && Array.isArray(state.deals)) ? state.deals.slice() : [],
+            freebies: (state && Array.isArray(state.freebies)) ? state.freebies.slice() : []
+        };
+        seenSaveTimer = setTimeout(function () { saveSeenNow(user, copy); }, 600);
     }
 
     // Called by tailored-feed.js whenever the picks change locally.
@@ -506,6 +529,37 @@
                     || JSON.stringify(mergedSTombs) !== JSON.stringify(acctSTombs);
                 if (sDiffers) CC_SAVES.set(mergedSaves, mergedSTombs); // set() also pushes the merge back up
                 else if (acctSStale) saveSavesNow(user, mergedSaves);
+            }
+            // Seen (opened deals/freebies) merges by plain union —
+            // opening is one-way, so there are no tombstones: the
+            // union of the account's opened ids and this device's is
+            // always the truth. Applying it retires the NEW badges
+            // for everything the member already opened on any device
+            // (owner request, 2026-11-16: read it on the phone and
+            // it still says NEW DEAL on the computer).
+            if (window.CC_FEED && typeof CC_FEED.getSeenState === 'function' && typeof CC_FEED.applyAccountSeen === 'function') {
+                var sameIds = function (a, b) {
+                    if (a.length !== b.length) return false;
+                    var bs = {};
+                    b.forEach(function (id) { bs[id] = true; });
+                    return a.every(function (id) { return bs[id] === true; });
+                };
+                var acctSeenD = Array.isArray(res.seenDeals) ? res.seenDeals : [];
+                var acctSeenF = Array.isArray(res.seenFreebies) ? res.seenFreebies : [];
+                var localSeen = CC_FEED.getSeenState();
+                var uD = {}, uF = {};
+                acctSeenD.forEach(function (id) { uD[id] = true; });
+                localSeen.deals.forEach(function (id) { uD[id] = true; });
+                acctSeenF.forEach(function (id) { uF[id] = true; });
+                localSeen.freebies.forEach(function (id) { uF[id] = true; });
+                var unionSeen = {
+                    deals: Object.keys(uD).map(Number),
+                    freebies: Object.keys(uF).map(Number)
+                };
+                var seenDiffers = !sameIds(unionSeen.deals, localSeen.deals) || !sameIds(unionSeen.freebies, localSeen.freebies);
+                var acctSeenStale = !sameIds(unionSeen.deals, acctSeenD) || !sameIds(unionSeen.freebies, acctSeenF);
+                if (seenDiffers) CC_FEED.applyAccountSeen(unionSeen); // also pushes the merge back up
+                else if (acctSeenStale) saveSeenNow(user, unionSeen);
             }
         }).catch(function () { /* guest picks remain in effect */ });
     }
@@ -951,6 +1005,7 @@
             return currentUser ? currentUser.getIdToken() : Promise.reject(new Error('not signed in'));
         },
         noteInterestsChanged: noteInterestsChanged,
+        noteSeenChanged: noteSeenChanged,
         noteVotesChanged: noteVotesChanged,
         noteSavesChanged: noteSavesChanged,
         username: function () { return profileUsername; },
