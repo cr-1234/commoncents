@@ -46,6 +46,15 @@
 // not a clean shot of the item — no clean picture, no freebie.
 // All five standing entries re-verified live again this day
 // (Starbucks, Panera, Krispy Kreme, Baskin-Robbins, Denny's).
+//
+// Added 2026-11-18: JCPenney free LEGO Snowman Ornament kids build
+// (Sat Dec 12, 11am-noon, verified against JCPenney's own Kids Zone
+// page, which carries the event; picture is the brand's own snowman
+// shot cropped to the two ornaments, promo frame removed). Same day:
+// all 7 existing entries re-verified live against their brand pages
+// (Starbucks/Panera/Krispy Kreme/Baskin-Robbins/Denny's birthday
+// programs, Lowe's workshops page, Purina feastivities page — the
+// ornament offer still live, expires Nov 20). No expiries to prune.
 const freebies = [
     {
         id: 1,
@@ -123,5 +132,16 @@ const freebies = [
         expires: "2026-11-20",
         votes: { up: 0, down: 0 },
         howTo: "Download the free myPurina app and sign up, then open the ornament offer in the app between 11 a.m. and 5:30 p.m. ET — ornaments restock daily through November 20 and go fast, so check early in the window."
+    },
+    {
+        id: 8,
+        title: "Free LEGO Snowman Ornament Build At JCPenney",
+        store: "JCPenney",
+        image: "img/freebie-jcpenney-snowman.jpg",
+        description: "JCPenney's free Kids Zone event on Saturday, December 12 lets kids build their own LEGO snowman ornament from real LEGO bricks and take it home — plus a craft ID badge with lanyard and a collector's pin, all free while supplies last.",
+        url: "https://www.jcpenney.com/m/kids-club",
+        expires: "2026-12-12",
+        votes: { up: 0, down: 0 },
+        howTo: "Just visit a participating JCPenney store on Saturday, December 12, 2026, between 11 a.m. and noon local time. Kids must be there in person with a parent or guardian, and crafts are first come, first served while supplies last."
     }
 ];
