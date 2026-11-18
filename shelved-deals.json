@@ -363,5 +363,28 @@
     "shelvedAt": "2026-11-17",
     "shelvedReason": "Temporarily out of stock on Amazon",
     "lastSeenPrice": null
+  },
+  {
+    "id": 1037,
+    "title": "2 Pack Of Lerat Rechargeable Hand Warmers For $6.88 From Amazon",
+    "category": "general",
+    "fc": "General",
+    "price": 6.88,
+    "originalPrice": 14.98,
+    "discount": 54,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/01184854/product-B0FNQLTK83.jpg",
+    "url": "https://www.amazon.com/dp/B0FNQLTK83?tag=commoncents0050-20",
+    "description": "Two rechargeable hand warmers — no disposable packets to buy all winter, and they recharge over USB.",
+    "code": "9NSFRATG",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-03T04:42:35Z",
+    "source": "dansdeals",
+    "aud": "all",
+    "shelvedAt": "2026-11-18",
+    "shelvedReason": "Promo code savings path gone — no coupon on the page, base price $14.99 back at list",
+    "lastSeenPrice": 14.99
   }
 ]
