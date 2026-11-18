@@ -308,5 +308,60 @@
     "shelvedAt": "2026-11-17",
     "shelvedReason": "Price rose to list price $49.99 — no discount left (posted $23.99).",
     "lastSeenPrice": 49.99
+  },
+  {
+    "id": 1001,
+    "title": "Samsung 65″ S85H Series OLED 4K Smart TV For $997.99 Shipped From Amazon",
+    "category": "tech",
+    "fc": "Tech",
+    "price": 997.99,
+    "originalPrice": 1297.99,
+    "discount": 23,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/10/31230236/product-B0GQ6YWP33.jpg",
+    "url": "https://www.amazon.com/dp/B0GQ6YWP33?tag=commoncents0050-20",
+    "description": "Samsung's S85H OLED delivers perfect blacks, rich color, and smooth 4K motion for movies, sports, and gaming. A 65-inch OLED under $1,000 is rare — this one is hundreds under its list price.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-02T16:38:50Z",
+    "source": "dansdeals",
+    "aud": "all",
+    "gallery": [
+      "https://m.media-amazon.com/images/I/51-xwq8lxUL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71JYYDpeaCL._AC_SL1500_.jpg"
+    ],
+    "shelvedAt": "2026-11-17",
+    "shelvedReason": "Price rose to $1,197.99 — only about 8% off the $1,297.99 list (posted $997.99).",
+    "lastSeenPrice": 1197.99
+  },
+  {
+    "id": 1094,
+    "title": "Ghost Of Yotei (PS5) For $34.97 From Amazon",
+    "category": "tech",
+    "fc": "Tech",
+    "price": 34.97,
+    "originalPrice": 54.99,
+    "discount": 36,
+    "image": "https://m.media-amazon.com/images/I/81ZD-UIELoL._SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B0F6F41T4H?tag=commoncents0050-20",
+    "description": "Atsu's standalone samurai adventure in 1600s Japan, set around Mount Yotei — the follow-up to the acclaimed Ghost of Tsushima, with open-world exploration, duels, and a striking autumn landscape. At $34.97 it's $20 under its $54.99 list price.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-16T13:30:06Z",
+    "source": "slickdeals",
+    "aud": "all",
+    "gallery": [
+      "https://m.media-amazon.com/images/I/7126zvqbAHL._SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71yKYTQWfgL._SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81OD5x1PvJL._SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81o8AVjMvvL._SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71mpj4tOlwL._SL1500_.jpg"
+    ],
+    "shelvedAt": "2026-11-17",
+    "shelvedReason": "Temporarily out of stock on Amazon",
+    "lastSeenPrice": null
   }
 ]
