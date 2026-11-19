@@ -985,7 +985,7 @@
                 menuDelBtn.textContent = 'Tap again to permanently delete your account and everything saved with it';
                 setTimeout(function () {
                     if (menuDelBtn.dataset.armed) { delete menuDelBtn.dataset.armed; menuDelBtn.textContent = 'Delete account'; }
-                }, 6000);
+                }, 15000);
                 return;
             }
             menuDelBtn.disabled = true;
