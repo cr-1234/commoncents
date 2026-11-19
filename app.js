@@ -2200,6 +2200,7 @@ function getStoreName(url) {
     try {
         const h = new URL(url).hostname;
         if (h.includes('amazon')) return 'Amazon';
+        if (h.includes('sovrn.co')) return 'Walmart'; // the Sovrn approval deal (id 1099) points to Walmart
         if (h.includes('dyson'))  return 'Dyson';
         if (h.includes('yeti'))   return 'YETI';
         return h.replace('www.', '').split('.')[0];
