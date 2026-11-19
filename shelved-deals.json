@@ -409,5 +409,82 @@
     "shelvedAt": "2026-11-18",
     "shelvedReason": "Amazon page now shows a different Ninja model (1200W Auto-iQ Compact) instead of the TB401 BlendSense — needs owner's eyes.",
     "lastSeenPrice": null
+  },
+  {
+    "id": 1022,
+    "title": "IRIS USA 4 Pack Of 6qt. Small Stacking Drawer Storage Organizers For $17.99 From Amazon",
+    "category": "household",
+    "fc": "Household",
+    "price": 17.99,
+    "originalPrice": 29.99,
+    "discount": 40,
+    "image": "https://i.dansdeals.com/wp-content/uploads/2026/10/06163447/product-B07C8LFBRB.jpg",
+    "url": "https://www.amazon.com/dp/B07C8LFBRB?tag=commoncents0050-20",
+    "description": "Four stackable 6-quart drawers for closets, desks, bathrooms, and craft supplies. Simple organization that actually stays organized.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-03T04:34:05Z",
+    "source": "dansdeals",
+    "aud": "all",
+    "gallery": [
+      "https://m.media-amazon.com/images/I/81R0BPXOMwL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/91aIob2u6dL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/91npl60Fh7L._AC_SL1500_.jpg"
+    ],
+    "shelvedAt": "2026-11-19",
+    "shelvedReason": "Price rose to $26.14 — only 13% off its $29.99 list (posted $17.99).",
+    "lastSeenPrice": 26.14
+  },
+  {
+    "id": 1085,
+    "title": "Marvel Legends Series 6-Inch Iron Man Gold Action Figure For $19.99 From Amazon",
+    "category": "kids",
+    "fc": "Kids",
+    "price": 19.99,
+    "originalPrice": 24.99,
+    "discount": 20,
+    "image": "https://m.media-amazon.com/images/I/71DoTA7XljL._AC_SL1500_.jpg",
+    "url": "https://www.amazon.com/dp/B0CFZR82SK?tag=commoncents0050-20",
+    "description": "Hasbro’s Marvel Legends gold Iron Man in his original comic suit, with alternate hands, blast effects, and an unmasked Tony Stark head. $19.99, down from $24.99.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-12T15:19:15Z",
+    "source": "techbargains",
+    "aud": "all",
+    "gallery": [
+      "https://m.media-amazon.com/images/I/61BtSVnu+PL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61UMdJU8fML._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/615eCSljZeL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61SDSlhqSeL._AC_SL1500_.jpg"
+    ],
+    "shelvedAt": "2026-11-19",
+    "shelvedReason": "Price rose to $21.63 — only 13% off its $24.99 list (posted $19.99).",
+    "lastSeenPrice": 21.63
+  },
+  {
+    "id": 1099,
+    "title": "Gourmia All-in-One 14-Quart Air Fryer Oven With Rotisserie And Dehydrator For $55 Shipped From Walmart",
+    "category": "household",
+    "fc": "Household",
+    "price": 55,
+    "originalPrice": 129,
+    "discount": 57,
+    "image": "https://i5.walmartimages.com/seo/Gourmia-All-in-One-14-Quart-Air-Fryer-Oven-Rotisserie-Dehydrator-with-Temperature-Probe-New_ddede81a-1a1d-4f67-9691-244ba7752d8f.e73ca346184304e370cc829142d9f4f7.jpeg?odnHeight=573&odnWidth=573&odnBg=FFFFFF",
+    "url": "https://sovrn.co/8l906fs",
+    "description": "Four appliances in one for $55: this extra-large 14-quart Gourmia air fries, roasts, rotisseries and dehydrates, with a temperature probe so roasts come out right. Sold and shipped by Walmart with free shipping — down from $129.",
+    "votes": {
+      "up": 0,
+      "down": 0
+    },
+    "ts": "2026-11-19T00:54:22Z",
+    "source": "walmart",
+    "aud": "all",
+    "shelvedAt": "2026-11-19",
+    "shelvedReason": "Not an Amazon deal — link goes to Walmart (sovrn redirect) and the card says shipped from Walmart; CommonCents is Amazon-only. Needs owner's eyes.",
+    "lastSeenPrice": null
   }
 ]
