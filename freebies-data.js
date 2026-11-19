@@ -55,6 +55,18 @@
 // (Starbucks/Panera/Krispy Kreme/Baskin-Robbins/Denny's birthday
 // programs, Lowe's workshops page, Purina feastivities page — the
 // ornament offer still live, expires Nov 20). No expiries to prune.
+//
+// Added 2026-11-19: Michaels free Kids Club holiday crafts (Dec 5/12/19
+// Saturdays 10am-noon, verified against Michaels' own winter-workshop
+// page, which carries the Seasonal Slider Card and Holly Jolly Ornaments
+// projects; picture is the brand's own ornaments shot) and Smoothie King
+// free 12 oz Vanilla Peppermint D-Lite on Tue Dec 1 (verified against
+// Smoothie King's own Nov 19 press release; picture is the brand's own
+// menu shot of the vanilla peppermint cup). Same day: all 8 existing
+// entries checked — Starbucks/Krispy Kreme/Baskin-Robbins/Lowe's/JCPenney
+// pages answer 200; Panera/Denny's/Purina answer 403 to curl (bot
+// protection, not a 404 — kept, all three were verified live Nov 16-18).
+// Nothing past expiry to prune (Fancy Feast ornament expires Nov 20).
 const freebies = [
     {
         id: 1,
@@ -143,5 +155,27 @@ const freebies = [
         expires: "2026-12-12",
         votes: { up: 0, down: 0 },
         howTo: "Just visit a participating JCPenney store on Saturday, December 12, 2026, between 11 a.m. and noon local time. Kids must be there in person with a parent or guardian, and crafts are first come, first served while supplies last."
+    },
+    {
+        id: 9,
+        title: "Free Kids Club Holiday Crafts At Michaels In December",
+        store: "Michaels",
+        image: "img/freebie-michaels-ornaments.jpg",
+        description: "Michaels is running free Kids Club holiday craft mornings every Saturday in December — kids make a seasonal slider card, paint wooden Christmas ornaments, and decorate cookies, with all supplies included and nothing to pay.",
+        url: "https://www.michaels.com/winter-workshop",
+        expires: "2026-12-19",
+        votes: { up: 0, down: 0 },
+        howTo: "Just stop by a participating Michaels store on Saturday, December 5, 12 or 19 between 10 a.m. and noon — no registration needed. December 5 makes a sliding holiday card, December 12 paints wooden ornaments, and December 19 decorates cookies; supplies are included and kids should be there with a parent or guardian."
+    },
+    {
+        id: 10,
+        title: "Free Vanilla Peppermint Smoothie At Smoothie King On December 1",
+        store: "Smoothie King",
+        image: "img/freebie-smoothieking-peppermint.jpg",
+        description: "Smoothie King is handing out a free 12-ounce Vanilla Peppermint D-Lite smoothie on Tuesday, December 1 — banana, vanilla frozen yogurt and peppermint, with 12 grams of protein — to Healthy Rewards members, no purchase needed.",
+        url: "https://www.smoothieking.com/healthy-rewards",
+        expires: "2026-12-01",
+        votes: { up: 0, down: 0 },
+        howTo: "Download the Smoothie King app and join Healthy Rewards free before December 1, then stop by a participating Smoothie King on Tuesday, December 1 and claim your free 12 oz. Vanilla Peppermint D-Lite smoothie — new and existing members both qualify, while supplies last."
     }
 ];
