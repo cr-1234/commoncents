@@ -355,6 +355,7 @@
         moveEl(menu, slot);
         moveEl(document.getElementById('notesPanel'), document.getElementById('mobileNotesSlot'));
         moveEl(document.getElementById('authMenuSignOut'), document.getElementById('mobileSignOutSlot'));
+        moveEl(document.getElementById('authMenuDelete'), document.getElementById('mobileSignOutSlot'));
         setDrawerDupRows(false);
         document.body.classList.add('cc-phone-layout');
         syncPhoneChrome();
@@ -970,6 +971,39 @@
             // signing out tucks the drawer away too.
             if (window.CC_MOBILE_NAV) window.CC_MOBILE_NAV.close();
             if (auth) auth.signOut();
+        });
+
+        // Delete account (owner request, 2026-11-19): two taps — the
+        // first arms the button with the full warning, the second
+        // calls the shared deleteMyAccount endpoint, which erases
+        // the member's data on BOTH sites and the sign-in itself.
+        var menuDelBtn = document.getElementById('authMenuDelete');
+        if (menuDelBtn) menuDelBtn.addEventListener('click', function () {
+            if (!auth || !auth.currentUser) return;
+            if (!menuDelBtn.dataset.armed) {
+                menuDelBtn.dataset.armed = '1';
+                menuDelBtn.textContent = 'Tap again to permanently delete your account and everything saved with it';
+                setTimeout(function () {
+                    if (menuDelBtn.dataset.armed) { delete menuDelBtn.dataset.armed; menuDelBtn.textContent = 'Delete account'; }
+                }, 6000);
+                return;
+            }
+            menuDelBtn.disabled = true;
+            menuDelBtn.textContent = 'Deleting\u2026';
+            auth.currentUser.getIdToken().then(function (token) {
+                return postFn('deleteMyAccount', {}, token);
+            }).then(function (res) {
+                if (!res || !res.ok) throw new Error('bad');
+                closeMenu();
+                if (window.CC_MOBILE_NAV) window.CC_MOBILE_NAV.close();
+                if (auth) auth.signOut();
+                if (window.CC_TOAST) window.CC_TOAST('Your account has been deleted.');
+            }).catch(function () {
+                menuDelBtn.disabled = false;
+                delete menuDelBtn.dataset.armed;
+                menuDelBtn.textContent = 'Delete account';
+                if (window.CC_TOAST) window.CC_TOAST('That could not be deleted — try again.');
+            });
         });
         toggle.addEventListener('click', function () { setMode(mode === 'signin' ? 'signup' : 'signin'); });
 
