@@ -398,27 +398,5 @@
     "shelvedAt": "2026-11-19",
     "shelvedReason": "Price rose to $21.63 — only 13% off its $24.99 list (posted $19.99).",
     "lastSeenPrice": 21.63
-  },
-  {
-    "id": 1099,
-    "title": "Gourmia All-in-One 14-Quart Air Fryer Oven With Rotisserie And Dehydrator For $55 Shipped From Walmart",
-    "category": "household",
-    "fc": "Household",
-    "price": 55,
-    "originalPrice": 129,
-    "discount": 57,
-    "image": "https://i5.walmartimages.com/seo/Gourmia-All-in-One-14-Quart-Air-Fryer-Oven-Rotisserie-Dehydrator-with-Temperature-Probe-New_ddede81a-1a1d-4f67-9691-244ba7752d8f.e73ca346184304e370cc829142d9f4f7.jpeg?odnHeight=573&odnWidth=573&odnBg=FFFFFF",
-    "url": "https://sovrn.co/8l906fs",
-    "description": "Four appliances in one for $55: this extra-large 14-quart Gourmia air fries, roasts, rotisseries and dehydrates, with a temperature probe so roasts come out right. Sold and shipped by Walmart with free shipping — down from $129.",
-    "votes": {
-      "up": 0,
-      "down": 0
-    },
-    "ts": "2026-11-19T00:54:22Z",
-    "source": "walmart",
-    "aud": "all",
-    "shelvedAt": "2026-11-19",
-    "shelvedReason": "Not an Amazon deal — link goes to Walmart (sovrn redirect) and the card says shipped from Walmart; CommonCents is Amazon-only. Needs owner's eyes.",
-    "lastSeenPrice": null
   }
 ]
