@@ -381,7 +381,13 @@
                      the chips and the "Your feed:" line (owner, 2026-11-15). -->
                 <div class="interest-picker-foot">
                     <p class="feed-status" id="feedStatus"></p>
-                    <button type="button" class="my-feed-btn" id="feedDoneBtn">Done</button>
+                    <!-- Clear all (owner, 2026-11-18): one tap unclicks
+                         every category pick instead of tapping each chip
+                         off one at a time. Sits beside Done in the footer. -->
+                    <div class="picker-foot-btns">
+                        <button type="button" class="my-feed-btn picker-clear-btn" id="feedClearBtn">Clear all</button>
+                        <button type="button" class="my-feed-btn" id="feedDoneBtn">Done</button>
+                    </div>
                 </div>
             </div>
             <div class="deal-grid" id="dealGrid"></div>

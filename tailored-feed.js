@@ -517,6 +517,8 @@
                 els.status.textContent = 'Pick what you care about and this page becomes your feed — only those deals, from every site we collect.';
             }
         }
+        // Clear all greys out when there is nothing to clear.
+        if (els.clearBtn) els.clearBtn.disabled = mine.length === 0;
         // chips
         if (els.chips) {
             els.chips.innerHTML = '';
@@ -613,6 +615,20 @@
             // exist — the chip clicks already derived the mode).
             saveView();
             paintAll();
+        });
+        // Clear all (owner, 2026-11-18): one tap does what unclicking
+        // every chip one at a time does — empties the picks, drops back
+        // to browsing everything, and saves the empty list to the
+        // account through the same notifyChange path a chip tap uses.
+        els.clearBtn = document.getElementById('feedClearBtn');
+        if (els.clearBtn) els.clearBtn.addEventListener('click', function () {
+            if (!getInterests().length) return;
+            lsSet('ccInterests', '[]');
+            mode = 'browse';
+            saveView();
+            notifyChange();
+            paintAll();
+            if (typeof renderDeals === 'function') renderDeals();
         });
         if (els.widgetChange) els.widgetChange.addEventListener('click', function () {
             expanded = true;
