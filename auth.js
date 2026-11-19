@@ -233,7 +233,7 @@
                 // call fails the note simply comes back on the next load.
                 dismissNote(n);
                 if (n.site === 'gb') {
-                    window.open('https://giftingbutler-74395.web.app', '_blank', 'noopener');
+                    window.open('https://giftingbutler.com', '_blank', 'noopener');
                     return;
                 }
                 var panel = document.getElementById('notesPanel');
