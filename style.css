@@ -1051,10 +1051,21 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     background: var(--highlight); border-color: var(--highlight); color: #fff;
 }
 .interest-picker-foot .my-feed-btn:hover { background: var(--highlight); filter: brightness(0.9); color: #fff; }
+/* Clear all (owner, 2026-11-18): the quieter outline pill beside Done,
+   grouped with it at the footer's right end. */
+.picker-foot-btns { display: flex; gap: 0.5rem; flex: none; }
+.interest-picker-foot .picker-clear-btn {
+    background: transparent; color: var(--highlight);
+}
+.interest-picker-foot .picker-clear-btn:hover { background: #EDE5F8; color: var(--highlight); filter: none; }
+.interest-picker-foot .picker-clear-btn:disabled { opacity: 0.45; cursor: default; }
+.interest-picker-foot .picker-clear-btn:disabled:hover { background: transparent; }
 /* Narrow screens: the footer stacks — summary above, Done full-width below. */
 @media (max-width: 640px) {
     .interest-picker-foot { flex-direction: column; align-items: stretch; gap: 0.6rem; }
     .interest-picker-foot .my-feed-btn { width: 100%; }
+    .picker-foot-btns { width: 100%; }
+    .picker-foot-btns .my-feed-btn { flex: 1; width: auto; }
 }
 .sponsored-tag { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--highlight); border: 1px solid var(--highlight); padding: 0.08rem 0.45rem; border-radius: 999px; flex: none; }
 .new-badge {
