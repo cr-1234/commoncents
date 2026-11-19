@@ -793,6 +793,10 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .footer-content { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
 .footer-brand { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
 .footer-tagline { color: var(--text-secondary); font-size: 0.9rem; }
+.footer-social { display: flex; gap: 0.6rem; justify-content: center; }
+.footer-social a { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--highlight); color: var(--highlight); display: inline-flex; align-items: center; justify-content: center; transition: background-color 0.15s, color 0.15s; }
+.footer-social a:hover { background-color: var(--highlight); color: #fff; }
+.footer-social svg { width: 17px; height: 17px; fill: currentColor; }
 .footer-nav { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
 .footer-nav a { color: var(--text-secondary); font-size: 0.9rem; }
 .footer-nav a:hover { color: var(--highlight); }

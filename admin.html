@@ -67,29 +67,30 @@
 
             <div id="tab-deals">
             <h2 class="admin-h">Deal views &amp; clicks <button type="button" class="btn" id="adminRefresh" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
-            <p class="admin-note" style="margin-bottom:0.75rem;">Two different signals (counted since Nov 12, 2026 — views started a few hours after clicks): <strong>Views</strong> = someone opened the deal's window — pure interest; that's what decides whether a deal earns its place on the site. <strong>Clicks to Amazon</strong> = someone tapped "View Deal" / "Get This Deal" and went to the store — those are the ones that can turn into sales. Most-viewed first — the deals at the bottom are the ones nobody's even opening.</p>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Two different signals (counted since Nov 12, 2026 — views started a few hours after clicks): <strong>Views</strong> = someone opened the deal's window — pure interest; that's what decides whether a deal earns its place on the site. <strong>Clicks to Amazon</strong> = someone tapped "View Deal" / "Get This Deal" and went to the store — those are the ones that can turn into sales. Most-viewed first — the deals at the bottom are the ones nobody's even opening. A shelved deal comes back on its own if its price returns — or you can remove it for good with its <strong>Delete</strong> button.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
                     <thead><tr><th>Deal</th><th class="n">Price</th><th class="n">Views (opened)</th><th class="n">Clicks to Amazon</th><th class="n">Amazon today</th><th>Last Amazon click</th><th>Status</th></tr></thead>
                     <tbody id="clickRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
             </div>
+            <p class="admin-note" id="dealMsg" style="margin-top:0.6rem;"></p>
             </div>
 
             <div id="tab-members" style="display:none;">
             <h2 class="admin-h">Members <span class="admin-note" id="memberCount"></span></h2>
-            <p class="admin-note" style="margin-bottom:0.75rem;">Everyone who has ever signed up — both sites share one account system, so this is the combined list for CommonCents and Gifting Butler, newest first. Visible only to you: the server checks it's really your account before it sends anything, the list is never public.</p>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Everyone who has ever signed up — both sites share one account system, so this is the combined list for CommonCents and Gifting Butler, newest first. Visible only to you: the server checks it's really your account before it sends anything, the list is never public. <strong>Delete</strong> removes a member completely — their sign-in, lists, votes and comments on both sites — which is how you clear out test accounts. It cannot be undone, and your own account can't be deleted here.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
-                    <thead><tr><th>Member</th><th>Joined</th><th>Last active</th><th class="n">CC picks</th><th class="n">CC votes</th><th class="n">GB wishlist</th><th class="n">GB reminders</th></tr></thead>
-                    <tbody id="memberRows"><tr><td colspan="7">Loading…</td></tr></tbody>
+                    <thead><tr><th>Member</th><th>Joined</th><th>Last active</th><th class="n">CC picks</th><th class="n">CC votes</th><th class="n">GB wishlist</th><th class="n">GB reminders</th><th></th></tr></thead>
+                    <tbody id="memberRows"><tr><td colspan="8">Loading…</td></tr></tbody>
                 </table>
             </div>
             </div>
 
             <div id="tab-subs" style="display:none;">
             <h2 class="admin-h">Deal submissions <span class="admin-note" id="subCount"></span></h2>
-            <p class="admin-note" style="margin-bottom:0.75rem;">Deals readers sent in — the ones still waiting sit on top, newest first. Nothing is ever posted automatically; you review each one here. <strong>Posted</strong> asks which deal number it became, marks it done, and tells the submitter it's live (only when they sent it while signed in, so we know who they are). <strong>Passed</strong> files it away.</p>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Deals readers sent in — the ones still waiting sit on top, newest first. Nothing is ever posted automatically; you review each one here. <strong>Posted</strong> asks which deal number it became, marks it done, and tells the submitter it's live (only when they sent it while signed in, so we know who they are). <strong>Passed</strong> files it away. <strong>Delete</strong> removes an entry for good — that's the one for clearing out test entries and clutter.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
                     <thead><tr><th>Submitter</th><th>Deal link</th><th>Price seen</th><th>Note</th><th>Date</th><th>Status</th><th></th></tr></thead>
@@ -149,7 +150,22 @@
         document.getElementById('subRows').addEventListener('click', function (ev) {
             var b = ev.target && ev.target.closest ? ev.target.closest('[data-subact]') : null;
             if (!b) return;
-            setSubStatus(b.getAttribute('data-subid'), b.getAttribute('data-subact'));
+            var act = b.getAttribute('data-subact');
+            if (act === 'delete') {
+                if (armConfirm(b)) deleteSubmission(b.getAttribute('data-subid'));
+            } else {
+                setSubStatus(b.getAttribute('data-subid'), act);
+            }
+        });
+        document.getElementById('memberRows').addEventListener('click', function (ev) {
+            var b = ev.target && ev.target.closest ? ev.target.closest('[data-memdel]') : null;
+            if (!b) return;
+            if (armConfirm(b)) deleteMember(b.getAttribute('data-memdel'));
+        });
+        document.getElementById('clickRows').addEventListener('click', function (ev) {
+            var b = ev.target && ev.target.closest ? ev.target.closest('[data-shelfdel]') : null;
+            if (!b) return;
+            if (armConfirm(b)) markShelfPurge(b.getAttribute('data-shelfdel'), b.getAttribute('data-title'), b);
         });
 
         auth.onAuthStateChanged(function (user) {
@@ -254,8 +270,9 @@
                     var acts = '';
                     if (s.status === 'pending') {
                         acts = '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="posted" data-subid="' + esc(s.id) + '">Posted</button> ' +
-                            '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="passed" data-subid="' + esc(s.id) + '">Passed</button>';
+                            '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="passed" data-subid="' + esc(s.id) + '">Passed</button> ';
                     }
+                    acts += '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="delete" data-subid="' + esc(s.id) + '">Delete</button>';
                     return '<tr><td>' + who + '</td>' +
                         '<td style="max-width:260px; word-break:break-all;">' + deal + '</td>' +
                         '<td>' + esc(s.priceSeen || '—') + '</td>' +
@@ -292,6 +309,65 @@
             }).catch(function () { alert('That did not save — try again.'); });
         }
 
+        // Two-tap confirm for the destructive buttons: the first tap
+        // arms the button ("Delete forever?"), a second tap within a
+        // few seconds actually does it. Anything else resets it.
+        function armConfirm(btn) {
+            if (btn.getAttribute('data-armed') === '1') {
+                btn.removeAttribute('data-armed');
+                btn.textContent = 'Delete';
+                return true;
+            }
+            btn.setAttribute('data-armed', '1');
+            btn.textContent = 'Delete forever?';
+            setTimeout(function () {
+                btn.removeAttribute('data-armed');
+                btn.textContent = 'Delete';
+            }, 10000);
+            return false;
+        }
+
+        function ownerFetch(name, body) {
+            var user = auth.currentUser;
+            if (!user) return Promise.reject(new Error('signed out'));
+            return user.getIdToken().then(function (token) {
+                return fetch(FN + name, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(body || {})
+                });
+            }).then(function (r) { return r.json(); });
+        }
+
+        function deleteMember(email) {
+            ownerFetch('adminDeleteMember', { email: email }).then(function (res) {
+                if (res && res.ok) loadMembers();
+                else alert('That member was not deleted — try again.');
+            }).catch(function () { alert('That member was not deleted — try again.'); });
+        }
+
+        function deleteSubmission(id) {
+            ownerFetch('ccDeleteSubmission', { id: id }).then(function (res) {
+                if (res && res.ok) loadSubmissions();
+                else alert('That submission was not deleted — try again.');
+            }).catch(function () { alert('That submission was not deleted — try again.'); });
+        }
+
+        function markShelfPurge(id, title, btn) {
+            ownerFetch('ccMarkShelfPurge', { id: id, title: title }).then(function (res) {
+                if (res && res.ok) {
+                    var tr = btn.closest ? btn.closest('tr') : null;
+                    if (tr) tr.remove();
+                    var sc = document.getElementById('statShelf');
+                    var n = parseInt(sc.textContent, 10);
+                    if (!isNaN(n) && n > 0) sc.textContent = n - 1;
+                    document.getElementById('dealMsg').textContent = '“' + title + '” is marked for permanent deletion — its saved clicks, views and comments are already erased, and the shelf record itself is removed on the next price check (within a few hours).';
+                } else {
+                    alert('That deal was not deleted — try again.');
+                }
+            }).catch(function () { alert('That deal was not deleted — try again.'); });
+        }
+
         function fmtDate(ms) {
             return ms ? new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
         }
@@ -308,12 +384,12 @@
             }).then(function (r) { return r.json(); }).then(function (res) {
                 var tb = document.getElementById('memberRows');
                 if (!res || !res.ok || !Array.isArray(res.members)) {
-                    tb.innerHTML = '<tr><td colspan="7">Could not load the member list.</td></tr>';
+                    tb.innerHTML = '<tr><td colspan="8">Could not load the member list.</td></tr>';
                     return;
                 }
                 document.getElementById('memberCount').textContent = '— ' + res.members.length + ' total';
                 if (!res.members.length) {
-                    tb.innerHTML = '<tr><td colspan="7">No members yet.</td></tr>';
+                    tb.innerHTML = '<tr><td colspan="8">No members yet.</td></tr>';
                     return;
                 }
                 tb.innerHTML = res.members.map(function (m) {
@@ -326,10 +402,11 @@
                         '<td class="n">' + (m.ccPicks || 0) + '</td>' +
                         '<td class="n">' + (m.ccVotes || 0) + '</td>' +
                         '<td class="n">' + (m.gbWishlist || 0) + '</td>' +
-                        '<td class="n">' + (m.gbReminders || 0) + '</td></tr>';
+                        '<td class="n">' + (m.gbReminders || 0) + '</td>' +
+                        '<td style="white-space:nowrap;">' + (String(m.email).toLowerCase() === OWNER_EMAIL ? '' : '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-memdel="' + esc(m.email).replace(/"/g, '&quot;') + '">Delete</button>') + '</td></tr>';
                 }).join('');
             }).catch(function () {
-                document.getElementById('memberRows').innerHTML = '<tr><td colspan="7">Could not load the member list.</td></tr>';
+                document.getElementById('memberRows').innerHTML = '<tr><td colspan="8">Could not load the member list.</td></tr>';
             });
         }
 
@@ -373,7 +450,7 @@
                         '<td class="n">' + r.total + '</td>' +
                         '<td class="n">' + r.today + '</td>' +
                         '<td>' + last + '</td>' +
-                        '<td>' + (r.shelved ? '<span class="tag-shelved">Shelved</span>' : '<span class="tag-live">Live</span>') + '</td></tr>';
+                        '<td>' + (r.shelved ? '<span class="tag-shelved">Shelved</span> <button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-shelfdel="' + r.deal.id + '" data-title="' + esc(r.deal.title).replace(/"/g, '&quot;') + '">Delete</button>' : '<span class="tag-live">Live</span>') + '</td></tr>';
                 }).join('');
             }).catch(function () {
                 document.getElementById('clickRows').innerHTML = '<tr><td colspan="7">Could not load click counts.</td></tr>';
