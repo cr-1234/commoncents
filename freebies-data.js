@@ -67,6 +67,20 @@
 // pages answer 200; Panera/Denny's/Purina answer 403 to curl (bot
 // protection, not a 404 — kept, all three were verified live Nov 16-18).
 // Nothing past expiry to prune (Fancy Feast ornament expires Nov 20).
+//
+// Added 2026-11-19 (evening batch): SiriusXM Listen Free Event — free
+// in-car listening Nov 19-30, verified against SiriusXM's own
+// free-listen page, which carries the offer; picture is a clean shot of
+// a car radio tuned to SiriusXM. Same pass: Instacart's free-turkey
+// offer checked and NOT added — its turkey page answers 200 but the
+// returned page shows no $40 offer (JS app; drops at noon ET, today's
+// drop already gone), so it fails the click-verify rule; Lowe's Black
+// Friday bucket likewise not added — details live behind the MyLowe's
+// Rewards login until Nov 24. All 10 existing entries checked again —
+// Starbucks/Krispy Kreme/Baskin-Robbins/Lowe's/JCPenney/Michaels/
+// Smoothie King pages answer 200; Panera/Denny's/Purina answer 403
+// to curl (bot protection, not a 404 — kept). Nothing past expiry
+// to prune (Fancy Feast ornament expires Nov 20).
 const freebies = [
     {
         id: 1,
@@ -177,5 +191,16 @@ const freebies = [
         expires: "2026-12-01",
         votes: { up: 0, down: 0 },
         howTo: "Download the Smoothie King app and join Healthy Rewards free before December 1, then stop by a participating Smoothie King on Tuesday, December 1 and claim your free 12 oz. Vanilla Peppermint D-Lite smoothie — new and existing members both qualify, while supplies last."
+    },
+    {
+        id: 11,
+        title: "Free SiriusXM In Your Car Through November 30",
+        store: "SiriusXM",
+        image: "img/freebie-siriusxm.jpg",
+        description: "SiriusXM's Listen Free Event switches on 100+ channels on inactive satellite radios — ad-free music, live sports, talk, news and holiday stations — free through November 30, with no subscription and nothing to sign up for.",
+        url: "https://www.siriusxm.com/offers/free-listen",
+        expires: "2026-11-30",
+        votes: { up: 0, down: 0 },
+        howTo: "Just turn on the satellite radio in your car — if it's inactive, the free channels should already be playing. The event runs November 19 through November 30, 2026, and covers 100+ channels including the holiday stations."
     }
 ];
