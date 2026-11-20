@@ -272,5 +272,27 @@
   "shelvedAt": "2026-11-19",
   "shelvedReason": "Delete proof test",
   "lastSeenPrice": null
+ },
+ {
+  "id": 1066,
+  "title": "Mike And Ike Mega Mix Candy 12-Pack For $12 From Amazon",
+  "category": "groceries",
+  "fc": "Groceries",
+  "price": 12,
+  "originalPrice": 12.72,
+  "discount": 6,
+  "image": "https://m.media-amazon.com/images/I/81zBQ4SR3aL._SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0C3J8DFCV?tag=commoncents0050-20",
+  "description": "Twelve theater boxes of Mike and Ike Mega Mix — ten fruity flavors in every chewy handful. A movie-night pantry stock-up at $12, down from $12.72.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-11T20:06:21Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "shelvedAt": "2026-11-19",
+  "shelvedReason": "Discount under 12%",
+  "lastSeenPrice": 12
  }
 ]
