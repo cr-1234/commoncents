@@ -294,5 +294,27 @@
   "shelvedAt": "2026-11-20",
   "shelvedReason": "Discount under 12%",
   "lastSeenPrice": 5.99
+ },
+ {
+  "id": 1101,
+  "title": "CP Toys 6-Piece Pretend Power Gardening Tool Set For $40.54 Shipped From Amazon",
+  "category": "kids",
+  "fc": "Kids",
+  "price": 40.54,
+  "originalPrice": 106.24,
+  "discount": 62,
+  "image": "https://m.media-amazon.com/images/I/71E+V96wjbL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B002S3VP1U?tag=commoncents0050-20",
+  "description": "Six toy power tools — a mower, chainsaw, trimmer, leaf blower, plus goggles and gloves — so little ones can garden right alongside you. Every piece lights up and makes its own sound, and it's built for ages 3 and up.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-20T16:44:23Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "shelvedAt": "2026-11-20",
+  "shelvedReason": "Discount under 12%",
+  "lastSeenPrice": 124.99
  }
 ]
