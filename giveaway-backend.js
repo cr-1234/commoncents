@@ -31,7 +31,7 @@
 //     never change the prize.
 //   - The prize ladder counts PEOPLE entered (cc_giveaway_meta count).
 (function () {
-    var FN_BASE = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/';
+    var FN_BASE = 'https://us-central1-commoncents-f8f77.cloudfunctions.net/';
 
     function postFn(name, body, idToken) {
         var headers = { 'Content-Type': 'application/json' };

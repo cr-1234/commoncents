@@ -8,7 +8,7 @@
  */
 (function () {
     'use strict';
-    var FN = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/';
+    var FN = 'https://us-central1-commoncents-f8f77.cloudfunctions.net/';
 
     function call(name, body) {
         var u = (window.CC_AUTH && typeof CC_AUTH.user === 'function') ? CC_AUTH.user() : null;

@@ -1,7 +1,7 @@
 // CommonCents accounts — sign in with Google or email/password.
 //
-// Accounts run on Firebase Auth in the same project as the giveaway
-// backend (the one Gifting Butler uses). Signing in gets you:
+// Accounts run on Firebase Auth in CommonCents' own Firebase project
+// (commoncents-f8f77), the same project as its backend. Signing in gets you:
 //   - Your feed interests saved to your account (ccGetProfile /
 //     ccSaveInterests) — they follow you across devices.
 //   - The deals/freebies you've opened saved to your account
@@ -11,16 +11,15 @@
 //     no typing (ccEnterGiveaway accepts the sign-in token).
 // Guests are untouched: picks stay saved in the browser, as before.
 (function () {
-    var FN_BASE = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/';
+    var FN_BASE = 'https://us-central1-commoncents-f8f77.cloudfunctions.net/';
     var firebaseConfig = {
-    apiKey:"AIzaSyBPvwf-ilWhc5G_jAEaRDwlom0jJY678w4",
-    authDomain:"giftingbutler-74395.firebaseapp.com",
-    projectId:"giftingbutler-74395",
-    storageBucket:"giftingbutler-74395.firebasestorage.app",
-    messagingSenderId:"37308175610",
-    appId:"1:37308175610:web:547281f014be448b292543",
-    measurementId:"G-KTPDVDSNWV"
-  };
+    apiKey: "AIzaSyDec6usbNv2090KxpHDLqHWM_xQhpDpomY",
+    authDomain: "commoncents-f8f77.firebaseapp.com",
+    projectId: "commoncents-f8f77",
+    storageBucket: "commoncents-f8f77.firebasestorage.app",
+    messagingSenderId: "420790095061",
+    appId: "1:420790095061:web:04cdb7e13848e8a67f665c"
+};
 
     var auth = null;
     var currentUser = null;
