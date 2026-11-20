@@ -294,5 +294,26 @@
   "shelvedAt": "2026-11-19",
   "shelvedReason": "Discount under 12%",
   "lastSeenPrice": 12
+ },
+ {
+  "id": 1071,
+  "title": "Partywind Glow-In-The-Dark Christmas Temporary Tattoos 10-Sheet Set For $3.34 From Amazon",
+  "category": "kids",
+  "fc": "Kids",
+  "price": 3.34,
+  "originalPrice": 3.99,
+  "discount": 16,
+  "image": "https://m.media-amazon.com/images/I/71LTCZSKI9L._SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B08K7BFPX9?tag=commoncents0050-20",
+  "description": "Ten sheets of glow-in-the-dark Christmas temporary tattoos — Santa, penguins, snowmen, and trees that light up after dark. A stocking-stuffer ten-pack for $3.34.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-19T15:40:39.670Z",
+  "source": "hip2save",
+  "shelvedAt": "2026-11-20",
+  "shelvedReason": "Discount under 12%",
+  "lastSeenPrice": 5.99
  }
 ]
