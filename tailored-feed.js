@@ -180,7 +180,7 @@
         // posted after the last-visit snapshot taken at the top.
         deals.forEach(function (d) {
             if (!d.ts) return;
-            var ts = Date.parse(d.ts);
+            var ts = (typeof d.ts === 'number') ? d.ts : Date.parse(d.ts);
             if (!isNaN(ts) && ts > prevVisit) newBadges.add(d.id);
         });
         // Prune: only deals still in the inventory and not yet opened
