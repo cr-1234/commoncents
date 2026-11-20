@@ -2235,17 +2235,17 @@ function copyDealCode(el, code) {
 // counted per deal on the backend (ccClick) so the owner can see
 // which deals people actually click. Fire-and-forget: it never
 // delays or blocks the visitor's trip to the store.
-const CC_CLICK_ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccClick';
+const CC_CLICK_ENDPOINT = 'https://us-central1-commoncents-f8f77.cloudfunctions.net/ccClick';
 // Views are counted separately (ccView): a view = the deal window
 // was opened (see openModal); a click = an outbound tap to the store.
-const CC_VIEW_ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccView';
+const CC_VIEW_ENDPOINT = 'https://us-central1-commoncents-f8f77.cloudfunctions.net/ccView';
 // Submitter rewards (2026-11-13): a signed-in member's tap ALSO
 // fires the counted-click beacon with their ID token — the backend
 // decides whether it is a qualified click for the deal's submitter
 // (never their own deal, max 3 per person per deal per day). The
 // anonymous ccClick tally above is unchanged, and signed-out taps
 // send nothing here.
-const CC_COUNTED_CLICK_ENDPOINT = 'https://us-central1-giftingbutler-74395.cloudfunctions.net/ccCountedClick';
+const CC_COUNTED_CLICK_ENDPOINT = 'https://us-central1-commoncents-f8f77.cloudfunctions.net/ccCountedClick';
 document.addEventListener('click', function (e) {
     const a = e.target && e.target.closest ? e.target.closest('a.view-deal-btn, a.modal-deal-btn') : null;
     if (!a) return;
