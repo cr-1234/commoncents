@@ -316,5 +316,31 @@
   "shelvedAt": "2026-11-20",
   "shelvedReason": "Discount under 12%",
   "lastSeenPrice": 124.99
+ },
+ {
+  "id": 1092,
+  "title": "LEGO Classic Medium Creative Brick Box 10696 For $14.99 From Amazon",
+  "category": "kids",
+  "fc": "Kids",
+  "price": 14.99,
+  "originalPrice": 34.99,
+  "discount": 57,
+  "image": "https://m.media-amazon.com/images/I/71-wvJPmL+L._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B00NHQFA1I?tag=commoncents0050-20",
+  "description": "A 484-piece box of classic LEGO bricks in 35 colors, with a green baseplate, windows, wheels and eyes for endless builds — trains, tigers, windmills and more. At $14.99 it is 57% under the $34.99 list price, and it carries 4.8 stars from 54,000+ reviews.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-15T18:59:00Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/81bE0wYfeLL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/81b6I+4dNWL._AC_SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-21",
+  "shelvedReason": "Discount under 12%",
+  "lastSeenPrice": 34.95
  }
 ]
