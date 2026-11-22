@@ -63,6 +63,22 @@
 
     function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+    // Logo-tap landing (owner, 2026-11-22): a logo tap reloads the
+    // page (CC_FEED.goLogoHome + the app.js logo handler), and the
+    // reader was wherever they were — often the bottom — when they
+    // tapped. Browsers restore that scroll position across a reload,
+    // stranding the reader at the bottom of the fresh page. The tap
+    // leaves a one-shot note (sessionStorage ccLogoTop); when it's
+    // here, this load starts at the top instead.
+    try {
+        if (sessionStorage.getItem('ccLogoTop') === '1') {
+            sessionStorage.removeItem('ccLogoTop');
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            window.scrollTo(0, 0);
+            document.addEventListener('DOMContentLoaded', function () { window.scrollTo(0, 0); });
+        }
+    } catch (e) {}
     function getInterests() {
         try { return JSON.parse(lsGet('ccInterests') || '[]'); }
         catch (e) { return []; }
