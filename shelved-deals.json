@@ -342,5 +342,147 @@
   "shelvedAt": "2026-11-21",
   "shelvedReason": "Discount under 12%",
   "lastSeenPrice": 34.95
+ },
+ {
+  "id": 1086,
+  "title": "Kettle Brand 6.5oz Air Fried Sea Salt & Vinegar Potato Chips For $2.69 From Amazon",
+  "category": "groceries",
+  "fc": "Groceries",
+  "price": 2.69,
+  "originalPrice": 4.29,
+  "discount": 37,
+  "image": "https://m.media-amazon.com/images/I/71Ig5c1uIuL._SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0BBL55GT7?tag=commoncents0050-20",
+  "description": "Kettle Brand's air fried chips — kettle-cooked crunch with 30% less fat than the regular variety, in the classic sea salt & vinegar flavor. A 6.5oz bag for $2.69 with the coupon clipped.",
+  "dealNote": "Clip the 10% coupon on the Amazon product page to get this price — without the coupon, it's $2.99.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-13T10:28:08Z",
+  "source": "techbargains",
+  "aud": "all",
+  "shelvedAt": "2026-11-21",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 2.69
+ },
+ {
+  "id": 1083,
+  "title": "RUNBOX Full-Grain Leather RFID Pop-Up Wallet For Men For $33.24 From Amazon",
+  "category": "clothing",
+  "fc": "Clothing",
+  "price": 33.24,
+  "originalPrice": 43.99,
+  "discount": 24,
+  "image": "https://m.media-amazon.com/images/I/81sh1jfKqUL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0HCVTNQD2?tag=commoncents0050-20",
+  "description": "A slim full-grain leather bifold with a pop-up aluminum card case, RFID blocking, and a money clip — 13 cards in a pocket-sized wallet. $33.24, down from $43.99.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-12T15:19:15Z",
+  "source": "bensbargains",
+  "aud": "men",
+  "shelvedAt": "2026-11-21",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 33.24
+ },
+ {
+  "id": 1087,
+  "title": "Cottonelle Ultra Soft Toilet Paper 40 Family Mega Rolls For $29.99 From Amazon",
+  "category": "groceries",
+  "fc": "Groceries",
+  "price": 29.99,
+  "originalPrice": 39.99,
+  "discount": 25,
+  "image": "https://m.media-amazon.com/images/I/81--wSSjeVL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0HCXF3KTB?tag=commoncents0050-20",
+  "description": "Forty Family Mega rolls of Cottonelle Ultra Soft — that's 180 regular rolls — with the cushiony CleaningRipples texture. A household staple at $29.99 with the 25% coupon clipped.",
+  "dealNote": "Clip the 25% coupon on the Amazon product page to get this price — without the coupon, it's $39.99.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-13T10:28:08Z",
+  "source": "techbargains",
+  "aud": "all",
+  "shelvedAt": "2026-11-21",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 29.99
+ },
+ {
+  "id": 1013,
+  "title": "Apple AirPods Pro 3 Active Noise Cancellation Wireless Earbuds $179",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 179,
+  "originalPrice": 249,
+  "discount": 28,
+  "image": "https://www.techbargains.com/imagery/deals/259556.1793632534.fit_lim.size_125x125.jpg",
+  "url": "https://www.amazon.com/dp/B0FQFB8FMG?tag=commoncents0050-20",
+  "description": "Apple's latest AirPods Pro with active noise cancellation and a comfier fit. At well under its $249 list price, this is one of the strongest prices we've seen on the newest model.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-02T16:38:50Z",
+  "source": "techbargains",
+  "aud": "all",
+  "shelvedAt": "2026-11-21",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 179
+ },
+ {
+  "id": 1018,
+  "title": "American Lawn Mower 20″ 5-Blade Reel Mower With Grass Catcher For $75.77 Shipped From Amazon",
+  "category": "tools",
+  "fc": "Tools",
+  "price": 75.77,
+  "originalPrice": 95.99,
+  "discount": 21,
+  "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/02101405/product-B0DD6F42BR.jpg",
+  "url": "https://www.amazon.com/dp/B0DD6F42BR?tag=commoncents0050-20",
+  "description": "No gas, no cords, no battery to charge — just push and cut. This 20-inch reel mower with a grass catcher suits small, flat lawns and cuts quietly enough for early mornings.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-03T04:34:05Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/91uyj5WiTsL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/91v70GF3E-L._AC_SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-21",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 75.77
+ },
+ {
+  "id": 1030,
+  "title": "Crayola Ultimate Light Board ColorVibe Sound Reactive Drawing Tablet For $19.49 From Amazon",
+  "category": "kids",
+  "fc": "Kids",
+  "price": 19.49,
+  "originalPrice": 29.97,
+  "discount": 35,
+  "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/01124139/product-B0GQDGXXMB.jpg",
+  "url": "https://www.amazon.com/dp/B0GQDGXXMB?tag=commoncents0050-20",
+  "description": "A light-up drawing board that reacts to sound and music as kids draw. Part toy, part night-light — a fun pick for creative kids at a third off.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-03T04:34:05Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/81LodKkqNJL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/81XhyeBvbTL._AC_SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-21",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 19.49
  }
 ]
