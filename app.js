@@ -393,27 +393,29 @@ function initApp() {
 
 // Event Listeners
 function setupEventListeners() {
-    // Header logo = the front page, always (owner, 2026-11-15):
-    // "when you push on the top CommonCents it always has to go back
-    // to the front page." The logo's plain href reloaded the page and
-    // the saved-view restore (ccFeedView) landed the visitor right
-    // back in the view they left — Saved, My Feed, a search — so the
-    // tap looked dead. Instead the tap resets the view in place: All
-    // Deals, page 1 (the filter change resets pagination), search
-    // cleared, scrolled to the top (setCategory's rule). The reset is
-    // persisted by CC_FEED.goHome, so a later reload agrees.
+    // Header logo = home, fresh (owner, 2026-11-22 — supersedes the
+    // 2026-11-15 in-place reset): "when I press CommonCents on top it
+    // should go to my feed, and the page should reload so I get the
+    // new deals." The tap records the home view — My Feed when the
+    // visitor has picks, All Deals when they don't (CC_FEED.goLogoHome
+    // persists it, so the reload's saved-view restore lands there) —
+    // then reloads the page for real, the way a plain logo link
+    // behaves on a site like DansDeals. The 2026-11-15 reset kept
+    // everything in place, which also kept yesterday's deals on
+    // screen in a tab left open overnight: nothing ever re-fetched
+    // them. Search and pagination need no manual reset here — a
+    // fresh load starts with both empty by construction.
     const logoLink = document.querySelector('.logo-link');
     if (logoLink) {
         logoLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (window.CC_FEED && typeof CC_FEED.goHome === 'function') CC_FEED.goHome();
-            if (searchInput) searchInput.value = '';
-            searchQuery = '';
-            // Explicit, not via the render filter: from page 2 of All
-            // Deals itself nothing in the filter changes, so the
-            // pagination reset there would never fire.
-            currentPage = 1;
-            setCategory('all');
+            if (window.CC_FEED && typeof CC_FEED.goLogoHome === 'function') {
+                e.preventDefault();
+                CC_FEED.goLogoHome();
+                window.location.reload();
+            }
+            // Without CC_FEED, the logo's plain href (index.html)
+            // still takes the visitor home with a fresh load — let
+            // the default happen.
         });
     }
 
