@@ -411,6 +411,16 @@ function setupEventListeners() {
             if (window.CC_FEED && typeof CC_FEED.goLogoHome === 'function') {
                 e.preventDefault();
                 CC_FEED.goLogoHome();
+                // Land at the TOP of the fresh page (owner,
+                // 2026-11-22): a reload otherwise restores the old
+                // scroll position, so a tap from the bottom of the
+                // page reloaded straight back into the bottom. The
+                // one-shot note tells the next load to start at the
+                // top (tailored-feed.js reads it), and
+                // scrollRestoration 'manual' stops the browser
+                // putting the old position back in the meantime.
+                try { sessionStorage.setItem('ccLogoTop', '1'); } catch (err) {}
+                if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (err) {} }
                 window.location.reload();
             }
             // Without CC_FEED, the logo's plain href (index.html)
