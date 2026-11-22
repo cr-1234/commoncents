@@ -1160,7 +1160,7 @@ function openFreebieModal(f) {
     const key = freebieVoteKey(f);
     const isSaved = hasFreebieSave(f.id);
     modalBody.innerHTML = `
-        ${f.image ? `<div class="modal-media-banner"><img src="${f.image}" alt="${f.title}"></div>` : ''}
+        ${f.image ? `<div class="modal-media-banner"><a class="modal-pic-link" href="${f.url}" target="_blank" rel="noopener noreferrer"><img src="${f.image}" alt="${f.title}"></a></div>` : ''}
         <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${f.store} &middot; Free Stuff</div>
         <h2 style="margin:0.5rem 0 1rem;">${f.title}</h2>
         <div class="modal-buy-row">
@@ -2046,9 +2046,17 @@ function openModal(deal) {
     // dots underneath showing position. One picture renders exactly
     // the banner it always has, no dots.
     const galleryPics = [deal.image].concat(Array.isArray(deal.gallery) ? deal.gallery.filter(u => u && u !== deal.image) : []);
+    // Every picture in the window is a link to the store (owner,
+    // 2026-11-21 — the same fix Giftingbutler got): tapping any
+    // picture, main or extra, goes to the deal's page, and the tap
+    // counts as a click like the Get This Deal button (the counting
+    // listener below matches a.modal-pic-link). A swipe that ends in
+    // a drag does not fire the link — see the guard where the
+    // gallery track is wired up.
+    const picHref = getAffiliateUrl(deal.url);
     const mediaHtml = galleryPics.length > 1
-        ? `<div class="modal-media-banner modal-gallery"><div class="modal-gallery-track">${galleryPics.map(u => `<img src="${u}" alt="${deal.title}">`).join('')}</div></div><div class="modal-gallery-dots">${galleryPics.map((u, i) => `<span class="modal-gallery-dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>`
-        : `<div class="modal-media-banner"><img src="${deal.image}" alt="${deal.title}"></div>`;
+        ? `<div class="modal-media-banner modal-gallery"><div class="modal-gallery-track">${galleryPics.map(u => `<a class="modal-pic-link" href="${picHref}" target="_blank" rel="noopener noreferrer" data-deal-id="${deal.id}"><img src="${u}" alt="${deal.title}"></a>`).join('')}</div></div><div class="modal-gallery-dots">${galleryPics.map((u, i) => `<span class="modal-gallery-dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>`
+        : `<div class="modal-media-banner"><a class="modal-pic-link" href="${picHref}" target="_blank" rel="noopener noreferrer" data-deal-id="${deal.id}"><img src="${deal.image}" alt="${deal.title}"></a></div>`;
     modalBody.innerHTML = `
         ${mediaHtml}
         <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); font-weight:600;">${getStoreName(deal.url)} &middot; ${deal.category}${deal.sponsored ? ' &middot; <span style="color:var(--highlight); font-weight:700;">Sponsored</span>' : ''}</div>
@@ -2094,6 +2102,20 @@ function openModal(deal) {
             const i = Math.max(0, Math.min(galDots.length - 1, Math.round(galTrack.scrollLeft / galTrack.clientWidth)));
             galDots.forEach((d, j) => d.classList.toggle('active', j === i));
         }, { passive: true });
+        // Picture links (above) must not fire when the "tap" was
+        // really a swipe: if the pointer travelled more than a few
+        // pixels between press and release, swallow the click —
+        // in the capture phase, so the click counter never sees
+        // it either.
+        let galDownX = null;
+        galTrack.addEventListener('pointerdown', (e) => { galDownX = e.clientX; }, { passive: true });
+        galTrack.addEventListener('click', (e) => {
+            if (galDownX !== null && Math.abs(e.clientX - galDownX) > 8) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            galDownX = null;
+        }, true);
     }
 
     modalBody.querySelector('.upvote-btn').addEventListener('click',   (e) => handleVote(e, deal, 'up'));
@@ -2247,7 +2269,7 @@ const CC_VIEW_ENDPOINT = 'https://us-central1-commoncents-f8f77.cloudfunctions.n
 // send nothing here.
 const CC_COUNTED_CLICK_ENDPOINT = 'https://us-central1-commoncents-f8f77.cloudfunctions.net/ccCountedClick';
 document.addEventListener('click', function (e) {
-    const a = e.target && e.target.closest ? e.target.closest('a.view-deal-btn, a.modal-deal-btn') : null;
+    const a = e.target && e.target.closest ? e.target.closest('a.view-deal-btn, a.modal-deal-btn, a.modal-pic-link') : null;
     if (!a) return;
     const dealId = a.getAttribute('data-deal-id');
     if (!dealId) return;
