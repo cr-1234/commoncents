@@ -396,6 +396,25 @@
             saveView();
             paintAll();
         },
+        // The header logo's promise, updated (owner, 2026-11-22 —
+        // supersedes the 2026-11-15 goHome reset above): tapping the
+        // CommonCents name is the "take me home, fresh" gesture. Home
+        // is My Feed when the visitor has picks — that's the page
+        // they built for themselves — and All Deals when they don't.
+        // This only records the destination (the saved view, so the
+        // startup restore agrees); app.js follows it with a REAL page
+        // reload, so what lands on screen is the deals as they stand
+        // now — not the ones from when the tab was opened. (His
+        // morning routine: leave the tab open overnight, tap the
+        // name, see today's deals — the in-place reset never
+        // re-fetched anything, so he kept seeing yesterday's page,
+        // and in All Deals instead of his feed.)
+        goLogoHome: function () {
+            mode = getInterests().length ? 'mine' : 'browse';
+            viewCategory = 'all';
+            saveView();
+            paintAll();
+        },
         setInterests: function (keys, fromAccount) {
             var valid = (keys || []).filter(function (k) {
                 return INTERESTS.some(function (i) { return i.key === k; });
