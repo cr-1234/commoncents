@@ -1458,6 +1458,18 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     flex: 0 0 100%; width: 100%; height: 100%; max-width: none;
     object-fit: contain; scroll-snap-align: center;
 }
+/* Pictures in the deal/freebie window are links to the store
+   (owner, 2026-11-21): the anchor takes the sizing the picture had —
+   a full slide in the gallery track, the whole banner when single —
+   and the picture fills it. */
+.modal-media-banner .modal-gallery-track a.modal-pic-link {
+    flex: 0 0 100%; width: 100%; height: 100%;
+    scroll-snap-align: center; display: block;
+}
+.modal-media-banner > a.modal-pic-link {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%;
+}
 .modal-gallery-dots { display: flex; justify-content: center; gap: 6px; margin: -0.6rem 0 1rem; }
 .modal-gallery-dot { width: 7px; height: 7px; border-radius: 50%; background: #D9CCEE; transition: background 0.15s; }
 .modal-gallery-dot.active { background: var(--highlight); }
