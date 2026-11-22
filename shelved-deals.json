@@ -43,29 +43,6 @@
   "lastSeenPrice": 99.99
  },
  {
-  "id": 1047,
-  "title": "Under Armour Girls’ Hooded Parka Puffer Jacket For $45.58 Shipped From Amazon",
-  "category": "clothing",
-  "fc": "Clothing",
-  "price": 45.58,
-  "originalPrice": 75.97,
-  "discount": 40,
-  "image": "https://m.media-amazon.com/images/I/71pzjEMwIOL._AC_SL1500_.jpg",
-  "url": "https://www.amazon.com/dp/B0FKHX4DPH?tag=commoncents0050-20",
-  "description": "Under Armour’s hooded puffer for girls — warm, water-resistant, and built for cold winter days. A name-brand winter coat at 40% off list.",
-  "dealNote": "Clip the $30.39 coupon on the Amazon product page to get this price — without the coupon, it’s $75.97.",
-  "votes": {
-   "up": 0,
-   "down": 0
-  },
-  "ts": "2026-11-11T16:28:23Z",
-  "source": "dansdeals",
-  "aud": "all",
-  "shelvedAt": "2026-11-15",
-  "shelvedReason": "Coupon gone — price back at list $94.97",
-  "lastSeenPrice": 94.97
- },
- {
   "id": 1055,
   "title": "Ninja PossibleCooker Pro Plus 9-In-1 8.5Qt Cooker For $129.99 From Amazon",
   "category": "household",
@@ -134,50 +111,6 @@
   "shelvedAt": "2026-11-17",
   "shelvedReason": "Price rose to $1,197.99 — only about 8% off the $1,297.99 list (posted $997.99).",
   "lastSeenPrice": 1197.99
- },
- {
-  "id": 1049,
-  "title": "ZUODUN Kids Instant Print Digital Camera For $12.99 From Amazon",
-  "category": "kids",
-  "fc": "Kids",
-  "price": 12.99,
-  "originalPrice": 20.61,
-  "discount": 37,
-  "image": "https://m.media-amazon.com/images/I/71mwatZHqLL._AC_SL1500_.jpg",
-  "url": "https://www.amazon.com/dp/B0HGB1P33R?tag=commoncents0050-20",
-  "description": "A chunky pink instant-print camera made for small hands — it snaps 12MP photos and 1080p video, then prints on the spot with no ink needed. Comes with a 32GB card, paper rolls, and coloring pens.",
-  "votes": {
-   "up": 0,
-   "down": 0
-  },
-  "ts": "2026-11-10T12:25:00Z",
-  "source": "hip2save",
-  "aud": "all",
-  "shelvedAt": "2026-11-18",
-  "shelvedReason": "Price back up to $20.61 — full list price, no discount left (was $12.99).",
-  "lastSeenPrice": 20.61
- },
- {
-  "id": 1075,
-  "title": "Ninja TB401 1800PW BlendSense Tech Kitchen System (72oz) For $179.95 From Amazon",
-  "category": "household",
-  "fc": "Household",
-  "price": 179.95,
-  "originalPrice": 249.99,
-  "discount": 28,
-  "image": "https://m.media-amazon.com/images/I/71EeP5yuaEL._AC_SL1500_.jpg",
-  "url": "https://www.amazon.com/dp/B0CDDFH2MZ?tag=commoncents0050-20",
-  "description": "An 1,800-watt Ninja kitchen system with a 72oz pitcher and BlendSense tech that adjusts power and time for smoothies, dough, and frozen drinks. $70 under its $249.99 list.",
-  "votes": {
-   "up": 0,
-   "down": 0
-  },
-  "ts": "2026-11-12T02:25:15Z",
-  "source": "techbargains",
-  "aud": "all",
-  "shelvedAt": "2026-11-18",
-  "shelvedReason": "Amazon page now shows a different Ninja model (1200W Auto-iQ Compact) instead of the TB401 BlendSense — needs owner's eyes.",
-  "lastSeenPrice": null
  },
  {
   "id": 1022,
