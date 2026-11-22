@@ -20,6 +20,10 @@
         .admin-table th { color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
         .admin-table td.n, .admin-table th.n { text-align: right; font-variant-numeric: tabular-nums; }
         .admin-table tr:last-child td { border-bottom: none; }
+        .admin-table th[data-sort] { cursor: pointer; user-select: none; }
+        .admin-table th[data-sort]:hover { color: var(--highlight); }
+        .admin-table th.sorted-asc::after { content: ' ▲'; font-size: 0.65rem; }
+        .admin-table th.sorted-desc::after { content: ' ▼'; font-size: 0.65rem; }
         .tag-shelved { color: #b45309; font-weight: 600; font-size: 0.8rem; }
         .tag-live { color: #15803d; font-weight: 600; font-size: 0.8rem; }
         .admin-login { max-width: 380px; margin: 3rem auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; }
@@ -36,7 +40,10 @@
     <div class="admin-wrap">
         <div class="admin-head">
             <h1>CommonCents Admin</h1>
-            <button type="button" class="btn" id="adminSignOut" style="display:none;">Sign out</button>
+            <div style="display:flex; gap:0.5rem;">
+                <a class="btn" href="index.html" style="text-decoration:none;">Go to site</a>
+                <button type="button" class="btn" id="adminSignOut" style="display:none;">Sign out</button>
+            </div>
         </div>
 
         <div class="admin-login" id="adminLogin">
@@ -67,10 +74,10 @@
 
             <div id="tab-deals">
             <h2 class="admin-h">Deal views &amp; clicks <button type="button" class="btn" id="adminRefresh" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
-            <p class="admin-note" style="margin-bottom:0.75rem;">Two different signals (counted since Nov 12, 2026 — views started a few hours after clicks): <strong>Views</strong> = someone opened the deal's window — pure interest; that's what decides whether a deal earns its place on the site. <strong>Clicks to Amazon</strong> = someone tapped "View Deal" / "Get This Deal" and went to the store — those are the ones that can turn into sales. Most-viewed first — the deals at the bottom are the ones nobody's even opening. A shelved deal comes back on its own if its price returns — or you can remove it for good with its <strong>Delete</strong> button.</p>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Two different signals (counted since Nov 12, 2026 — views started a few hours after clicks): <strong>Views</strong> = someone opened the deal's window — pure interest; that's what decides whether a deal earns its place on the site. <strong>Clicks to Amazon</strong> = someone tapped "View Deal" / "Get This Deal" and went to the store — those are the ones that can turn into sales. Sorted by views at first — the deals at the bottom are the ones nobody's even opening. Click any column heading — Price, Views, Clicks, Status — to sort by it instead; click it again to flip the order. A shelved deal comes back on its own if its price returns — or you can remove it for good with its <strong>Delete</strong> button.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
-                    <thead><tr><th>Deal</th><th class="n">Price</th><th class="n">Views (opened)</th><th class="n">Clicks to Amazon</th><th class="n">Amazon today</th><th>Last Amazon click</th><th>Status</th></tr></thead>
+                    <thead><tr><th data-sort="title">Deal</th><th class="n" data-sort="price">Price</th><th class="n sorted-desc" data-sort="views">Views (opened)</th><th class="n" data-sort="clicks">Clicks to Amazon</th><th class="n" data-sort="today">Amazon today</th><th data-sort="last">Last Amazon click</th><th data-sort="status">Status</th></tr></thead>
                     <tbody id="clickRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
             </div>
@@ -78,22 +85,22 @@
             </div>
 
             <div id="tab-members" style="display:none;">
-            <h2 class="admin-h">Members <span class="admin-note" id="memberCount"></span></h2>
-            <p class="admin-note" style="margin-bottom:0.75rem;">Everyone who has ever signed up — both sites share one account system, so this is the combined list for CommonCents and Gifting Butler, newest first. Visible only to you: the server checks it's really your account before it sends anything, the list is never public. <strong>Delete</strong> removes a member completely — their sign-in, lists, votes and comments on both sites — which is how you clear out test accounts. It cannot be undone, and your own account can't be deleted here.</p>
+            <h2 class="admin-h">Members <span class="admin-note" id="memberCount"></span> <button type="button" class="btn" id="adminRefreshMembers" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Everyone who has ever signed up — both sites share one account system, so this is the combined list for CommonCents and Gifting Butler, newest first. Visible only to you: the server checks it's really your account before it sends anything, the list is never public. <strong>Delete</strong> removes a member completely — their sign-in, lists, votes and comments on both sites — which is how you clear out test accounts. It cannot be undone, and your own account can't be deleted here. Click a column heading to sort the list.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
-                    <thead><tr><th>Member</th><th>Joined</th><th>Last active</th><th class="n">CC picks</th><th class="n">CC votes</th><th class="n">GB wishlist</th><th class="n">GB reminders</th><th></th></tr></thead>
+                    <thead><tr><th data-sort="who">Member</th><th data-sort="joined">Joined</th><th data-sort="active">Last active</th><th class="n" data-sort="picks">CC picks</th><th class="n" data-sort="votes">CC votes</th><th class="n" data-sort="wishlist">GB wishlist</th><th class="n" data-sort="reminders">GB reminders</th><th></th></tr></thead>
                     <tbody id="memberRows"><tr><td colspan="8">Loading…</td></tr></tbody>
                 </table>
             </div>
             </div>
 
             <div id="tab-subs" style="display:none;">
-            <h2 class="admin-h">Deal submissions <span class="admin-note" id="subCount"></span></h2>
-            <p class="admin-note" style="margin-bottom:0.75rem;">Deals readers sent in — the ones still waiting sit on top, newest first. Nothing is ever posted automatically; you review each one here. <strong>Posted</strong> asks which deal number it became, marks it done, and tells the submitter it's live (only when they sent it while signed in, so we know who they are). <strong>Passed</strong> files it away. <strong>Delete</strong> removes an entry for good — that's the one for clearing out test entries and clutter.</p>
+            <h2 class="admin-h">Deal submissions <span class="admin-note" id="subCount"></span> <button type="button" class="btn" id="adminRefreshSubs" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
+            <p class="admin-note" style="margin-bottom:0.75rem;">Deals readers sent in — the ones still waiting sit on top, newest first. Nothing is ever posted automatically; you review each one here. <strong>Posted</strong> asks which deal number it became, marks it done, and tells the submitter it's live (only when they sent it while signed in, so we know who they are). <strong>Passed</strong> files it away. <strong>Delete</strong> removes an entry for good — that's the one for clearing out test entries and clutter. Click a column heading to sort the list.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
-                    <thead><tr><th>Submitter</th><th>Deal link</th><th>Price seen</th><th>Note</th><th>Date</th><th>Status</th><th></th></tr></thead>
+                    <thead><tr><th data-sort="who">Submitter</th><th>Deal link</th><th data-sort="price">Price seen</th><th>Note</th><th data-sort="date">Date</th><th data-sort="status">Status</th><th></th></tr></thead>
                     <tbody id="subRows"><tr><td colspan="7">Loading…</td></tr></tbody>
                 </table>
             </div>
@@ -143,6 +150,8 @@
         });
         els.signOut.addEventListener('click', function () { auth.signOut(); });
         document.getElementById('adminRefresh').addEventListener('click', loadDash);
+        document.getElementById('adminRefreshMembers').addEventListener('click', loadMembers);
+        document.getElementById('adminRefreshSubs').addEventListener('click', loadSubmissions);
         document.querySelectorAll('.admin-tab').forEach(function (b) {
             b.addEventListener('click', function () { showAdminTab(b.getAttribute('data-tab')); });
         });
@@ -187,6 +196,82 @@
         function esc(s) {
             return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
+
+        // Column sorting for the three admin tables: click a heading to
+        // sort by it, click it again to flip the order. Deals start out
+        // sorted by views (most first), exactly as before; members and
+        // submissions keep the server's order until a heading is clicked.
+        var dealSort = { key: 'views', dir: -1 };
+        var memberSort = { key: null, dir: 1 };
+        var subSort = { key: null, dir: 1 };
+        var dealRowsCache = [], memberCache = [], subCache = [];
+
+        var dealGetters = {
+            title: function (r) { return r.deal.title || ''; },
+            price: function (r) { return parseFloat(r.deal.price) || 0; },
+            views: function (r) { return r.views; },
+            clicks: function (r) { return r.total; },
+            today: function (r) { return r.today; },
+            last: function (r) { return r.lastAt || 0; },
+            status: function (r) { return r.shelved ? 1 : 0; }
+        };
+        var memberGetters = {
+            who: function (m) { return m.name || m.email || ''; },
+            joined: function (m) { return m.joinedAt || 0; },
+            active: function (m) { return m.lastActiveAt || 0; },
+            picks: function (m) { return m.ccPicks || 0; },
+            votes: function (m) { return m.ccVotes || 0; },
+            wishlist: function (m) { return m.gbWishlist || 0; },
+            reminders: function (m) { return m.gbReminders || 0; }
+        };
+        var subGetters = {
+            who: function (s) { return s.username || s.name || ''; },
+            price: function (s) { var n = parseFloat(String(s.priceSeen || '').replace(/[^0-9.]/g, '')); return isNaN(n) ? -1 : n; },
+            date: function (s) { return s.createdAt || 0; },
+            status: function (s) { return s.status === 'pending' ? 0 : s.status === 'posted' ? 1 : 2; }
+        };
+
+        function sortedRows(state, getters, rows, tiebreak) {
+            if (!state.key) return rows.slice();
+            var g = getters[state.key];
+            return rows.slice().sort(function (a, b) {
+                var x = g(a), y = g(b);
+                if (typeof x === 'string' || typeof y === 'string') { x = String(x).toLowerCase(); y = String(y).toLowerCase(); }
+                if (x < y) return -state.dir;
+                if (x > y) return state.dir;
+                return tiebreak ? tiebreak(a, b) : 0;
+            });
+        }
+
+        function markSorted(tbodyId, state) {
+            var tb = document.getElementById(tbodyId);
+            var table = tb ? tb.closest('table') : null;
+            if (!table) return;
+            table.querySelectorAll('th[data-sort]').forEach(function (th) {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+                if (state.key && th.getAttribute('data-sort') === state.key) {
+                    th.classList.add(state.dir === 1 ? 'sorted-asc' : 'sorted-desc');
+                }
+            });
+        }
+
+        function wireSort(tbodyId, state, renderFn) {
+            var tb = document.getElementById(tbodyId);
+            var table = tb ? tb.closest('table') : null;
+            if (!table) return;
+            table.querySelectorAll('th[data-sort]').forEach(function (th) {
+                th.addEventListener('click', function () {
+                    var key = th.getAttribute('data-sort');
+                    if (state.key === key) state.dir = -state.dir;
+                    else { state.key = key; state.dir = 1; }
+                    renderFn();
+                });
+            });
+        }
+
+        wireSort('clickRows', dealSort, renderDeals);
+        wireSort('memberRows', memberSort, renderMembers);
+        wireSort('subRows', subSort, renderSubs);
 
         function showAdminTab(name) {
             ['deals', 'subs', 'members'].forEach(function (t) {
@@ -233,6 +318,36 @@
             loadSubmissions();
         }
 
+function renderSubs() {
+            document.getElementById('subRows').innerHTML = sortedRows(subSort, subGetters, subCache).map(function (s) {
+            var who = '<strong>' + esc(s.username || s.name || '—') + '</strong>';
+            if (s.username && s.name && s.name !== s.username) {
+                who += '<br><span style="color:var(--text-secondary); font-size:0.82rem;">' + esc(s.name) + '</span>';
+            }
+            if (!s.username) {
+                who += '<br><span style="color:var(--text-secondary); font-size:0.82rem;">not signed in</span>';
+            }
+            var deal = '<a href="' + esc(s.url || '').replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">' + esc(s.url || '') + '</a>';
+            var st = s.status === 'posted' ? '<span class="tag-live">Posted</span>'
+                : s.status === 'passed' ? '<span class="tag-shelved">Passed</span>'
+                : s.status === 'pending' ? '<strong>Waiting</strong>'
+                : esc(s.status || '');
+            var acts = '';
+            if (s.status === 'pending') {
+                acts = '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="posted" data-subid="' + esc(s.id) + '">Posted</button> ' +
+                    '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="passed" data-subid="' + esc(s.id) + '">Passed</button> ';
+            }
+            acts += '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="delete" data-subid="' + esc(s.id) + '">Delete</button>';
+            return '<tr><td>' + who + '</td>' +
+                '<td style="max-width:260px; word-break:break-all;">' + deal + '</td>' +
+                '<td>' + esc(s.priceSeen || '—') + '</td>' +
+                '<td>' + esc(s.note || '—') + '</td>' +
+                '<td>' + fmtDate(s.createdAt) + '</td>' +
+                '<td>' + st + '</td>' +
+                '<td style="white-space:nowrap;">' + acts + '</td></tr>';
+        });
+            markSorted('subRows', subSort);
+        }
         function loadSubmissions() {
             var user = auth.currentUser;
             if (!user) return;
@@ -249,37 +364,12 @@
                     return;
                 }
                 document.getElementById('subCount').textContent = '— ' + res.submissions.length + ' in the queue';
-                if (!res.submissions.length) {
+                subCache = res.submissions;
+                if (!subCache.length) {
                     tb.innerHTML = '<tr><td colspan="7">No submissions yet.</td></tr>';
                     return;
                 }
-                tb.innerHTML = res.submissions.map(function (s) {
-                    var who = '<strong>' + esc(s.username || s.name || '—') + '</strong>';
-                    if (s.username && s.name && s.name !== s.username) {
-                        who += '<br><span style="color:var(--text-secondary); font-size:0.82rem;">' + esc(s.name) + '</span>';
-                    }
-                    if (!s.username) {
-                        who += '<br><span style="color:var(--text-secondary); font-size:0.82rem;">not signed in</span>';
-                    }
-                    var deal = '<a href="' + esc(s.url || '').replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">' + esc(s.url || '') + '</a>';
-                    var st = s.status === 'posted' ? '<span class="tag-live">Posted</span>'
-                        : s.status === 'passed' ? '<span class="tag-shelved">Passed</span>'
-                        : s.status === 'pending' ? '<strong>Waiting</strong>'
-                        : esc(s.status || '');
-                    var acts = '';
-                    if (s.status === 'pending') {
-                        acts = '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="posted" data-subid="' + esc(s.id) + '">Posted</button> ' +
-                            '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="passed" data-subid="' + esc(s.id) + '">Passed</button> ';
-                    }
-                    acts += '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-subact="delete" data-subid="' + esc(s.id) + '">Delete</button>';
-                    return '<tr><td>' + who + '</td>' +
-                        '<td style="max-width:260px; word-break:break-all;">' + deal + '</td>' +
-                        '<td>' + esc(s.priceSeen || '—') + '</td>' +
-                        '<td>' + esc(s.note || '—') + '</td>' +
-                        '<td>' + fmtDate(s.createdAt) + '</td>' +
-                        '<td>' + st + '</td>' +
-                        '<td style="white-space:nowrap;">' + acts + '</td></tr>';
-                }).join('');
+                renderSubs();
             }).catch(function () {
                 document.getElementById('subRows').innerHTML = '<tr><td colspan="7">Could not load submissions.</td></tr>';
             });
@@ -371,6 +461,22 @@
             return ms ? new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
         }
 
+function renderMembers() {
+            document.getElementById('memberRows').innerHTML = sortedRows(memberSort, memberGetters, memberCache).map(function (m) {
+            var who = esc(m.email);
+            if (m.name && m.name !== m.email) who = '<strong>' + esc(m.name) + '</strong><br><span style="color:var(--text-secondary); font-size:0.82rem;">' + esc(m.email) + '</span>';
+            if (m.disabled) who += ' <span class="tag-shelved">(disabled)</span>';
+            return '<tr><td>' + who + '</td>' +
+                '<td>' + fmtDate(m.joinedAt) + '</td>' +
+                '<td>' + fmtDate(m.lastActiveAt) + '</td>' +
+                '<td class="n">' + (m.ccPicks || 0) + '</td>' +
+                '<td class="n">' + (m.ccVotes || 0) + '</td>' +
+                '<td class="n">' + (m.gbWishlist || 0) + '</td>' +
+                '<td class="n">' + (m.gbReminders || 0) + '</td>' +
+                '<td style="white-space:nowrap;">' + (String(m.email).toLowerCase() === OWNER_EMAIL ? '' : '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-memdel="' + esc(m.email).replace(/"/g, '&quot;') + '">Delete</button>') + '</td></tr>';
+        });
+            markSorted('memberRows', memberSort);
+        }
         function loadMembers() {
             var user = auth.currentUser;
             if (!user) return;
@@ -387,26 +493,32 @@
                     return;
                 }
                 document.getElementById('memberCount').textContent = '— ' + res.members.length + ' total';
-                if (!res.members.length) {
+                memberCache = res.members;
+                if (!memberCache.length) {
                     tb.innerHTML = '<tr><td colspan="8">No members yet.</td></tr>';
                     return;
                 }
-                tb.innerHTML = res.members.map(function (m) {
-                    var who = esc(m.email);
-                    if (m.name && m.name !== m.email) who = '<strong>' + esc(m.name) + '</strong><br><span style="color:var(--text-secondary); font-size:0.82rem;">' + esc(m.email) + '</span>';
-                    if (m.disabled) who += ' <span class="tag-shelved">(disabled)</span>';
-                    return '<tr><td>' + who + '</td>' +
-                        '<td>' + fmtDate(m.joinedAt) + '</td>' +
-                        '<td>' + fmtDate(m.lastActiveAt) + '</td>' +
-                        '<td class="n">' + (m.ccPicks || 0) + '</td>' +
-                        '<td class="n">' + (m.ccVotes || 0) + '</td>' +
-                        '<td class="n">' + (m.gbWishlist || 0) + '</td>' +
-                        '<td class="n">' + (m.gbReminders || 0) + '</td>' +
-                        '<td style="white-space:nowrap;">' + (String(m.email).toLowerCase() === OWNER_EMAIL ? '' : '<button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-memdel="' + esc(m.email).replace(/"/g, '&quot;') + '">Delete</button>') + '</td></tr>';
-                }).join('');
+                renderMembers();
             }).catch(function () {
                 document.getElementById('memberRows').innerHTML = '<tr><td colspan="8">Could not load the member list.</td></tr>';
             });
+        }
+
+        function renderDeals() {
+            var rows = sortedRows(dealSort, dealGetters, dealRowsCache, function (a, b) {
+                return b.views - a.views || b.total - a.total || a.deal.id - b.deal.id;
+            });
+            document.getElementById('clickRows').innerHTML = rows.map(function (r) {
+            var last = r.lastAt ? new Date(r.lastAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+            return '<tr><td>' + esc(r.deal.title) + '</td>' +
+                '<td class="n">$' + esc(r.deal.price) + '</td>' +
+                '<td class="n"><strong>' + r.views + '</strong></td>' +
+                '<td class="n">' + r.total + '</td>' +
+                '<td class="n">' + r.today + '</td>' +
+                '<td>' + last + '</td>' +
+                '<td>' + (r.shelved ? '<span class="tag-shelved">Shelved</span> <button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-shelfdel="' + r.deal.id + '" data-title="' + esc(r.deal.title).replace(/"/g, '&quot;') + '">Delete</button>' : '<span class="tag-live">Live</span>') + '</td></tr>';
+        });
+            markSorted('clickRows', dealSort);
         }
 
         function loadClicks(live, shelf) {
@@ -440,17 +552,8 @@
                     var v = views[id] || { total: 0 };
                     return { deal: entry.deal, shelved: entry.shelved, total: c.total || 0, views: v.total || 0, today: (c.days && c.days[today]) || 0, lastAt: c.lastAt };
                 });
-                rows.sort(function (a, b) { return b.views - a.views || b.total - a.total || a.deal.id - b.deal.id; });
-                document.getElementById('clickRows').innerHTML = rows.map(function (r) {
-                    var last = r.lastAt ? new Date(r.lastAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
-                    return '<tr><td>' + esc(r.deal.title) + '</td>' +
-                        '<td class="n">$' + esc(r.deal.price) + '</td>' +
-                        '<td class="n"><strong>' + r.views + '</strong></td>' +
-                        '<td class="n">' + r.total + '</td>' +
-                        '<td class="n">' + r.today + '</td>' +
-                        '<td>' + last + '</td>' +
-                        '<td>' + (r.shelved ? '<span class="tag-shelved">Shelved</span> <button type="button" class="btn" style="font-size:0.78rem; padding:0.25rem 0.7rem;" data-shelfdel="' + r.deal.id + '" data-title="' + esc(r.deal.title).replace(/"/g, '&quot;') + '">Delete</button>' : '<span class="tag-live">Live</span>') + '</td></tr>';
-                }).join('');
+                dealRowsCache = rows;
+                renderDeals();
             }).catch(function () {
                 document.getElementById('clickRows').innerHTML = '<tr><td colspan="7">Could not load click counts.</td></tr>';
             });
