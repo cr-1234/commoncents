@@ -627,7 +627,7 @@ async function main() {
 
   // land on main via a clean temp worktree
   const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-main-'));
-  fs.rmSync(wt); // git worktree add needs a non-existent path
+  fs.rmSync(wt, { recursive: true, force: true }); // git worktree add needs a non-existent path
   try {
     await sh('git', ['worktree', 'add', wt, 'main']);
     const headCommit = (await sh('git', ['rev-parse', 'HEAD'])).trim();
