@@ -1078,6 +1078,9 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     font-size: 11px; font-weight: 800; letter-spacing: 0.05em;
     padding: 0.28rem 0.65rem; border-radius: 999px;
 }
+/* A returned deal's badge (owner, 2026-11-23): same pill, plum
+   instead of gold, reading BACK AGAIN — it isn't new, it's back. */
+.new-badge.back-badge { background: #5B2D8E; }
 /* A freebie's NEW badge (owner, 2026-11-16) sits at the picture's
    top-right — the top-left corner already carries its FREE badge. */
 .new-badge-freebie { left: auto; right: 10px; }

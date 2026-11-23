@@ -1495,7 +1495,7 @@ function createDealCard(deal) {
     article.innerHTML = `
         <div class="card-image">
             <img src="${deal.image}" alt="${deal.title}" loading="lazy">
-            ${expired ? '<span class="expired-badge">EXPIRED</span>' : ((window.CC_FEED && CC_FEED.isNew(deal)) ? '<span class="new-badge">NEW DEAL</span>' : '')}
+            ${expired ? '<span class="expired-badge">EXPIRED</span>' : ((window.CC_FEED && CC_FEED.isBack && CC_FEED.isBack(deal)) ? '<span class="new-badge back-badge">BACK AGAIN</span>' : ((window.CC_FEED && CC_FEED.isNew(deal)) ? '<span class="new-badge">NEW DEAL</span>' : ''))}
         </div>
         <div class="card-content">
             <div class="card-meta">

@@ -338,6 +338,14 @@
             if (seenDeals.has(deal.id)) return false;
             return newBadges.has(deal.id);
         },
+        isBack: function (deal) {
+            // A deal that came BACK from the shelf (owner, 2026-11-23):
+            // its badge reads BACK AGAIN instead of NEW DEAL — it isn't
+            // new, it's back. The record carries back:true, set when it
+            // was brought back; the badge follows the same rule as NEW
+            // (shows until the visitor opens that deal).
+            return !!(deal && deal.back === true) && this.isNew(deal);
+        },
         markSeen: function (deal) {
             if (!deal || deal.id == null) return;
             var changed = false;
