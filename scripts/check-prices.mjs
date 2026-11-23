@@ -391,6 +391,19 @@ async function main() {
     if (live == null) { result.notes.push(`Deal ${deal.id}: price null but item appears available — left as posted.`); continue; }
 
     if (couponBased) {
+      // 7-day life for typed promo codes (owner, 2026-11-23): a code
+      // typed at checkout can't be re-tested automatically — the
+      // KIDMI clogs code (deal 1080) died around day 11 while an
+      // unrelated page coupon checkbox kept every check passing it,
+      // and a visitor + the owner hit the dead code. Deals whose
+      // price depends on a typed code (deal.code) shelve at 7 days
+      // old, before the code can quietly die. Subscribe & Save deals
+      // carry no typed code and are exempt — that discount is
+      // visible on the product page, where the checks below see it.
+      if (deal.code && tsMillis(deal.ts) > 0 && Date.now() - tsMillis(deal.ts) >= 7 * 24 * 3600 * 1000) {
+        shelve(entry, `Promo code deal over 7 days old — checkout codes can't be re-tested automatically, so code deals come down at 7 days (posted $${fmtPrice(deal.price)} with code ${deal.code})`, live);
+        continue;
+      }
       const couponPresent = !!(rec.coupon && String(rec.coupon).trim());
       if (!couponPresent && deal.originalPrice != null && live >= deal.originalPrice) {
         shelve(entry, `Coupon gone — no coupon on the page and live base price $${fmtPrice(live)} is at or above the $${fmtPrice(deal.originalPrice)} list price`, live);
