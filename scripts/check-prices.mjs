@@ -638,11 +638,17 @@ async function main() {
   if (!result.previewVerified) throw new Error('preview site did not serve the new feed-data.js within ~3 minutes');
   if (headShelved) await pollMatch(PREVIEW_SHELVED, headShelved, 'preview shelved');
 
-  // land on main via a clean temp worktree
+  // land on main via a clean temp worktree, based on the LIVE list
+  // itself (origin/main), never the local main branch (owner fix,
+  // 2026-11-23): local main falls behind whenever a change reaches
+  // live any other way (e.g. a hand-landing), and the 13:24 run's
+  // push was refused non-fast-forward, stranding its shelve on the
+  // preview only. Fetch fresh and build on origin/main every run.
   const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-main-'));
   fs.rmSync(wt, { recursive: true, force: true }); // git worktree add needs a non-existent path
   try {
-    await sh('git', ['worktree', 'add', wt, 'main']);
+    await sh('git', ['fetch', 'origin', 'main']);
+    await sh('git', ['worktree', 'add', wt, 'origin/main']);
     const headCommit = (await sh('git', ['rev-parse', 'HEAD'])).trim();
     try {
       await sh('git', ['cherry-pick', headCommit], { cwd: wt });
