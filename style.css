@@ -1410,7 +1410,7 @@ body.dark-mode .amazon-browse-btn { color: #000; }
 .modal-deal-btn { margin-left: auto; }
 /* Second row under price + Get This Deal (owner, 2026-11-23):
    thumbs, Share and Save live here, beneath the price line. */
-.modal-sub-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.modal-sub-actions { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
 /* The buy row's three buttons live in ONE group (owner's modal
    screenshot, 2026-11-15: the price + Get This Deal + Share filled
    the first line and Save dropped ALONE onto a second line at the
