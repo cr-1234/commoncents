@@ -91,6 +91,22 @@
 // peppermint confirmed in its Nov 19 press release); Panera/Denny's
 // answer 403 to curl (bot protection, not a 404 — kept, both verified
 // live Nov 16-18). All pictures present in img/.
+//
+// Added 2026-11-23: PetSmart free pet photos with Santa (Dec 12-13,
+// 2-5 p.m., verified against PetSmart's own Nov 16 press release;
+// PetSmart publishes no standalone event page, so the stored url is
+// the official release, which carries the offer) and Michaels free
+// Countdown to Craftsmas advent calendar (handed out at checkout from
+// Black Friday Nov 27, 500 per store, no purchase necessary — verified
+// against Michaels' own corrected Nov 10 press release; the
+// michaels.com terms link in the release answers with a maintenance
+// stub, so the stored url is the official release). Same pass: all 10
+// existing entries re-checked — Starbucks/Krispy Kreme/Baskin-Robbins/
+// Lowe's/JCPenney/Michaels/SiriusXM answer 200; Panera/Denny's answer
+// 403 to curl (bot protection, not a 404 — kept); Smoothie King's
+// stored url 308-redirects to /rewards/ (200), so the stored url was
+// updated to the live address. Nothing past expiry to prune (next
+// expiry is SiriusXM Nov 30).
 const freebies = [
     {
         id: 1,
@@ -186,7 +202,7 @@ const freebies = [
         store: "Smoothie King",
         image: "img/freebie-smoothieking-peppermint.jpg",
         description: "Smoothie King is handing out a free 12-ounce Vanilla Peppermint D-Lite smoothie on Tuesday, December 1 — banana, vanilla frozen yogurt and peppermint, with 12 grams of protein — to Healthy Rewards members, no purchase needed.",
-        url: "https://www.smoothieking.com/healthy-rewards",
+        url: "https://www.smoothieking.com/rewards/",
         expires: "2026-12-01",
         votes: { up: 0, down: 0 },
         howTo: "Download the Smoothie King app and join Healthy Rewards free before December 1, then stop by a participating Smoothie King on Tuesday, December 1 and claim your free 12 oz. Vanilla Peppermint D-Lite smoothie — new and existing members both qualify, while supplies last."
@@ -201,5 +217,27 @@ const freebies = [
         expires: "2026-11-30",
         votes: { up: 0, down: 0 },
         howTo: "Just turn on the satellite radio in your car — if it's inactive, the free channels should already be playing. The event runs November 19 through November 30, 2026, and covers 100+ channels including the holiday stations."
+    },
+    {
+        id: 12,
+        title: "Free Pet Photos With Santa At PetSmart",
+        store: "PetSmart",
+        image: "img/freebie-petsmart-santa.jpg",
+        description: "PetSmart is bringing back its free Photos with Santa event: bring your dog, cat or small pet to any PetSmart store on December 12 or 13 between 2 and 5 p.m. and an associate dressed as Santa will pose with them for a festive holiday photo — completely free, with no purchase needed.",
+        url: "https://www.prnewswire.com/news-releases/petsmart-brings-back-beloved-holiday-tradition-with-free-pet-photos-with-santa-dec-12-13-302939480.html",
+        expires: "2026-12-13",
+        votes: { up: 0, down: 0 },
+        howTo: "Just show up at a participating PetSmart store on Saturday, December 12 or Sunday, December 13, 2026, between 2 and 5 p.m. local time. You will get a numbered ticket at check-in, then listen for your pet's name to be called when Santa is ready. Pets must follow PetSmart's in-store pet policy."
+    },
+    {
+        id: 13,
+        title: "Free Countdown To Craftsmas Advent Calendar At Michaels On Black Friday",
+        store: "Michaels",
+        image: "img/freebie-michaels-advent.jpg",
+        description: "Michaels is handing out free Countdown to Craftsmas advent calendars at checkout starting Black Friday, November 27 — 25 doors of screen-free holiday crafts, tips and surprises for every day of December, with no purchase necessary. Some calendars hide a $100 gift card, and one holds a $10,000 grand prize.",
+        url: "https://www.prnewswire.com/news-releases/michaels-launches-countdown-to-craftsmas-advent-calendar-with-25-days-of-screen-free-holiday-projects-and-a-10-000-grand-prize-302935458.html",
+        expires: "2026-11-27",
+        votes: { up: 0, down: 0 },
+        howTo: "Visit a Michaels store on Black Friday, November 27, 2026 and pick up a free Countdown to Craftsmas advent calendar at checkout — no purchase necessary. Each store has just 500, so get there early; then open a new door each day from December 1 through 25."
     }
 ];
