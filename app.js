@@ -2094,7 +2094,6 @@ function openModal(deal) {
                 ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
                 ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
-            <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
             </div>
         <div class="modal-sub-actions">
                 <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
@@ -2107,6 +2106,7 @@ function openModal(deal) {
                 </button>
                 <button type="button" class="btn share-modal-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px; margin-right:0.35rem;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Share</span></button>
                 <button type="button" class="btn save-modal-btn ${hasSave(deal.id) ? 'saved' : ''}" data-save-id="${deal.id}" aria-pressed="${hasSave(deal.id) ? 'true' : 'false'}"><span style="vertical-align:-3px; margin-right:0.35rem; display:inline-block;">${SAVE_BOOKMARK_SVG}</span><span class="save-label">${hasSave(deal.id) ? 'Saved' : 'Save'}</span></button>
+                <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
         </div>
         <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
         ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
