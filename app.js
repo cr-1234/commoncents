@@ -1458,9 +1458,13 @@ function renderPagination(totalPages) {
 // The in-feed sister-site ad, as a designed card that fills its
 // cell like a deal card (owner, 2026-11-15: the earlier picture
 // version sat in a tall, mostly-empty card — "huge empty space
-// before and after it, looks very funny"). The plum G is cropped
-// from the house picture (img/gb-g-mark.png); the name, line and
-// button are real elements, centred in the card. Deliberately NOT
+// before and after it, looks very funny"). Since 2026-11-22 the
+// brand block is the full Giftingbutler script wordmark
+// (img/gb-wordmark.png, rendered from the site's vector logo) at
+// the top — the separate plum-G picture was dropped at the owner's
+// word because the wordmark already says the name — with the line
+// and text under it and the button pinned to the card's bottom.
+// Deliberately NOT
 // a .deal-card — no modal, no votes, no counts. This card is the
 // sister promo's ONLY home: never in the side rail or the bottom
 // strip (owner, 2026-11-15 — those carry the sponsor ad only).
@@ -1468,7 +1472,7 @@ function createFeedAdCard() {
     const article = document.createElement('article');
     article.className = 'feed-ad-card gb-feed-card';
     article.innerHTML = `
-        <a class="gb-feed-link" href="https://giftingbutler-74395.web.app" target="_blank" rel="noopener noreferrer"><img class="gb-feed-mark" src="img/gb-g-mark.png" alt="Gifting Butler" loading="lazy"><span class="gb-feed-name">Gifting Butler</span><span class="gb-feed-line">Looking for a gift, not just a deal?</span><span class="gb-feed-btn">Browse gifts &#8594;</span></a>`;
+        <a class="gb-feed-link" href="https://giftingbutler.com" target="_blank" rel="noopener noreferrer"><img class="gb-feed-wordmark" src="img/gb-wordmark.png" alt="Giftingbutler" loading="lazy"><span class="gb-feed-line">Looking for a gift, not just a deal?</span><span class="gb-feed-text">Hand-picked gifts, shareable wishlists and reminders for every occasion.</span><span class="gb-feed-btn">Browse gifts &#8594;</span></a>`;
     return article;
 }
 
