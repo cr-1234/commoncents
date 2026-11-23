@@ -527,5 +527,124 @@
   "shelvedAt": "2026-11-23",
   "shelvedReason": "Price rose to $249.95 — only about 0% off the $249.99 list (posted $179.95)",
   "lastSeenPrice": 249.95
+ },
+ {
+  "id": 1106,
+  "title": "Apple iPad Mini (A17 Pro) 128GB Wi-Fi Tablet For $484 From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 484,
+  "originalPrice": 599,
+  "discount": 19,
+  "image": "https://m.media-amazon.com/images/I/61Tix2-t7iL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0DK3W6TV6?tag=commoncents0050-20",
+  "description": "Apple's smallest iPad with the A17 Pro chip, an 8.3-inch Liquid Retina display, 128GB of storage, and Wi-Fi 6E. The Space Gray 128GB model is $484, down from its $599 list.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-22T20:02:04.947Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/81qyHwtDbzL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/81aYYgsaNBL._AC_SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-23",
+  "shelvedReason": "Unavailable on Amazon — no price and no buy box",
+  "lastSeenPrice": null
+ },
+ {
+  "id": 1038,
+  "title": "BEAKEY 13-Piece Makeup Brush & Blending Sponge Set For $5.99 From Amazon",
+  "category": "beauty",
+  "fc": "Beauty",
+  "price": 5.99,
+  "originalPrice": 12.99,
+  "discount": 54,
+  "image": "https://m.media-amazon.com/images/I/71P-H9CLGuL._SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B09XXJLD4X?tag=commoncents0050-20",
+  "description": "Ten brushes plus two blending sponges in their own travel case — a full face kit for foundation, powder, and eyeshadow at a stocking-stuffer price with the code below.",
+  "code": "3PNZ8G5C",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-09T20:00:22Z",
+  "source": "hip2save",
+  "aud": "women",
+  "shelvedAt": "2026-11-23",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 5.99
+ },
+ {
+  "id": 1039,
+  "title": "Lenski Bluetooth Beanie With LED Light For $8.99 From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 8.99,
+  "originalPrice": 19.99,
+  "discount": 55,
+  "image": "https://m.media-amazon.com/images/I/710XlIeorwL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B09BYX17H8?tag=commoncents0050-20",
+  "description": "A warm knit beanie with built-in Bluetooth speakers and a rechargeable LED headlamp — hands-free music and light for night walks, runs, and shoveling snow. Use the code below to get this price.",
+  "code": "11EZ0QNX",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-09T20:00:22Z",
+  "source": "hip2save",
+  "aud": "all",
+  "shelvedAt": "2026-11-23",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 8.99
+ },
+ {
+  "id": 1040,
+  "title": "Klein Tools 32933Kit Flip Socket Set For $29 From Amazon",
+  "category": "tools",
+  "fc": "Tools",
+  "price": 29,
+  "originalPrice": 36.98,
+  "discount": 22,
+  "image": "https://m.media-amazon.com/images/I/61kIlPUdjgL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0GNNBVN3Z?tag=commoncents0050-20",
+  "description": "Eight flip sockets in SAE and metric, color-coded so you grab the right size without squinting. One bit holder covers 1/4, 3/8, and 1/2-inch drives — a tidy little kit for the toolbox.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-10T12:25:00Z",
+  "source": "techbargains",
+  "aud": "all",
+  "shelvedAt": "2026-11-23",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 29
+ },
+ {
+  "id": 1041,
+  "title": "TCL 65\" QM8L Series 144Hz SQD-Mini LED QLED 4K Smart Google TV For $997.99 From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 997.99,
+  "originalPrice": 2499.99,
+  "discount": 60,
+  "image": "https://m.media-amazon.com/images/I/81LJcS4Al8L._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0GPSYT2KN?tag=commoncents0050-20",
+  "description": "A 65-inch Mini LED QLED with a 144Hz refresh and Google TV built in — big, bright, and smooth for movies, sports, and gaming. Hundreds under its $2,499.99 list price.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-10T12:25:00Z",
+  "source": "techbargains",
+  "aud": "all",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/71YIMGo0CcL._AC_SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-23",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 997.99
  }
 ]
