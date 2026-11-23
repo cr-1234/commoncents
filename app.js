@@ -1513,6 +1513,7 @@ function createDealCard(deal) {
                 ${!expired && deal.dealNote ? `<span class="deal-note-tag">Coupon</span>` : ''}
                 ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
+            ${!expired && deal.code ? `<p class="code-warning">⚠ Promo code — codes change all the time and may not work.</p>` : ''}
             ${expired
                 ? `<span class="btn btn-primary full-width view-deal-btn expired-btn" style="margin-bottom:1rem;">Deal Expired</span>`
                 : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" data-deal-id="${deal.id}" style="margin-bottom:1rem;">View Deal</a>`}
@@ -2109,6 +2110,7 @@ function openModal(deal) {
         </div>
         <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
         ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
+        ${deal.code ? `<div class="code-warning-box"><strong>⚠ Heads up:</strong> promo codes change all the time and can stop working at any moment. If this code doesn't work, Amazon will charge its regular price instead of the price above.</div>` : ''}
         ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
         <div class="comments-section">
                     <h3 style="font-size:1.05rem; margin-bottom:0.75rem;">Comments</h3>

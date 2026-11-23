@@ -1492,6 +1492,19 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     padding: 0.12rem 0.5rem; border-radius: 999px;
     background: #FDF3D8; color: #8A6A10; border: 1px solid #C49A28;
 }
+/* Code warning (owner, 2026-11-23, after the KIDMI dead code):
+   on the card face, one short line under the price; in the deal
+   window, a full amber box above the code — codes change all the
+   time and may not work, said plainly BEFORE anyone checks out. */
+.code-warning {
+    color: #B45309; font-size: 0.8rem; font-weight: 700;
+    margin: -0.35rem 0 0.8rem; line-height: 1.4;
+}
+.code-warning-box {
+    background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E;
+    border-radius: 10px; padding: 0.6rem 0.8rem;
+    font-size: 0.88rem; line-height: 1.45; margin-bottom: 0.75rem;
+}
 /* Modal: coupon-clip box. Tap copies; the box visibly flips to a clipped state. */
 .deal-code {
     display: flex; align-items: center; justify-content: center; gap: 0.6rem;
