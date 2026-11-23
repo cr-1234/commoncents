@@ -1319,7 +1319,17 @@ function renderDeals() {
     const sortValue = activeSort ? activeSort.dataset.value : 'newest';
 
     if (sortValue === 'newest') {
-        filtered.sort((a, b) => b.id - a.id);
+        // Newest = when the deal arrived on the site (its ts), NOT its
+        // deal number (owner, 2026-11-23): a deal brought back from the
+        // shelf keeps its old number but gets a fresh ts, and he wants
+        // it back at the front with its NEW DEAL badge — sorting by
+        // number buried it on page 3-4 under its old slot. Ties (batch
+        // posts share a ts) fall back to the number, newest first.
+        const dealTime = (d) => {
+            const t = (typeof d.ts === 'number') ? d.ts : Date.parse(d.ts);
+            return isNaN(t) ? 0 : t;
+        };
+        filtered.sort((a, b) => (dealTime(b) - dealTime(a)) || (b.id - a.id));
     } else if (sortValue === 'popular') {
         filtered.sort((a, b) => (b.votes.up - b.votes.down) - (a.votes.up - a.votes.down));
     } else if (sortValue === 'price-low') {
@@ -2087,21 +2097,19 @@ function openModal(deal) {
                 <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
                 <button type="button" class="btn share-modal-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px; margin-right:0.35rem;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Share</span></button>
                 <button type="button" class="btn save-modal-btn ${hasSave(deal.id) ? 'saved' : ''}" data-save-id="${deal.id}" aria-pressed="${hasSave(deal.id) ? 'true' : 'false'}"><span style="vertical-align:-3px; margin-right:0.35rem; display:inline-block;">${SAVE_BOOKMARK_SVG}</span><span class="save-label">${hasSave(deal.id) ? 'Saved' : 'Save'}</span></button>
+                <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                    <span>${voteCount(deal, 'up')}</span>
+                </button>
+                <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1 2.33 2H17"></path></svg>
+                    <span>${voteCount(deal, 'down')}</span>
+                </button>
             </div>
         </div>
         <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
         ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
         ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
-        <div class="vote-container" style="margin-bottom:0.25rem;">
-            <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                <span>${voteCount(deal, 'up')}</span>
-            </button>
-            <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-                <span>${voteCount(deal, 'down')}</span>
-            </button>
-        </div>
         <div class="comments-section">
                     <h3 style="font-size:1.05rem; margin-bottom:0.75rem;">Comments</h3>
                     <div id="commentsList" style="max-height:150px; overflow-y:auto; margin-bottom:1rem; padding-right:0.5rem;"></div>
