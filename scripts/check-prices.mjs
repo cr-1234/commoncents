@@ -47,8 +47,11 @@ const SPLIT_DATE = '2026-12-01'; // before this ET date: all checks via cc2
 const API = 'https://us-central1-commoncents-f8f77.cloudfunctions.net';
 const PREVIEW_FEED = 'https://cr-1234.github.io/commoncents-preview/feed-data.js';
 const PREVIEW_SHELVED = 'https://cr-1234.github.io/commoncents-preview/shelved-deals.json';
-const LIVE_FEED = 'http://commoncentsdeals.com/feed-data.js';
-const LIVE_SHELVED = 'http://commoncentsdeals.com/shelved-deals.json';
+// Live site: the https certificate has issued (found 2026-11-22 — http
+// now 301-redirects to https, and https serves the file correctly), so
+// verify over https directly. fetch() follows redirects either way.
+const LIVE_FEED = 'https://commoncentsdeals.com/feed-data.js';
+const LIVE_SHELVED = 'https://commoncentsdeals.com/shelved-deals.json';
 const COUNTING_START = new Date('2026-11-12T21:00:00-05:00').getTime();
 
 // ---------- time helpers (America/New_York) ----------
