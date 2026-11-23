@@ -1319,7 +1319,17 @@ function renderDeals() {
     const sortValue = activeSort ? activeSort.dataset.value : 'newest';
 
     if (sortValue === 'newest') {
-        filtered.sort((a, b) => b.id - a.id);
+        // Newest = when the deal arrived on the site (its ts), NOT its
+        // deal number (owner, 2026-11-23): a deal brought back from the
+        // shelf keeps its old number but gets a fresh ts, and he wants
+        // it back at the front with its NEW DEAL badge — sorting by
+        // number buried it on page 3-4 under its old slot. Ties (batch
+        // posts share a ts) fall back to the number, newest first.
+        const dealTime = (d) => {
+            const t = (typeof d.ts === 'number') ? d.ts : Date.parse(d.ts);
+            return isNaN(t) ? 0 : t;
+        };
+        filtered.sort((a, b) => (dealTime(b) - dealTime(a)) || (b.id - a.id));
     } else if (sortValue === 'popular') {
         filtered.sort((a, b) => (b.votes.up - b.votes.down) - (a.votes.up - a.votes.down));
     } else if (sortValue === 'price-low') {
@@ -1485,7 +1495,7 @@ function createDealCard(deal) {
     article.innerHTML = `
         <div class="card-image">
             <img src="${deal.image}" alt="${deal.title}" loading="lazy">
-            ${expired ? '<span class="expired-badge">EXPIRED</span>' : ((window.CC_FEED && CC_FEED.isNew(deal)) ? '<span class="new-badge">NEW DEAL</span>' : '')}
+            ${expired ? '<span class="expired-badge">EXPIRED</span>' : ((window.CC_FEED && CC_FEED.isBack && CC_FEED.isBack(deal)) ? '<span class="new-badge back-badge">BACK AGAIN</span>' : ((window.CC_FEED && CC_FEED.isNew(deal)) ? '<span class="new-badge">NEW DEAL</span>' : ''))}
         </div>
         <div class="card-content">
             <div class="card-meta">
@@ -1503,6 +1513,7 @@ function createDealCard(deal) {
                 ${!expired && deal.dealNote ? `<span class="deal-note-tag">Coupon</span>` : ''}
                 ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
+            ${!expired && deal.code ? `<p class="code-warning">⚠ Promo code — codes change all the time and may not work.</p>` : ''}
             ${expired
                 ? `<span class="btn btn-primary full-width view-deal-btn expired-btn" style="margin-bottom:1rem;">Deal Expired</span>`
                 : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" data-deal-id="${deal.id}" style="margin-bottom:1rem;">View Deal</a>`}
@@ -2079,9 +2090,9 @@ function openModal(deal) {
         <h2 style="margin:0.5rem 0 1rem;">${deal.title}</h2>
         <div class="modal-buy-row">
             <div class="card-price" style="font-size:2rem;">
-                $${deal.price}
-                ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
-                ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
+            $${deal.price}
+            ${deal.originalPrice ? `<span class="original-price" style="font-size:1.2rem;">$${deal.originalPrice}</span>` : ''}
+            ${deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
             </div>
             <div class="modal-buy-actions">
                 <a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-deal-btn" data-deal-id="${deal.id}">Get This Deal</a>
@@ -2091,15 +2102,16 @@ function openModal(deal) {
         </div>
         <p style="color:var(--text-secondary); margin-bottom:1.25rem; line-height:1.7;">${deal.description}</p>
         ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
+        ${deal.code ? `<div class="code-warning-box"><strong>⚠ Heads up:</strong> promo codes change all the time and can stop working at any moment. If this code doesn't work, Amazon will charge its regular price instead of the price above.</div>` : ''}
         ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
         <div class="vote-container" style="margin-bottom:0.25rem;">
             <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                <span>${voteCount(deal, 'up')}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+            <span>${voteCount(deal, 'up')}</span>
             </button>
             <button class="vote-btn downvote-btn ${myVotes[deal.id] === 'down' ? 'active' : ''}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-                <span>${voteCount(deal, 'down')}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1 2.33 2H17"></path></svg>
+            <span>${voteCount(deal, 'down')}</span>
             </button>
         </div>
         <div class="comments-section">
@@ -2108,6 +2120,19 @@ function openModal(deal) {
                     <div id="commentFormWrap"></div>
         </div>`;
 
+    // Phone layout (owner, 2026-11-23): on small phones the thumbs
+    // move up into the buy-actions row, left of Share/Save — the
+    // spot that otherwise sits empty under the full-width Get This
+    // Deal button. Wider screens keep the thumbs above comments.
+    if (window.matchMedia('(max-width: 480px)').matches) {
+        const vc = modalBody.querySelector('.vote-container');
+        const shareBtn = modalBody.querySelector('.share-modal-btn');
+        if (vc && shareBtn) {
+            vc.style.margin = '0';
+            vc.style.marginRight = 'auto';
+            shareBtn.parentNode.insertBefore(vc, shareBtn);
+        }
+    }
     modal.style.display = 'flex';
 
     // Gallery dots follow the swipe/scroll position.
