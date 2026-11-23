@@ -1596,13 +1596,13 @@ body.dark-mode .amazon-browse-btn { color: #000; }
     box-shadow: 0 8px 24px rgba(91,45,142,0.16), 0 0 0 1px var(--highlight);
     border-color: var(--highlight);
 }
-.gb-feed-link { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-start; gap: 0.55rem; padding: 1.6rem 1.1rem; text-decoration: none; text-align: center; }
+.gb-feed-link { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: space-evenly; gap: 0.55rem; padding: 1.6rem 1.1rem; text-decoration: none; text-align: center; }
 .gb-feed-mark { height: 104px; width: auto; display: block; }
 .gb-feed-wordmark { width: 210px; max-width: 82%; height: auto; display: block; }
 .gb-feed-name { font-family: Georgia, 'Times New Roman', serif; font-size: 1.45rem; font-weight: 700; color: var(--highlight); line-height: 1.15; }
 .gb-feed-line { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.35; }
 .gb-feed-text { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.35; }
-.gb-feed-btn { margin-top: auto; background: var(--highlight); color: #fff; font-weight: 700; font-size: 0.88rem; padding: 0.55rem 1.15rem; border-radius: 999px; }
+.gb-feed-btn { background: var(--highlight); color: #fff; font-weight: 700; font-size: 0.88rem; padding: 0.55rem 1.15rem; border-radius: 999px; }
 
 /* Phone header, second slimming pass (owner, 2026-11-15 — his
    screenshot of the already-slimmed header with the logo block
