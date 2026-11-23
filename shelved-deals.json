@@ -646,5 +646,34 @@
   "shelvedAt": "2026-11-23",
   "shelvedReason": "Rotated out for fresh deals",
   "lastSeenPrice": 997.99
+ },
+ {
+  "id": 1080,
+  "title": "KIDMI Women’s Fur-Lined Suede Clogs For $17.49 From Amazon",
+  "category": "clothing",
+  "fc": "Clothing",
+  "price": 17.49,
+  "originalPrice": 49.99,
+  "discount": 65,
+  "image": "https://m.media-amazon.com/images/I/81EoKGYS5rL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0CLJDYYVH?tag=commoncents0050-20",
+  "description": "Cozy fur-lined suede clogs with a cushioned cork footbed, adjustable buckles, and non-slip soles — warm indoors or out. Use the code below and they’re $17.49, down from $49.99.",
+  "code": "XOPW9KNS",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-12T02:25:15Z",
+  "source": "hip2save",
+  "aud": "women",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/71q343AtHLL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/81dwp8aB1yL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/71pVoz8MzrL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/81+Za-3mTSL._AC_SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-23",
+  "shelvedReason": "Promo code XOPW9KNS no longer works — owner and a visitor both tested it on Amazon; real price is now $33.24, not the posted $17.49",
+  "lastSeenPrice": 33.24
  }
 ]
