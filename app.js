@@ -2120,6 +2120,19 @@ function openModal(deal) {
                     <div id="commentFormWrap"></div>
         </div>`;
 
+    // Phone layout (owner, 2026-11-23): on small phones the thumbs
+    // move up into the buy-actions row, left of Share/Save — the
+    // spot that otherwise sits empty under the full-width Get This
+    // Deal button. Wider screens keep the thumbs above comments.
+    if (window.matchMedia('(max-width: 480px)').matches) {
+        const vc = modalBody.querySelector('.vote-container');
+        const shareBtn = modalBody.querySelector('.share-modal-btn');
+        if (vc && shareBtn) {
+            vc.style.margin = '0';
+            vc.style.marginRight = 'auto';
+            shareBtn.parentNode.insertBefore(vc, shareBtn);
+        }
+    }
     modal.style.display = 'flex';
 
     // Gallery dots follow the swipe/scroll position.
