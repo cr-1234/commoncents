@@ -505,5 +505,27 @@
   "shelvedAt": "2026-11-22",
   "shelvedReason": "Discount under 12%",
   "lastSeenPrice": 450.01
+ },
+ {
+  "id": 1075,
+  "title": "Ninja TB401 1800PW BlendSense Tech Kitchen System (72oz) For $179.95 From Amazon",
+  "category": "household",
+  "fc": "Household",
+  "price": 179.95,
+  "originalPrice": 249.99,
+  "discount": 28,
+  "image": "https://m.media-amazon.com/images/I/71EeP5yuaEL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0CDDFH2MZ?tag=commoncents0050-20",
+  "description": "An 1,800-watt Ninja kitchen system with a 72oz pitcher and BlendSense tech that adjusts power and time for smoothies, dough, and frozen drinks. $70 under its $249.99 list.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-22T15:33:48.593Z",
+  "source": "techbargains",
+  "aud": "all",
+  "shelvedAt": "2026-11-23",
+  "shelvedReason": "Price rose to $249.95 — only about 0% off the $249.99 list (posted $179.95)",
+  "lastSeenPrice": 249.95
  }
 ]
