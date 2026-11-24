@@ -956,5 +956,31 @@
   "shelvedAt": "2026-11-24",
   "shelvedReason": "Unavailable on Amazon — no price and no buy box",
   "lastSeenPrice": null
+ },
+ {
+  "id": 1105,
+  "title": "Candle Warmer Lamp With Timer And Dimmer For $10.44 From Amazon",
+  "category": "household",
+  "fc": "Household",
+  "price": 10.44,
+  "originalPrice": 16.99,
+  "discount": 39,
+  "image": "https://m.media-amazon.com/images/I/71YSvK9iBmL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0FN83D814?tag=commoncents0050-20",
+  "description": "A lamp-style warmer that melts scented jar candles from the top down — all the fragrance, no open flame, smoke, or soot. It has a timer, a dimmer, and an adjustable height for large jars. $10.44 against a $16.99 list.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-22T20:02:04.947Z",
+  "source": "hip2save",
+  "aud": "women",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/611tcBvMeEL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/7145OlZ9nSL._AC_SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-24",
+  "shelvedReason": "Unavailable on Amazon — no price and no buy box",
+  "lastSeenPrice": null
  }
 ]
