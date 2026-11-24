@@ -934,5 +934,27 @@
   "shelvedAt": "2026-11-24",
   "shelvedReason": "Rotated out for fresh deals",
   "lastSeenPrice": 14.99
+ },
+ {
+  "id": 1113,
+  "title": "furReal Daisy The Yoga Goat Interactive Toy For $20 From Amazon",
+  "category": "kids",
+  "fc": "Kids",
+  "price": 20,
+  "originalPrice": 44.99,
+  "discount": 56,
+  "image": "https://m.media-amazon.com/images/I/71evi78LFWL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0CPQ25G7L?tag=commoncents0050-20",
+  "description": "An interactive plush goat that does yoga poses, giggles, and even toots — with over 60 sounds and reactions plus a meditation mode. A giggle-worthy gift for kids 4 and up.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": 1795476330876,
+  "source": "hip2save",
+  "aud": "all",
+  "shelvedAt": "2026-11-24",
+  "shelvedReason": "Unavailable on Amazon — no price and no buy box",
+  "lastSeenPrice": null
  }
 ]
