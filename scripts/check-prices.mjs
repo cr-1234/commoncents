@@ -490,14 +490,20 @@ async function main() {
     }
   }
 
-  // 6. hour-10-only steps: rotation first, then no-interest
-  if (et.hour === 10) {
+  // 6. Daily make-room steps, on the FIRST morning check (hour 7,
+  // ~07:24 ET): rotation first, then no-interest. Moved from hour 10
+  // to hour 7 on 2026-11-23 on the owner's order: fresh deals going
+  // up EVERY day is priority one, so the day's ~6 slots must stand
+  // open BEFORE the collector's daytime batches run — at hour 10 the
+  // morning batch had already found a full feed and posted nothing
+  // (exactly what happened on 2026-11-23).
+  if (et.hour === 7) {
     let clicks = null, views = null;
     try {
       const c = await fetchJson(`${API}/ccGetClicks`); clicks = c.clicks || {};
       const v = await fetchJson(`${API}/ccGetViews`); views = v.views || {};
     } catch (e) {
-      result.notes.push(`Hour-10 counters fetch failed (${String(e.message || e).slice(0, 120)}) — rotation and no-interest shelving skipped this run.`);
+      result.notes.push(`Morning counters fetch failed (${String(e.message || e).slice(0, 120)}) — rotation and no-interest shelving skipped this run.`);
     }
     if (clicks && views) {
       const total = (m, id) => (m[String(id)] && m[String(id)].total) || 0;
