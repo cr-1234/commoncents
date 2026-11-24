@@ -797,5 +797,142 @@
   "shelvedAt": "2026-11-23",
   "shelvedReason": "Promo code deal over 7 days old — checkout codes can't be re-tested automatically, so code deals come down at 7 days (posted $36.32 with code P2G7D32N)",
   "lastSeenPrice": 47.24
+ },
+ {
+  "id": 1061,
+  "title": "LEGO Up-Scaled Santa Minifigure 40820 For $41.99 From Amazon",
+  "category": "kids",
+  "fc": "Kids",
+  "price": 41.99,
+  "originalPrice": 59.99,
+  "discount": 30,
+  "image": "https://m.media-amazon.com/images/I/71XAotKCBaL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0G2T5PP7W?tag=commoncents0050-20",
+  "description": "A giant buildable LEGO Santa — 761 pieces that stack into a foot-tall minifigure for the mantel or the tree. An early Black Friday deal at $41.99.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-11T13:21:10Z",
+  "source": "9to5toys",
+  "aud": "all",
+  "shelvedAt": "2026-11-24",
+  "shelvedReason": "Unavailable on Amazon — no price and no buy box",
+  "lastSeenPrice": null
+ },
+ {
+  "id": 1042,
+  "title": "Sceptre 27\" 1920x1080 100Hz 1500R Curved Gaming Monitor For $84.97 From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 84.97,
+  "originalPrice": 124.97,
+  "discount": 32,
+  "image": "https://m.media-amazon.com/images/I/71vuq27GlGL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0D2JM3NQG?tag=commoncents0050-20",
+  "description": "A 27-inch curved 1080p gaming monitor with a fast 100Hz refresh and 1ms response. Smooth play and a wide view for under $90.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-10T12:25:00Z",
+  "source": "techbargains",
+  "aud": "all",
+  "shelvedAt": "2026-11-24",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 84.97
+ },
+ {
+  "id": 1048,
+  "title": "AOC 16\" FHD 1080p IPS USB-C Portable Laptop Screen For $47.48 From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 47.48,
+  "originalPrice": 69.99,
+  "discount": 32,
+  "image": "https://m.media-amazon.com/images/I/61z9-LCtffL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0F3MMK1J4?tag=commoncents0050-20",
+  "description": "A slim 16-inch portable monitor that plugs into a laptop with a single USB-C cable — a second screen for work, travel, or gaming anywhere. Under $50 for a full HD IPS panel with built-in speakers.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-10T12:25:00Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "shelvedAt": "2026-11-24",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 47.48
+ },
+ {
+  "id": 1051,
+  "title": "Gold Bond Healing Hydrating Lotion With Aloe 5.5oz For $2.49 From Amazon",
+  "category": "beauty",
+  "fc": "Beauty",
+  "price": 2.49,
+  "originalPrice": 7.99,
+  "discount": 69,
+  "image": "https://m.media-amazon.com/images/I/614KaHTGdWL._SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B00J2L5TOK?tag=commoncents0050-20",
+  "description": "Gold Bond’s healing lotion with aloe — seven moisturizers and three vitamins for dry winter skin. Clip the coupon below and a 5.5oz tube is just $2.49.",
+  "dealNote": "Clip the $3.49 coupon on the Amazon product page to get this price — without the coupon, it’s $5.98.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-10T12:25:00Z",
+  "source": "hip2save",
+  "aud": "all",
+  "shelvedAt": "2026-11-24",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 2.49
+ },
+ {
+  "id": 1054,
+  "title": "Metabo HPT 18V Cordless Brushless Drill And Impact Driver Combo Kit For $129 From Amazon",
+  "category": "tools",
+  "fc": "Tools",
+  "price": 129,
+  "originalPrice": 199,
+  "discount": 35,
+  "image": "https://m.media-amazon.com/images/I/710ouYU688L._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0BVPS2ZYN?tag=commoncents0050-20",
+  "description": "Two brushless 18V tools — a driver drill and an impact driver — plus two batteries, a charger, and a carry bag. A full kit at $70 under its $199 list price.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-11T13:21:10Z",
+  "source": "techbargains",
+  "aud": "all",
+  "shelvedAt": "2026-11-24",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 129
+ },
+ {
+  "id": 1056,
+  "title": "Celsius Sparkling Spritz Vibe Summer Edition Sugar Free Energy Drink 12-Pack For $14.99 From Amazon",
+  "category": "groceries",
+  "fc": "Groceries",
+  "price": 14.99,
+  "originalPrice": 24.99,
+  "discount": 40,
+  "image": "https://m.media-amazon.com/images/I/8108w338FFL._SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0H2K3KGM5?tag=commoncents0050-20",
+  "description": "Twelve cans of Celsius Sparkling Spritz Vibe — zero sugar, 200mg of caffeine, and a sparkling limoncello twist. A summer-edition 12-pack at 40% off list with the coupon clipped.",
+  "dealNote": "Clip the $5 coupon on the Amazon product page to get this price — without the coupon, it's $19.99.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-11T13:21:10Z",
+  "source": "techbargains",
+  "aud": "all",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/71lca8GDHOL._SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-24",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 14.99
  }
 ]
