@@ -982,5 +982,143 @@
   "shelvedAt": "2026-11-24",
   "shelvedReason": "Unavailable on Amazon — no price and no buy box",
   "lastSeenPrice": null
+ },
+ {
+  "id": 1095,
+  "title": "Amazon Fire TV Stick 4K (Newest Model) With All-New Fire TV Remote For $19.99 Shipped From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 19.99,
+  "originalPrice": 59.99,
+  "discount": 67,
+  "image": "https://m.media-amazon.com/images/I/61blUHa9vvL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0G4XRP464?tag=commoncents0050-20",
+  "description": "Amazon's newest Fire TV Stick 4K streams in sharp 4K with HDR10+ and Wi-Fi 6, and the redesigned remote finally puts a proper metal Home button under your thumb. At $19.99 — a third of its $59.99 list — it's the cheapest way to give an older TV a serious upgrade.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-17T14:52:11Z",
+  "source": "9to5toys",
+  "aud": "all",
+  "shelvedAt": "2026-11-25",
+  "shelvedReason": "No views or clicks in 7 days",
+  "lastSeenPrice": 19.99
+ },
+ {
+  "id": 1076,
+  "title": "Bose QuietComfort Wireless Bluetooth Headphones With Active Noise Cancelling For $167 Shipped From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 167,
+  "originalPrice": 359,
+  "discount": 53,
+  "image": "https://m.media-amazon.com/images/I/51VyH2KY-eL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0F2LCBKVN?tag=commoncents0050-20",
+  "description": "Bose's QuietComfort over-ears with active noise cancelling, plush cushions, and up to 24 hours of battery — a flagship headphone at over half off its $359 list.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-17T21:21:38Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/61swCmjZjML._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/51+6sp-ILlL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/612IOFVUcyL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/61qrmulYsDL._AC_SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-25",
+  "shelvedReason": "No views or clicks in 7 days",
+  "lastSeenPrice": 167
+ },
+ {
+  "id": 1096,
+  "title": "Amazon Fire TV Stick HD (Newest Model) For $15.99 From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 15.99,
+  "originalPrice": 39.99,
+  "discount": 60,
+  "image": "https://m.media-amazon.com/images/I/610j-wmxRcL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0DJGDC3BD?tag=commoncents0050-20",
+  "description": "Amazon’s newest Fire TV Stick HD turns any TV with an HDMI port into a smart TV, with the Alexa Voice Remote and Wi-Fi 6 built in. At $15.99 — 60% off its $39.99 list — it’s the cheapest way to bring an older TV up to date.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-18T09:52:59Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "shelvedAt": "2026-11-25",
+  "shelvedReason": "No views or clicks in 7 days",
+  "lastSeenPrice": 15.99
+ },
+ {
+  "id": 1097,
+  "title": "Ring Battery Doorbell (Newest Model) With Ring Indoor Cam For $49.99 From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 49.99,
+  "originalPrice": 149.98,
+  "discount": 67,
+  "image": "https://m.media-amazon.com/images/I/51PMx58OLQL._SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0H6GX9QQ6?tag=commoncents0050-20",
+  "description": "A doorbell and an indoor camera in one box: the newest Ring Battery Doorbell watches the front door while the Indoor Cam keeps an eye inside. At $49.99 it’s a third of the $149.98 the pair usually costs.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-18T09:52:59Z",
+  "source": "dansdeals",
+  "aud": "all",
+  "shelvedAt": "2026-11-25",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 49.99
+ },
+ {
+  "id": 1098,
+  "title": "WYZE Window Camera WiFi Indoor HD Security Camera For $21.98 From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 21.98,
+  "originalPrice": 34.98,
+  "discount": 37,
+  "image": "https://m.media-amazon.com/images/I/81thZSimCeL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0FQ637L54?tag=commoncents0050-20",
+  "description": "A window camera that films through the glass — no drilling, no outdoor mount — with color night vision and an anti-glare design that cuts reflections. At $21.98 it’s a solid cut from its $34.98 list price.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-18T09:52:59Z",
+  "source": "bensbargains",
+  "aud": "all",
+  "shelvedAt": "2026-11-25",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 21.98
+ },
+ {
+  "id": 1057,
+  "title": "Beribes Bluetooth Over Ear Wireless Headphones With 120H Playtime For $18.95 From Amazon",
+  "category": "tech",
+  "fc": "Tech",
+  "price": 18.95,
+  "originalPrice": 28.99,
+  "discount": 35,
+  "image": "https://m.media-amazon.com/images/I/71F2ccIPPLL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B09LYF2ST7?tag=commoncents0050-20",
+  "description": "Over-ear Bluetooth headphones with a claimed 120 hours of playtime and six EQ modes — a lot of listening for under $20. At $18.95 it's over a third off its $28.99 list.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-11T13:21:10Z",
+  "source": "techbargains",
+  "aud": "all",
+  "shelvedAt": "2026-11-25",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 18.95
  }
 ]
