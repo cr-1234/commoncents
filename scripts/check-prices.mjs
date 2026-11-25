@@ -137,7 +137,7 @@ function titleOverlap(dealTitle, recTitle) {
 const result = {
   ok: false, dryRun: DRY, gated: false, changed: false,
   runAtET: null, checkedCount: 0, liveCountBefore: 0, liveCountAfter: 0,
-  changedDeals: [], shelved: [], rotated: [], noInterest: [], purged: [],
+  changedDeals: [], shelved: [], rotated: [], noInterest: [], purged: [], synced: [],
   needsReview: [], notes: [],
   bdCc2UsedThisRun: 0, bdOrigUsedThisRun: 0, tallyUsed: null, tallyWarning: false,
   bothHelpersFailed: false, previewVerified: false, liveVerified: false,
@@ -160,8 +160,9 @@ function writeOutputs() {
     }
     for (const s of result.shelved) L.push(`Shelved: deal ${s.id} (${s.title}) — ${s.reason}${s.lastSeenPrice != null ? ` (last seen $${fmtPrice(s.lastSeenPrice)})` : ''}.`);
     for (const p of result.purged) L.push(`Removed for good (owner purge): deal ${p.id} (${p.title}).`);
+    for (const s of result.synced) L.push(`Landed on the live site: deal ${s.id} (${s.title}) — it was posted earlier and had been waiting on the preview only.`);
     for (const n of result.needsReview) L.push(`NEEDS EYES: deal ${n.id} (${n.title}) — Amazon's page title looks different: "${n.recordTitle}" (word overlap ${n.overlap}). ${n.action}`);
-    if (!result.changedDeals.length && !result.shelved.length && !result.purged.length) L.push('No price changes, no shelvings, no purges.');
+    if (!result.changedDeals.length && !result.shelved.length && !result.purged.length && !result.synced.length) L.push('No price changes, no shelvings, no purges.');
     if (result.previewVerified) L.push('Verified on the preview site.');
     if (result.liveVerified) L.push('Verified on the live site (commoncentsdeals.com).');
     if (result.changed && !result.liveVerified && !DRY) L.push('WARNING: the change did NOT reach the live site — it is on the preview only.');
@@ -340,6 +341,29 @@ async function main() {
   result.liveCountBefore = entries.length;
   const byId = new Map(entries.map((e) => [e.obj.id, e]));
   const checkDeals = entries.filter((e) => e.obj.id !== EXEMPT_ID).map((e) => e.obj);
+
+  // 2b. stranded-post sync (owner fix, 2026-11-25): collector batches
+  // post to tailored-feed (the preview) first and copy to main
+  // themselves; when that copy step fails, new deals sit on the preview
+  // only — and this script's cherry-pick landing never carries them,
+  // because it moves only this run's own diff (14 deals, 1123-1136,
+  // stranded 2026-11-24/25 until the owner spotted them). Detect any
+  // live deal present here but missing from origin/main, and any
+  // shelved record missing there, and force the full-file landing
+  // path below so they reach the live site on this run. New deals
+  // must never wait on a human noticing.
+  let shelvedStranded = 0;
+  try {
+    await sh('git', ['fetch', 'origin', 'main']);
+    const mainFeedText = await sh('git', ['show', 'origin/main:feed-data.js']);
+    const mainIds = new Set(parseFeed(mainFeedText).deals.map((e) => e.obj.id));
+    for (const e of entries) if (!mainIds.has(e.obj.id)) result.synced.push({ id: e.obj.id, title: e.obj.title });
+    const mainShelved = JSON.parse(await sh('git', ['show', 'origin/main:shelved-deals.json']));
+    const mainShelvedIds = new Set(mainShelved.map((s) => s.id));
+    shelvedStranded = shelved.filter((s) => !mainShelvedIds.has(s.id)).length;
+  } catch (e) {
+    result.notes.push(`Stranded-post sync check failed (${String(e.message || e).slice(0, 120)}) — sync skipped this run.`);
+  }
 
   // 3. Bright Data scrape
   const records = await scrapeAll(checkDeals);
@@ -570,9 +594,9 @@ async function main() {
   // 9. assemble outputs
   const survivors = entries.filter((e) => byId.has(e.obj.id));
   result.liveCountAfter = survivors.length;
-  result.changed = result.changedDeals.length > 0 || result.shelved.length > 0 || result.purged.length > 0;
+  result.changed = result.changedDeals.length > 0 || result.shelved.length > 0 || result.purged.length > 0 || result.synced.length > 0;
   const newFeed = serializeFeed(header, survivors);
-  const shelvedChanged = result.shelved.length > 0 || result.purged.length > 0;
+  const shelvedChanged = result.shelved.length > 0 || result.purged.length > 0 || shelvedStranded > 0;
   const newShelved = shelvedChanged ? JSON.stringify(shelved, null, 1) + '\n' : null;
 
   const runNote = `CommonCents price check ${et.date} ${et.hhmm} ET (script${DRY ? ', dry run' : ''}): checked ${result.checkedCount} deals; changed=[${result.changedDeals.map((c) => c.id).join(',')}] shelved=[${result.shelved.map((s) => s.id).join(',')}] purged=[${result.purged.map((p) => p.id).join(',')}]; cc2 tally ${result.tallyUsed}.`;
@@ -614,12 +638,20 @@ async function main() {
   for (const c of result.changedDeals) summaryParts.push(`deal ${c.id} price $${fmtPrice(c.from)} -> $${fmtPrice(c.to)}`);
   if (result.shelved.length) summaryParts.push(`shelved ${result.shelved.map((s) => s.id).join(', ')}`);
   if (result.purged.length) summaryParts.push(`purged ${result.purged.map((p) => p.id).join(', ')}`);
+  if (result.synced.length) summaryParts.push(`landed preview-only deals ${result.synced.map((s) => s.id).join(', ')}`);
   const commitMsg = `Price check ${et.date} (script): ${summaryParts.join('; ')}; no revivals`;
 
   const changedFiles = ['feed-data.js'];
   if (newShelved) changedFiles.push('shelved-deals.json');
   await sh('git', ['add', ...changedFiles]);
-  await sh('git', ['commit', '-m', commitMsg]);
+  try {
+    await sh('git', ['commit', '-m', commitMsg]);
+  } catch (e) {
+    // Sync-only run: the files on tailored-feed are already correct
+    // (the stranded deals came from there) — nothing new to commit.
+    // HEAD's file contents below are exactly what main needs.
+    result.notes.push('No new commit on tailored-feed (sync-only run — files there were already correct); landing the current files on main directly.');
+  }
   const headFeed = await sh('git', ['show', 'HEAD:feed-data.js']);
   const headShelved = newShelved ? await sh('git', ['show', 'HEAD:shelved-deals.json']) : null;
 
@@ -656,10 +688,20 @@ async function main() {
     await sh('git', ['fetch', 'origin', 'main']);
     await sh('git', ['worktree', 'add', wt, 'origin/main']);
     const headCommit = (await sh('git', ['rev-parse', 'HEAD'])).trim();
-    try {
-      await sh('git', ['cherry-pick', headCommit], { cwd: wt });
-    } catch (e) {
-      try { await sh('git', ['cherry-pick', '--abort'], { cwd: wt }); } catch {}
+    // When stranded preview-only deals are being synced, a cherry-pick
+    // of this run's commit can never carry them (they are not in its
+    // diff) — go straight to copying the full data files.
+    const forceCopy = result.synced.length > 0 || shelvedStranded > 0;
+    let cherryOk = false;
+    if (!forceCopy) {
+      try {
+        await sh('git', ['cherry-pick', headCommit], { cwd: wt });
+        cherryOk = true;
+      } catch (e) {
+        try { await sh('git', ['cherry-pick', '--abort'], { cwd: wt }); } catch {}
+      }
+    }
+    if (!cherryOk) {
       for (const f of changedFiles) {
         const content = await sh('git', ['show', `HEAD:${f}`]);
         fs.writeFileSync(path.join(wt, f), content);
