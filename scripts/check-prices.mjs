@@ -527,14 +527,16 @@ async function main() {
     }
   }
 
-  // 6. Daily make-room steps, on the FIRST morning check (hour 7,
-  // ~07:24 ET): rotation first, then no-interest. Moved from hour 10
-  // to hour 7 on 2026-11-23 on the owner's order: fresh deals going
-  // up EVERY day is priority one, so the day's ~6 slots must stand
-  // open BEFORE the collector's daytime batches run — at hour 10 the
-  // morning batch had already found a full feed and posted nothing
-  // (exactly what happened on 2026-11-23).
-  if (et.hour === 7) {
+  // 6. Daily make-room steps, on the early-morning check (hour 4,
+  // ~04:24 ET): rotation first, then no-interest. Moved from hour 10
+  // to hour 7 on 2026-11-23 on the owner's order (fresh deals going
+  // up EVERY day is priority one), then to hour 4 on 2026-11-25 when
+  // the owner set the staggered posting schedule: the morning batch
+  // posts around 6 AM and must find its slots already open, and the
+  // rotation now makes room for the WHOLE day's staggered batches
+  // (~6 morning + ~2 midday + ~2 afternoon), so it shelves down to
+  // 51 counted deals instead of 54.
+  if (et.hour === 4) {
     let clicks = null, views = null;
     try {
       const c = await fetchJson(`${API}/ccGetClicks`); clicks = c.clicks || {};
@@ -555,11 +557,11 @@ async function main() {
         }
       }
       const liveCount = [...byId.keys()].filter((id) => id !== EXEMPT_ID).length;
-      if (liveCount > 54) {
+      if (liveCount > 51) {
         const candidates = [...byId.values()]
           .filter((e) => e.obj.id !== EXEMPT_ID && !e.obj.sponsored && !isGlitch(e.obj) && Date.now() - tsMillis(e.obj.ts) >= 7 * 24 * 3600 * 1000)
           .sort((a, b) => (total(clicks, a.obj.id) + total(views, a.obj.id)) - (total(clicks, b.obj.id) + total(views, b.obj.id)) || tsMillis(a.obj.ts) - tsMillis(b.obj.ts));
-        let need = liveCount - 54;
+        let need = liveCount - 51;
         for (const entry of candidates) {
           if (need <= 0) break;
           result.rotated.push(entry.obj.id);
