@@ -206,6 +206,18 @@
             prevSnapshot = JSON.parse(lsGet('ccFeedSnapshot') || '[]') || [];
         } catch (e) {}
         var prevSnapshotSet = new Set(prevSnapshot);
+        if (!prevSnapshot.length && prevVisit > 0) {
+            // First load under the snapshot rule for a returning
+            // visitor (no snapshot stored yet, but a last-visit clock
+            // exists): seed the snapshot with everything except the
+            // last day's arrivals, so today's new deals still badge
+            // without badging the whole back catalog at once.
+            var dayAgo = Date.now() - 24 * 3600 * 1000;
+            deals.forEach(function (d) {
+                var ts = (typeof d.ts === 'number') ? d.ts : Date.parse(d.ts || '');
+                if (isNaN(ts) || ts < dayAgo) prevSnapshotSet.add(d.id);
+            });
+        }
         deals.forEach(function (d) {
             if (!prevSnapshotSet.has(d.id) && !seenDeals.has(d.id)) newBadges.add(d.id);
         });
