@@ -361,6 +361,19 @@ async function main() {
     const mainShelved = JSON.parse(await sh('git', ['show', 'origin/main:shelved-deals.json']));
     const mainShelvedIds = new Set(mainShelved.map((s) => s.id));
     shelvedStranded = shelved.filter((s) => !mainShelvedIds.has(s.id)).length;
+    // A rescued deal must also be re-stamped to now (owner complaint,
+    // 2026-11-25): the NEW DEAL badge and the Newest sort key off ts,
+    // and a deal that sat on the preview for hours carries its old
+    // preview-posting time — visitors who checked the site meanwhile
+    // (the owner did, looking for the new deals) have a last-visit
+    // clock newer than that ts, so the badge never shows. From the
+    // live site's side the deal IS new today; stamp it so.
+    if (result.synced.length) {
+      const syncedIds = new Set(result.synced.map((s) => s.id));
+      for (const e of entries) {
+        if (syncedIds.has(e.obj.id)) { e.obj.ts = Date.now(); e.changed = true; }
+      }
+    }
   } catch (e) {
     result.notes.push(`Stranded-post sync check failed (${String(e.message || e).slice(0, 120)}) — sync skipped this run.`);
   }
