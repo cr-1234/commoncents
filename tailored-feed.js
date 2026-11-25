@@ -178,9 +178,10 @@
     }
 
     // The deals currently carrying a NEW DEAL badge. A deal joins
-    // this set when it arrives (posted after the pre-advance last-visit
-    // snapshot above) and leaves it ONLY when the visitor opens that
-    // deal — never just because a page loaded. Badges used to be
+    // this set when it appears on the site (it was not in the snapshot
+    // of deal ids stored at the visitor's previous load) and leaves it
+    // ONLY when the visitor opens that deal — never just because a
+    // page loaded. Badges used to be
     // computed straight from the visit clock, which advances on every
     // load, so all unopened badges vanished at once on the next visit
     // (user's complaint, 2026-11-10): he wants each card's badge to go
@@ -192,12 +193,33 @@
     } catch (e) {}
     if (typeof deals !== 'undefined' && Array.isArray(deals)) {
         var liveBadgeIds = new Set(deals.map(function (d) { return d.id; }));
-        // Union in this visit's new arrivals — the same rule as before:
-        // posted after the last-visit snapshot taken at the top.
+        // Union in this visit's new arrivals. The rule is per-card and
+        // clock-free (owner's design, restated 2026-11-25): a deal gets
+        // the badge if it was NOT on the site at the visitor's last
+        // page load and the visitor hasn't opened it — full stop. The
+        // old rule compared the deal's posted-time to the last-visit
+        // clock, so a deal that reached the site between visits (e.g.
+        // landed late from the preview) could carry a timestamp older
+        // than the visitor's last look and never badge at all.
+        var prevSnapshot = [];
+        try {
+            prevSnapshot = JSON.parse(lsGet('ccFeedSnapshot') || '[]') || [];
+        } catch (e) {}
+        var prevSnapshotSet = new Set(prevSnapshot);
+        if (!prevSnapshot.length && prevVisit > 0) {
+            // First load under the snapshot rule for a returning
+            // visitor (no snapshot stored yet, but a last-visit clock
+            // exists): seed the snapshot with everything except the
+            // last day's arrivals, so today's new deals still badge
+            // without badging the whole back catalog at once.
+            var dayAgo = Date.now() - 24 * 3600 * 1000;
+            deals.forEach(function (d) {
+                var ts = (typeof d.ts === 'number') ? d.ts : Date.parse(d.ts || '');
+                if (isNaN(ts) || ts < dayAgo) prevSnapshotSet.add(d.id);
+            });
+        }
         deals.forEach(function (d) {
-            if (!d.ts) return;
-            var ts = (typeof d.ts === 'number') ? d.ts : Date.parse(d.ts);
-            if (!isNaN(ts) && ts > prevVisit) newBadges.add(d.id);
+            if (!prevSnapshotSet.has(d.id) && !seenDeals.has(d.id)) newBadges.add(d.id);
         });
         // Prune: only deals still in the inventory and not yet opened
         // keep their badge.
@@ -206,6 +228,9 @@
         });
         newBadges = new Set(keptBadges);
         lsSet('ccNewBadges', JSON.stringify(keptBadges));
+        // Remember exactly which deals were on the site at this load;
+        // the next load badges whatever wasn't here.
+        lsSet('ccFeedSnapshot', JSON.stringify([...liveBadgeIds]));
     }
 
     // Freebies get the same seen treatment as deals (owner request,
