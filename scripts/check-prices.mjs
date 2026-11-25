@@ -320,8 +320,13 @@ async function main() {
   fs.writeFileSync(LOCK_FILE, String(process.pid));
   process.on('exit', () => { try { fs.rmSync(LOCK_FILE); } catch {} });
 
-  // overnight gate: hour 1 or 4 ET — no check, no Bright Data
-  if (et.hour === 1 || et.hour === 4) {
+  // overnight gate: hour 1 or 22 ET — no check, no Bright Data.
+  // (Was hours 1 and 4 until 2026-11-25; the gate moved off hour 4
+  // when the daily rotation moved there for the staggered posting
+  // schedule — the 04:24 run now does the full check AND the
+  // rotation, and the late-evening run is the one that rests. Still
+  // 6 full checks a day, same Bright Data spend.)
+  if (et.hour === 1 || et.hour === 22) {
     result.ok = true; result.gated = true;
     appendDailyLog([`CommonCents price check ${et.hhmm} ET: overnight gate (hour ${et.hour}) — skipped, no Bright Data used. (script)`]);
     writeOutputs();
