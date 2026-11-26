@@ -73,7 +73,7 @@
             </div>
 
             <div id="tab-deals">
-            <h2 class="admin-h">Deal views &amp; clicks <button type="button" class="btn" id="adminRefresh" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
+            <h2 class="admin-h">Deal views &amp; clicks <button type="button" class="btn" id="adminRefresh" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button> <span class="admin-note" id="dashUpdated"></span></h2>
             <p class="admin-note" style="margin-bottom:0.75rem;">Two different signals (counted since Nov 12, 2026 — views started a few hours after clicks): <strong>Views</strong> = someone opened the deal's window — pure interest; that's what decides whether a deal earns its place on the site. <strong>Clicks to Amazon</strong> = someone tapped "View Deal" / "Get This Deal" and went to the store — those are the ones that can turn into sales. Sorted by views at first — the deals at the bottom are the ones nobody's even opening. Click any column heading — Price, Views, Clicks, Status — to sort by it instead; click it again to flip the order. A shelved deal comes back on its own if its price returns — or you can remove it for good with its <strong>Delete</strong> button.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
@@ -85,7 +85,7 @@
             </div>
 
             <div id="tab-members" style="display:none;">
-            <h2 class="admin-h">Members <span class="admin-note" id="memberCount"></span> <button type="button" class="btn" id="adminRefreshMembers" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
+            <h2 class="admin-h">Members <span class="admin-note" id="memberCount"></span> <button type="button" class="btn" id="adminRefreshMembers" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button> <span class="admin-note" id="membersUpdated"></span></h2>
             <p class="admin-note" style="margin-bottom:0.75rem;">Everyone who has ever signed up — both sites share one account system, so this is the combined list for CommonCents and Gifting Butler, newest first. Visible only to you: the server checks it's really your account before it sends anything, the list is never public. <strong>Delete</strong> removes a member completely — their sign-in, lists, votes and comments on both sites — which is how you clear out test accounts. It cannot be undone, and your own account can't be deleted here. Click a column heading to sort the list.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
@@ -96,7 +96,7 @@
             </div>
 
             <div id="tab-subs" style="display:none;">
-            <h2 class="admin-h">Deal submissions <span class="admin-note" id="subCount"></span> <button type="button" class="btn" id="adminRefreshSubs" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button></h2>
+            <h2 class="admin-h">Deal submissions <span class="admin-note" id="subCount"></span> <button type="button" class="btn" id="adminRefreshSubs" style="font-size:0.8rem; padding:0.3rem 0.9rem; margin-left:0.5rem;">Refresh</button> <span class="admin-note" id="subsUpdated"></span></h2>
             <p class="admin-note" style="margin-bottom:0.75rem;">Deals readers sent in — the ones still waiting sit on top, newest first. Nothing is ever posted automatically; you review each one here. <strong>Posted</strong> asks which deal number it became, marks it done, and tells the submitter it's live (only when they sent it while signed in, so we know who they are). <strong>Passed</strong> files it away. <strong>Delete</strong> removes an entry for good — that's the one for clearing out test entries and clutter. Click a column heading to sort the list.</p>
             <div style="overflow-x:auto;">
                 <table class="admin-table">
@@ -149,7 +149,7 @@
                 .catch(function (e) { showErr('Google sign-in failed.'); });
         });
         els.signOut.addEventListener('click', function () { auth.signOut(); });
-        document.getElementById('adminRefresh').addEventListener('click', loadDash);
+        document.getElementById('adminRefresh').addEventListener('click', refreshDash);
         document.getElementById('adminRefreshMembers').addEventListener('click', loadMembers);
         document.getElementById('adminRefreshSubs').addEventListener('click', loadSubmissions);
         document.querySelectorAll('.admin-tab').forEach(function (b) {
@@ -283,11 +283,30 @@
             });
         }
 
+        function stampUpdated(id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = '· Updated ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        }
+
+        // Refresh must reload the deal list itself, not just the
+        // counts: the feed-data.js copy belongs to page open, so deals
+        // posted or shelved since then never showed on Refresh
+        // (owner report 2026-11-26). feed-data.js pushes into the
+        // shared `deals` array, so empty it before reloading.
+        function refreshDash() {
+            try { if (typeof deals !== 'undefined') deals.length = 0; } catch (e) {}
+            var s = document.createElement('script');
+            s.src = 'feed-data.js?cb=' + Date.now();
+            s.onload = function () { s.remove(); loadDash(); };
+            s.onerror = function () { s.remove(); loadDash(); };
+            document.head.appendChild(s);
+        }
+
         function loadDash() {
             var live = (typeof deals !== 'undefined' ? deals : []).slice();
             document.getElementById('statLive').textContent = live.length;
 
-            fetch('shelved-deals.json').then(function (r) { return r.json(); }).then(function (shelf) {
+            fetch('shelved-deals.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (shelf) {
                 document.getElementById('statShelf').textContent = shelf.length;
                 loadClicks(live, shelf);
             }).catch(function () {
@@ -365,6 +384,7 @@ function renderSubs() {
                 }
                 document.getElementById('subCount').textContent = '— ' + res.submissions.length + ' in the queue';
                 subCache = res.submissions;
+                stampUpdated('subsUpdated');
                 if (!subCache.length) {
                     tb.innerHTML = '<tr><td colspan="7">No submissions yet.</td></tr>';
                     return;
@@ -494,6 +514,7 @@ function renderMembers() {
                 }
                 document.getElementById('memberCount').textContent = '— ' + res.members.length + ' total';
                 memberCache = res.members;
+                stampUpdated('membersUpdated');
                 if (!memberCache.length) {
                     tb.innerHTML = '<tr><td colspan="8">No members yet.</td></tr>';
                     return;
@@ -554,6 +575,7 @@ function renderMembers() {
                 });
                 dealRowsCache = rows;
                 renderDeals();
+                stampUpdated('dashUpdated');
             }).catch(function () {
                 document.getElementById('clickRows').innerHTML = '<tr><td colspan="7">Could not load click counts.</td></tr>';
             });
