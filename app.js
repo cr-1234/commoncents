@@ -1509,11 +1509,11 @@ function createDealCard(deal) {
                 ${expired ? `<span class="expired-price">$${deal.price}</span>` : `$${deal.price}`}
                 ${!expired && deal.originalPrice ? `<span class="original-price">$${deal.originalPrice}</span>` : ''}
                 ${!expired && deal.discount ? `<span class="discount-badge">${deal.discount}% OFF</span>` : ''}
-                ${!expired && deal.code ? `<span class="deal-code-tag">Promo code</span>` : ''}
+                ${!expired && (deal.code || deal.bonusCode) ? `<span class="deal-code-tag">Promo code</span>` : ''}
                 ${!expired && deal.dealNote ? `<span class="deal-note-tag">Coupon</span>` : ''}
                 ${postedDate ? `<span class="card-date">Posted ${postedDate}</span>` : ''}
             </div>
-            ${!expired && deal.code ? `<p class="code-warning">⚠ Promo code — codes change all the time and may not work.</p>` : ''}
+            ${!expired && (deal.code || deal.bonusCode) ? `<p class="code-warning">⚠ Promo code — codes change all the time and may not work.</p>` : ''}
             ${expired
                 ? `<span class="btn btn-primary full-width view-deal-btn expired-btn" style="margin-bottom:1rem;">Deal Expired</span>`
                 : `<a href="${getAffiliateUrl(deal.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary full-width view-deal-btn" data-deal-id="${deal.id}" style="margin-bottom:1rem;">View Deal</a>`}
@@ -2104,6 +2104,8 @@ function openModal(deal) {
         ${deal.dealNote ? `<div class="deal-note"><strong>How to get this price:</strong> ${deal.dealNote}</div>` : ''}
         ${deal.code ? `<div class="code-warning-box"><strong>⚠ Heads up:</strong> promo codes change all the time and can stop working at any moment. If this code doesn't work, Amazon will charge its regular price instead of the price above.</div>` : ''}
         ${deal.code ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Use code <strong>${deal.code}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout.</p>` : ''}
+        ${!deal.code && deal.bonusCode ? `<div class="code-warning-box"><strong>⚠ Heads up:</strong> the price above doesn't need a code. The bonus code below takes extra off — but promo codes change all the time and can stop working at any moment.</div>` : ''}
+        ${!deal.code && deal.bonusCode ? `<div class="deal-code" role="button" tabindex="0" title="Tap to copy the code"><span class="code-clip-icon">✂</span><span class="code-main">Bonus code <strong>${deal.bonusCode}</strong></span><span class="code-action">TAP TO COPY</span></div><p class="code-helper">Copy the code, then tap Get This Deal and paste it at checkout for the extra discount.</p>` : ''}
         <div class="vote-container" style="margin-bottom:0.25rem;">
             <button class="vote-btn upvote-btn ${myVotes[deal.id] === 'up' ? 'active' : ''}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
@@ -2168,8 +2170,8 @@ function openModal(deal) {
 
     const modalCode = modalBody.querySelector('.deal-code');
     if (modalCode) {
-        modalCode.addEventListener('click', () => copyDealCode(modalCode, deal.code));
-        modalCode.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyDealCode(modalCode, deal.code); } });
+        modalCode.addEventListener('click', () => copyDealCode(modalCode, deal.code || deal.bonusCode));
+        modalCode.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyDealCode(modalCode, deal.code || deal.bonusCode); } });
     }
 
     ccSetupComments(deal, String(deal.id), skipLoadOnce, () => openModal(deal));
