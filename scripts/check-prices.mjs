@@ -93,6 +93,17 @@ async function sh(cmd, args, opts = {}) {
   const { stdout } = await run(cmd, args, { maxBuffer: 64 * 1024 * 1024, timeout: opts.timeout || 600000, cwd: opts.cwd || REPO });
   return stdout;
 }
+// Network git ops in a cron-worker sandbox have no credential helper
+// configured — plain `git push` dies with "could not read Username
+// for 'https://github.com'" (this exact failure stranded the 2026-11-26
+// 04:24 check's publish; the same fix was applied to the Gifting
+// Butler checks 2026-11-25). The sandbox sanitizes the repo's own
+// .git/config, so the fix cannot live in config — pass the signed-in
+// gh helper on the command line for every network git call instead.
+const GIT_AUTH = ['-c', 'credential.helper=!gh auth git-credential'];
+async function gitNet(args, opts = {}) {
+  return sh('git', [...GIT_AUTH, ...args], opts);
+}
 async function fetchJson(url) {
   const r = await fetch(url, { signal: AbortSignal.timeout(30000) });
   if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
@@ -337,7 +348,7 @@ async function main() {
   // 1. git pull (real + dry both start from freshest tailored-feed)
   const status = await sh('git', ['status', '--porcelain', '--', 'feed-data.js', 'shelved-deals.json']);
   if (status.trim()) throw new Error('feed-data.js / shelved-deals.json not clean on tailored-feed — aborting before any change: ' + status.trim().slice(0, 200));
-  await sh('git', ['pull', 'origin', 'tailored-feed']);
+  await gitNet(['pull', 'origin', 'tailored-feed']);
 
   // 2. read current data
   const feedText = fs.readFileSync(FEED_FILE, 'utf8');
@@ -359,7 +370,7 @@ async function main() {
   // must never wait on a human noticing.
   let shelvedStranded = 0;
   try {
-    await sh('git', ['fetch', 'origin', 'main']);
+    await gitNet(['fetch', 'origin', 'main']);
     const mainFeedText = await sh('git', ['show', 'origin/main:feed-data.js']);
     const mainIds = new Set(parseFeed(mainFeedText).deals.map((e) => e.obj.id));
     for (const e of entries) if (!mainIds.has(e.obj.id)) result.synced.push({ id: e.obj.id, title: e.obj.title });
@@ -677,12 +688,12 @@ async function main() {
 
   // push tailored-feed (one rebase retry if the collector landed meanwhile)
   try {
-    await sh('git', ['push', 'origin', 'tailored-feed']);
+    await gitNet(['push', 'origin', 'tailored-feed']);
   } catch (e) {
-    await sh('git', ['pull', '--rebase', 'origin', 'tailored-feed']);
-    await sh('git', ['push', 'origin', 'tailored-feed']);
+    await gitNet(['pull', '--rebase', 'origin', 'tailored-feed']);
+    await gitNet(['push', 'origin', 'tailored-feed']);
   }
-  await sh('git', ['push', 'preview', 'tailored-feed:main']);
+  await gitNet(['push', 'preview', 'tailored-feed:main']);
 
   // verify preview served bytes
   const pollMatch = async (url, expected, label) => {
@@ -705,7 +716,7 @@ async function main() {
   const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-main-'));
   fs.rmSync(wt, { recursive: true, force: true }); // git worktree add needs a non-existent path
   try {
-    await sh('git', ['fetch', 'origin', 'main']);
+    await gitNet(['fetch', 'origin', 'main']);
     await sh('git', ['worktree', 'add', wt, 'origin/main']);
     const headCommit = (await sh('git', ['rev-parse', 'HEAD'])).trim();
     // When stranded preview-only deals are being synced, a cherry-pick
@@ -729,11 +740,11 @@ async function main() {
       await sh('git', ['add', ...changedFiles], { cwd: wt });
       await sh('git', ['commit', '-m', commitMsg], { cwd: wt });
     }
-    await sh('git', ['push', 'origin', 'HEAD:main'], { cwd: wt });
+    await gitNet(['push', 'origin', 'HEAD:main'], { cwd: wt });
   } finally {
     try { await sh('git', ['worktree', 'remove', '--force', wt]); } catch {}
   }
-  await sh('git', ['fetch', 'origin', 'main']);
+  await gitNet(['fetch', 'origin', 'main']);
   const mainFeed = await sh('git', ['show', 'origin/main:feed-data.js']);
   result.liveVerified = await pollMatch(LIVE_FEED, mainFeed, 'live feed');
   if (headShelved) {
