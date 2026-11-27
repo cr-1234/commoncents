@@ -1545,5 +1545,34 @@
   "shelvedAt": "2026-11-27",
   "shelvedReason": "Rotated out for fresh deals",
   "lastSeenPrice": 26.5
+ },
+ {
+  "id": 1149,
+  "title": "Little Tikes Cozy Coupe 30th Anniversary Ride-On Car For $38.49 From Amazon",
+  "category": "kids",
+  "fc": "Kids",
+  "price": 38.49,
+  "originalPrice": 64.99,
+  "discount": 41,
+  "image": "https://m.media-amazon.com/images/I/51KQC8H1QaL._AC_SL1000_.jpg",
+  "url": "https://www.amazon.com/dp/B001NQHN7S?tag=commoncents0050-20",
+  "description": "The ride-on every childhood remembers — parent-push handle and removable floorboard for little ones, foot-powered cruising once they grow. Built for ages 18 months to 5 years, indoors or out.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": 1795777989568,
+  "source": "hip2save",
+  "aud": "all",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/71HQhIs4SYL._AC_SL1000_.jpg",
+   "https://m.media-amazon.com/images/I/51rRhWwE8wL._AC_SL1000_.jpg",
+   "https://m.media-amazon.com/images/I/71M-ZeQVQKL._AC_SL1000_.jpg",
+   "https://m.media-amazon.com/images/I/517XyPakbVL._AC_SL1000_.jpg",
+   "https://m.media-amazon.com/images/I/511kDkCOdNL._AC_SL1000_.jpg"
+  ],
+  "shelvedAt": "2026-11-27",
+  "shelvedReason": "Price rose to $83.02 from $38.49 with no list price — jump over 25%",
+  "lastSeenPrice": 83.02
  }
 ]
