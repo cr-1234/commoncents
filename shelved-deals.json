@@ -1574,5 +1574,27 @@
   "shelvedAt": "2026-11-27",
   "shelvedReason": "Price rose to $83.02 from $38.49 with no list price — jump over 25%",
   "lastSeenPrice": 83.02
+ },
+ {
+  "id": 1134,
+  "title": "EGO POWER+ Nexus 1400W Portable Inverter/Generator For $579 From Amazon",
+  "category": "tools",
+  "fc": "Tools",
+  "price": 579,
+  "originalPrice": 699,
+  "discount": 17,
+  "image": "https://m.media-amazon.com/images/I/715Fi53UOXL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0GLS49B9N?tag=commoncents0050-20",
+  "description": "A 1,400W portable inverter that runs off any EGO 56V battery and doubles as a fast battery charger, with AC, USB-A, and USB-C ports. $100 off its $699 list for Black Friday — quiet, fume-free backup power for home or camp.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": 1795642332964,
+  "source": "9to5toys",
+  "aud": "all",
+  "shelvedAt": "2026-11-27",
+  "shelvedReason": "Unavailable on Amazon — no price and no buy box",
+  "lastSeenPrice": null
  }
 ]
