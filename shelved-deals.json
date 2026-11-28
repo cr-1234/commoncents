@@ -1646,5 +1646,71 @@
   "shelvedAt": "2026-11-27",
   "shelvedReason": "Discount under 12%",
   "lastSeenPrice": 32.99
+ },
+ {
+  "id": 1089,
+  "title": "Contigo Cortland Chill 2.0 24oz Stainless Steel Water Bottle Lavender For $12.99 From Amazon",
+  "category": "household",
+  "fc": "Household",
+  "price": 12.99,
+  "originalPrice": 28.49,
+  "discount": 54,
+  "image": "https://m.media-amazon.com/images/I/41l8nPMuY+L._AC_SL1200_.jpg",
+  "url": "https://www.amazon.com/dp/B092MXJFNS?tag=commoncents0050-20",
+  "description": "Contigo's Cortland Chill 2.0 keeps drinks cold for 24 hours and seals shut with one push of the AUTOSEAL button — no spills in the bag or the cup holder. The lavender 24oz bottle is $12.99, over half off.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-13T10:28:08Z",
+  "source": "slickdeals",
+  "aud": "all",
+  "shelvedAt": "2026-11-27",
+  "shelvedReason": "Unavailable on Amazon — no price and no buy box",
+  "lastSeenPrice": null
+ },
+ {
+  "id": 1122,
+  "title": "Instant Pot Duo 6-Qt 7-in-1 Electric Pressure Cooker For $59.99 From Amazon",
+  "category": "household",
+  "fc": "Household",
+  "price": 59.99,
+  "originalPrice": 109.99,
+  "discount": 45,
+  "image": "https://m.media-amazon.com/images/I/71Z401LjFFL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B00FLYWNYQ?tag=commoncents0050-20",
+  "description": "The original 7-in-1 cooker: pressure cooker, slow cooker, rice cooker, steamer, sauté pan, yogurt maker and food warmer in one stainless-steel pot. At $59.99 it's 45% off its $109.99 list.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": 1795498011126,
+  "source": "slickdeals",
+  "aud": "all",
+  "shelvedAt": "2026-11-27",
+  "shelvedReason": "Unavailable on Amazon — no price and no buy box",
+  "lastSeenPrice": null
+ },
+ {
+  "id": 1139,
+  "title": "Sol de Janeiro Cheirosa 76 Hair And Body Fragrance Mist 3oz For $12.35 From Amazon",
+  "category": "beauty",
+  "fc": "Beauty",
+  "price": 12.35,
+  "originalPrice": 26,
+  "discount": 53,
+  "image": "https://m.media-amazon.com/images/I/61Wh7mGBe2L._SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0D6ZVJ3K2?tag=commoncents0050-20",
+  "description": "The amber-floral mist with midnight jasmine and vanilla crème — a TSA-friendly 3oz bottle at its lowest price ever from Amazon.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": 1795693900431,
+  "source": "dansdeals",
+  "aud": "women",
+  "shelvedAt": "2026-11-27",
+  "shelvedReason": "Unavailable on Amazon — no price and no buy box",
+  "lastSeenPrice": null
  }
 ]
