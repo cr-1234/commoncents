@@ -1712,5 +1712,78 @@
   "shelvedAt": "2026-11-27",
   "shelvedReason": "Unavailable on Amazon — no price and no buy box",
   "lastSeenPrice": null
+ },
+ {
+  "id": 1021,
+  "title": "Ninja UltraCrush Professional 1000W Blender With 72oz. Pitcher For $68.99 Shipped From Amazon",
+  "category": "household",
+  "fc": "Household",
+  "price": 68.99,
+  "originalPrice": 109.99,
+  "discount": 37,
+  "image": "https://i.dansdeals.com/wp-content/uploads/2026/11/02143624/product-B0GH8PVFHS.jpg",
+  "url": "https://www.amazon.com/dp/B0GH8PVFHS?tag=commoncents0050-20",
+  "description": "A 1,000-watt Ninja with a big 72oz pitcher that crushes ice and frozen fruit for smoothies, shakes, and frozen drinks. Priced like the basic models, well under its $109.99 list.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-20T15:31:24.564Z",
+  "source": "dansdeals",
+  "shelvedAt": "2026-11-28",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 68.99
+ },
+ {
+  "id": 1102,
+  "title": "Grace & Stella Luscious Lip Butter With Keychain Charm For $7.95 From Amazon",
+  "category": "beauty",
+  "fc": "Beauty",
+  "price": 7.95,
+  "originalPrice": 13.95,
+  "discount": 43,
+  "image": "https://m.media-amazon.com/images/I/616SoB72gsL._SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0H2Z9MLPF?tag=commoncents0050-20",
+  "description": "A sheer, glossy lip butter in a toffee-apple shade that keeps lips soft and hydrated, with vitamin E and a cute heart-and-rainbow charm keychain on the tube. At $7.95 it's 43% off its $13.95 list.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-21T00:36:09.015Z",
+  "source": "hip2save",
+  "aud": "women",
+  "dealNote": "Opt for Subscribe & Save to get it for $7.15 (10% off) or $6.76 (15% off with 5+ subscriptions).",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/61HhHc9Z47L._SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-28",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 7.95
+ },
+ {
+  "id": 1043,
+  "title": "Magic Bullet Personal Blender With 22oz To-Go Cups For $26.47 From Amazon",
+  "category": "household",
+  "fc": "Household",
+  "price": 26.47,
+  "originalPrice": 39.99,
+  "discount": 34,
+  "image": "https://m.media-amazon.com/images/I/61Wnq-sBVYL._AC_SL1500_.jpg",
+  "url": "https://www.amazon.com/dp/B0BPDG1331?tag=commoncents0050-20",
+  "description": "The classic personal blender that turns fruit, ice, and yogurt into a smoothie in seconds. Two to-go cups included, so breakfast is ready to walk out the door.",
+  "votes": {
+   "up": 0,
+   "down": 0
+  },
+  "ts": "2026-11-10T12:25:00Z",
+  "source": "techbargains",
+  "aud": "all",
+  "gallery": [
+   "https://m.media-amazon.com/images/I/61+8dMqr4vL._AC_SL1500_.jpg",
+   "https://m.media-amazon.com/images/I/61yy70+i+dL._AC_SL1500_.jpg"
+  ],
+  "shelvedAt": "2026-11-28",
+  "shelvedReason": "Rotated out for fresh deals",
+  "lastSeenPrice": 26.47
  }
 ]
